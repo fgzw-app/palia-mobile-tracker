@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#282033">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Palia Weekly Tracker</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: #18141F; color: #F3EEF9; padding-bottom: 40px; }
+    header { background: #282033; padding: 16px; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #3B304C; }
+    h1 { font-size: 1.2rem; font-weight: 700; color: #FFF; display: flex; align-items: center; justify-content: space-between; }
+    .btn-reset { font-size: 0.75rem; background: #3B304C; color: #DDD; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+    .search-box { width: 100%; margin-top: 10px; padding: 10px 14px; background: #18141F; border: 1px solid #3B304C; border-radius: 8px; color: #FFF; font-size: 0.95rem; }
+    .container { padding: 14px; display: flex; flex-direction: column; gap: 12px; max-width: 600px; margin: 0 auto; }
+    .card { background: #231C2D; border: 1px solid #352B44; border-radius: 12px; padding: 14px; }
+    .card-top { display: flex; justify-content: space-between; margin-bottom: 10px; align-items: baseline; }
+    .villager-name { font-weight: 700; font-size: 1.05rem; color: #FFF; }
+    .villager-loc { font-size: 0.8rem; color: #E5A958; }
+    .wants-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+    .badge { background: #322741; border: 1px solid #433557; color: #DED3EC; font-size: 0.82rem; padding: 6px 10px; border-radius: 8px; cursor: pointer; user-select: none; }
+    .badge.done { background: #1B4D3E; border-color: #2E7963; color: #A6EDD8; text-decoration: line-through; opacity: 0.7; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>
+    <span>🌱 Palia Wants Tracker</span>
+    <button class="btn-reset" onclick="resetAll()">Reset Week</button>
+  </h1>
+  <input type="text" id="search" class="search-box" placeholder="Search villager or item..." oninput="renderList()">
+</header>
+
+<div class="container" id="list"></div>
+
+<script>
+  // Core Villagers & Wants data
+  const VILLAGERS = [
+    { name: "Ashura", loc: "Kilima Tavern", wants: ["Hearty Veggie Soup", "Sundrop Lily", "Saffron", "Kilima Catfish"] },
+    { name: "Tish", loc: "Furniture Store", wants: ["Silk Thread", "Treasure Chest", "Palium Bar", "Briar Daisy"] },
+    { name: "Reth", loc: "Kilima Tavern", wants: ["Grilled Meat", "Sweet Leaf", "Dari Cloves", "Bacon Mushrooms"] },
+    { name: "Jina", loc: "Mirror Pond Ruins", wants: ["Amber Beetle", "Flint", "Green Pearl", "Silver Ore"] },
+    { name: "Hassian", loc: "Kilima Outskirts", wants: ["Sernuk Antler", "Standard Arrow", "Chapaa Tail", "Brightshroom"] },
+    { name: "Kenyatta", loc: "Town Hall", wants: ["Chapaa Meat", "Knapweed", "Forked Butterfly", "Flow-Infused Wood"] },
+    { name: "Zeki", loc: "General Store", wants: ["Fish Stew", "Gold Ore", "Sashimi", "Pearl"] },
+    { name: "Hodari", loc: "Bahari Bay", wants: ["Copper Bar", "Iron Ore", "Pickled Carrots", "Leather"] },
+    { name: "Auni", loc: "Kilima Valley", wants: ["Spotted Stinkbug", "Apple", "Silk Thread", "Dragon's Beard Peat"] },
+    { name: "Badruu", loc: "Daiya Family Farm", wants: ["Carrot", "Fertilizer", "Onion", "Potato"] }
+  ];
+
+  let state = JSON.parse(localStorage.getItem('palia_saved_wants') || '{}');
+
+  function toggle(id) {
+    state[id] = !state[id];
+    localStorage.setItem('palia_saved_wants', JSON.stringify(state));
+    renderList();
+  }
+
+  function resetAll() {
+    if (confirm("Reset all gifts for the week?")) {
+      state = {};
+      localStorage.removeItem('palia_saved_wants');
+      renderList();
+    }
+  }
+
+  function renderList() {
+    const q = document.getElementById('search').value.toLowerCase();
+    const container = document.getElementById('list');
+    
+    container.innerHTML = VILLAGERS
+      .filter(v => v.name.toLowerCase().includes(q) || v.wants.some(w => w.toLowerCase().includes(q)))
+      .map(v => `
+        <div class="card">
+          <div class="card-top">
+            <div class="villager-name">${v.name}</div>
+            <div class="villager-loc">${v.loc}</div>
+          </div>
+          <div class="wants-grid">
+            ${v.wants.map(w => {
+              const key = `${v.name}-${w}`;
+              const isDone = !!state[key];
+              return `<div class="badge ${isDone ? 'done' : ''}" onclick="toggle('${key}')">${isDone ? '✓' : '🎁'} ${w}</div>`;
+            }).join('')}
+          </div>
+        </div>
+      `).join('');
+  }
+
+  renderList();
+</script>
+</body>
+</html>
