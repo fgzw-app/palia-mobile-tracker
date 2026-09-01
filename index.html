@@ -3,67 +3,195 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#282033">
+  <meta name="theme-color" content="#1F1829">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Palia Weekly Tracker</title>
   <link rel="manifest" href="manifest.json">
   <style>
+    :root {
+      --bg: #130E1C;
+      --card-bg: #1E162B;
+      --card-border: #2D2240;
+      --text: #F2ECFB;
+      --text-muted: #9E8DB6;
+      --accent: #E5A853;
+      --badge-like: #2C213E;
+      --badge-love: #441A33;
+      --done-bg: #174E3E;
+      --done-border: #288066;
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: #18141F; color: #F3EEF9; padding-bottom: 40px; }
-    header { background: #282033; padding: 16px; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #3B304C; }
-    h1 { font-size: 1.2rem; font-weight: 700; color: #FFF; display: flex; align-items: center; justify-content: space-between; }
-    .btn-reset { font-size: 0.75rem; background: #3B304C; color: #DDD; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
-    .search-box { width: 100%; margin-top: 10px; padding: 10px 14px; background: #18141F; border: 1px solid #3B304C; border-radius: 8px; color: #FFF; font-size: 0.95rem; }
-    .container { padding: 14px; display: flex; flex-direction: column; gap: 12px; max-width: 600px; margin: 0 auto; }
-    .card { background: #231C2D; border: 1px solid #352B44; border-radius: 12px; padding: 14px; }
-    .card-top { display: flex; justify-content: space-between; margin-bottom: 10px; align-items: baseline; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 50px; }
+    
+    header {
+      background: #1F1829;
+      padding: 14px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--card-border);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .header-top { display: flex; justify-content: space-between; align-items: center; }
+    h1 { font-size: 1.15rem; font-weight: 700; color: #FFF; display: flex; align-items: center; gap: 6px; }
+    .btn-reset {
+      font-size: 0.75rem;
+      background: #312347;
+      color: #D3C3EB;
+      border: 1px solid var(--card-border);
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-reset:active { background: #443261; }
+
+    .search-box {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px 14px;
+      background: var(--bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      color: #FFF;
+      font-size: 0.95rem;
+      outline: none;
+    }
+    .search-box:focus { border-color: var(--accent); }
+
+    .stats-bar {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .container {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 650px;
+      margin: 0 auto;
+    }
+    
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px;
+      transition: opacity 0.2s;
+    }
+    .card.all-done { opacity: 0.55; border-color: var(--done-border); }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .villager-title { display: flex; align-items: baseline; gap: 8px; }
     .villager-name { font-weight: 700; font-size: 1.05rem; color: #FFF; }
-    .villager-loc { font-size: 0.8rem; color: #E5A958; }
-    .wants-grid { display: flex; flex-wrap: wrap; gap: 6px; }
-    .badge { background: #322741; border: 1px solid #433557; color: #DED3EC; font-size: 0.82rem; padding: 6px 10px; border-radius: 8px; cursor: pointer; user-select: none; }
-    .badge.done { background: #1B4D3E; border-color: #2E7963; color: #A6EDD8; text-decoration: line-through; opacity: 0.7; }
+    .villager-loc { font-size: 0.78rem; color: var(--accent); }
+    .card-counter { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+
+    .wants-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 8px;
+    }
+
+    .badge {
+      background: var(--badge-like);
+      border: 1px solid #3F3057;
+      color: #DDD0F0;
+      font-size: 0.8rem;
+      padding: 8px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 6px;
+      line-height: 1.2;
+    }
+    .badge.love {
+      background: var(--badge-love);
+      border-color: #64284D;
+      color: #FFD3E8;
+    }
+    .badge.done {
+      background: var(--done-bg) !important;
+      border-color: var(--done-border) !important;
+      color: #A3F3DB !important;
+      text-decoration: line-through;
+      opacity: 0.65;
+    }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>
-    <span>🌱 Palia Wants Tracker</span>
+  <div class="header-top">
+    <h1><span>✨ Palia Guide</span></h1>
     <button class="btn-reset" onclick="resetAll()">Reset Week</button>
-  </h1>
+  </div>
   <input type="text" id="search" class="search-box" placeholder="Search villager or item..." oninput="renderList()">
+  <div class="stats-bar">
+    <span id="progress-text">Completed: 0 / 0</span>
+    <span>Source: Paliapedia</span>
+  </div>
 </header>
 
 <div class="container" id="list"></div>
 
 <script>
-  // Core Villagers & Wants data
+  // Complete Paliapedia Weekly Wants Dataset
   const VILLAGERS = [
-    { name: "Ashura", loc: "Kilima Tavern", wants: ["Hearty Veggie Soup", "Sundrop Lily", "Saffron", "Kilima Catfish"] },
-    { name: "Tish", loc: "Furniture Store", wants: ["Silk Thread", "Treasure Chest", "Palium Bar", "Briar Daisy"] },
-    { name: "Reth", loc: "Kilima Tavern", wants: ["Grilled Meat", "Sweet Leaf", "Dari Cloves", "Bacon Mushrooms"] },
-    { name: "Jina", loc: "Mirror Pond Ruins", wants: ["Amber Beetle", "Flint", "Green Pearl", "Silver Ore"] },
-    { name: "Hassian", loc: "Kilima Outskirts", wants: ["Sernuk Antler", "Standard Arrow", "Chapaa Tail", "Brightshroom"] },
-    { name: "Kenyatta", loc: "Town Hall", wants: ["Chapaa Meat", "Knapweed", "Forked Butterfly", "Flow-Infused Wood"] },
-    { name: "Zeki", loc: "General Store", wants: ["Fish Stew", "Gold Ore", "Sashimi", "Pearl"] },
-    { name: "Hodari", loc: "Bahari Bay", wants: ["Copper Bar", "Iron Ore", "Pickled Carrots", "Leather"] },
-    { name: "Auni", loc: "Kilima Valley", wants: ["Spotted Stinkbug", "Apple", "Silk Thread", "Dragon's Beard Peat"] },
-    { name: "Badruu", loc: "Daiya Family Farm", wants: ["Carrot", "Fertilizer", "Onion", "Potato"] }
+    { name: "Ashura", loc: "Kilima Tavern", wants: [{name: "Sweet Leaf", love: false}, {name: "Kilima Catfish", love: false}, {name: "Fish Stew", love: true}, {name: "Celebration Cake", love: true}] },
+    { name: "Auni", loc: "Tavern / Kilima Fields", wants: [{name: "Ship Fragments", love: false}, {name: "Garden Mantis", love: false}, {name: "Firebreathing Dragonfly", love: true}, {name: "Blueberry Pie", love: true}] },
+    { name: "Badruu", loc: "Daiya Family Farm", wants: [{name: "Potato Seed", love: false}, {name: "HydratePro Fertilizer", love: false}, {name: "Batterfly Beans", love: true}, {name: "Rice 'n Beans", love: true}] },
+    { name: "Caleri", loc: "Library", wants: [{name: "Crystal Lake Lotus", love: false}, {name: "Heat Root", love: false}, {name: "Bahari Glowbug", love: true}, {name: "Lotus Leaf Tea", love: true}] },
+    { name: "Chayne", loc: "Apothecary", wants: [{name: "Tomato", love: false}, {name: "Wheat Seed", love: false}, {name: "Candied Kopaa Nuts", love: true}, {name: "Cream of Mushroom Soup", love: true}] },
+    { name: "Delaila", loc: "Daiya Family Farm", wants: [{name: "Channel Catfish", love: false}, {name: "QualityUp Fertilizer", love: false}, {name: "Stalking Catfish", love: true}, {name: "Breakfast Skillet", love: true}] },
+    { name: "Einar", loc: "Fisherman's Lagoon", wants: [{name: "Silver Salmon", love: false}, {name: "Spineshell Crab", love: false}, {name: "Charged Cardinal", love: true}, {name: "Long Nosed Unicorn Fish", love: true}] },
+    { name: "Elouisa", loc: "Kilima Village", wants: [{name: "Ship Fragments", love: false}, {name: "Bahari Bee", love: false}, {name: "Raspberry Beetle", love: true}, {name: "Ancient Amber Beetle", love: true}] },
+    { name: "Eshe", loc: "Mayor's Estate", wants: [{name: "Fur", love: false}, {name: "Silk", love: false}, {name: "Petit Fives", love: true}, {name: "Gold Ore", love: true}] },
+    { name: "Hassian", loc: "Kilima Outskirts", wants: [{name: "Congee", love: false}, {name: "Elder Sernuk Antlers", love: false}, {name: "Azure Chapaa Tail", love: true}, {name: "Eleroo Eel", love: true}] },
+    { name: "Hekla", loc: "Mirror Pond Ruins", wants: [{name: "Grilled Fish", love: false}, {name: "Fried Catfish Dinner", love: false}, {name: "Dawnspur Tea", love: true}, {name: "Celebration Cake", love: true}] },
+    { name: "Hodari", loc: "Bahari Bay", wants: [{name: "Copper Ore", love: false}, {name: "Copper Bar", love: false}, {name: "Jadium Ore", love: true}, {name: "Steak Dinner", love: true}] },
+    { name: "Jel", loc: "Tailor Shop", wants: [{name: "Barracuda", love: false}, {name: "Lunar Fairy Moth", love: false}, {name: "Midnight Floatfish", love: true}, {name: "Jewelled Mantis", love: true}] },
+    { name: "Jina", loc: "Mirror Pond Ruins", wants: [{name: "Grilled Mushroom", love: false}, {name: "Glass Pane", love: false}, {name: "Radiant Sunfish", love: true}, {name: "Cream of Mushroom Soup", love: true}] },
+    { name: "Kenli", loc: "Town Hall", wants: [{name: "Chapaa Meat", love: false}, {name: "Striped Chapaa Tail", love: false}, {name: "Azure Chapaa Tail", love: true}, {name: "Muujin Bahari", love: true}] },
+    { name: "Kenyatta", loc: "Town Hall", wants: [{name: "Garden Mantis", love: false}, {name: "Pickled Onions", love: false}, {name: "Lake Shark", love: true}, {name: "Meaty Stir Fry", love: true}] },
+    { name: "Nai'o", loc: "Daiya Family Farm", wants: [{name: "Waterlogged Boot", love: false}, {name: "Fish Stew", love: false}, {name: "Apple Tree Seed", love: true}, {name: "Fruit Smoothie Bowl", love: true}] },
+    { name: "Najuma", loc: "Bahari Bay Workshop", wants: [{name: "Knapweed", love: false}, {name: "Garden Snail", love: false}, {name: "Ancient Wood Plank", love: true}, {name: "Blueberry Pie", love: true}] },
+    { name: "Reth", loc: "Kilima Tavern", wants: [{name: "Spice Sprouts", love: false}, {name: "Largemouth Bass", love: false}, {name: "Kopaa Nuts", love: true}, {name: "Palian Onion Soup", love: true}] },
+    { name: "Sifuu", loc: "Blacksmith Shop", wants: [{name: "Muujin Meat", love: false}, {name: "Pickled Carrots", love: false}, {name: "Beans On Toast", love: true}, {name: "Jadium Ore", love: true}] },
+    { name: "Subira", loc: "Inn (Upstairs)", wants: [{name: "Potato", love: false}, {name: "Grilled Oyster", love: false}, {name: "Ogopuu Skin", love: true}, {name: "Spitfire Cicada", love: true}] },
+    { name: "Tamala", loc: "Bahari Woods", wants: [{name: "Common Field Cricket", love: false}, {name: "Garden Millipede", love: false}, {name: "Palian Betta", love: true}, {name: "Ancient Amber Beetle", love: true}] },
+    { name: "Tau", loc: "Village / Farm", wants: [{name: "Trout Dinner", love: false}, {name: "Heartwood Plank", love: false}, {name: "Lantern Ashwood", love: true}, {name: "Apple", love: true}] },
+    { name: "The Gardener", loc: "Temple of the Roots", wants: [{name: "Plant Fiber", love: false}, {name: "Glow Worm", love: false}, {name: "Flow-Infused Wood", love: true}, {name: "Will-o-wisp Rockhopper", love: true}] },
+    { name: "Tish", loc: "Furniture Store", wants: [{name: "Sundrop Lily", love: false}, {name: "Heartwood Plank", love: false}, {name: "Ashwood Plank", love: true}, {name: "Jadium Bar", love: true}] },
+    { name: "Ulfe", loc: "Bahari Bay", wants: [{name: "Yellow Perch", love: false}, {name: "Platinum Chad", love: false}, {name: "Bluefin Tuna", love: true}, {name: "Crab Gumbo", love: true}] },
+    { name: "Zeki", loc: "General Store", wants: [{name: "Silvery Minnow", love: false}, {name: "Silk", love: false}, {name: "Bronze Bluegill", love: true}, {name: "Black Pearl", love: true}] }
   ];
 
-  let state = JSON.parse(localStorage.getItem('palia_saved_wants') || '{}');
+  let state = JSON.parse(localStorage.getItem('palia_paliapedia_wants') || '{}');
 
   function toggle(id) {
     state[id] = !state[id];
-    localStorage.setItem('palia_saved_wants', JSON.stringify(state));
+    localStorage.setItem('palia_paliapedia_wants', JSON.stringify(state));
     renderList();
   }
 
   function resetAll() {
-    if (confirm("Reset all gifts for the week?")) {
+    if (confirm("Reset all tracked gifts for the week?")) {
       state = {};
-      localStorage.removeItem('palia_saved_wants');
+      localStorage.removeItem('palia_paliapedia_wants');
       renderList();
     }
   }
@@ -71,24 +199,55 @@
   function renderList() {
     const q = document.getElementById('search').value.toLowerCase();
     const container = document.getElementById('list');
-    
-    container.innerHTML = VILLAGERS
-      .filter(v => v.name.toLowerCase().includes(q) || v.wants.some(w => w.toLowerCase().includes(q)))
-      .map(v => `
-        <div class="card">
+
+    let totalGifts = 0;
+    let completedGifts = 0;
+
+    const filtered = VILLAGERS.filter(v => 
+      v.name.toLowerCase().includes(q) || 
+      v.loc.toLowerCase().includes(q) ||
+      v.wants.some(w => w.name.toLowerCase().includes(q))
+    );
+
+    container.innerHTML = filtered.map(v => {
+      let vDoneCount = 0;
+      
+      const wantsHtml = v.wants.map(w => {
+        totalGifts++;
+        const key = `${v.name}-${w.name}`;
+        const isDone = !!state[key];
+        if (isDone) {
+          completedGifts++;
+          vDoneCount++;
+        }
+        const icon = isDone ? '✓' : (w.love ? '❤️' : '👍');
+        return `
+          <div class="badge ${w.love ? 'love' : ''} ${isDone ? 'done' : ''}" onclick="toggle('${key}')">
+            <span>${icon}</span>
+            <span>${w.name}</span>
+          </div>
+        `;
+      }).join('');
+
+      const isAllDone = vDoneCount === v.wants.length;
+
+      return `
+        <div class="card ${isAllDone ? 'all-done' : ''}">
           <div class="card-top">
-            <div class="villager-name">${v.name}</div>
-            <div class="villager-loc">${v.loc}</div>
+            <div class="villager-title">
+              <span class="villager-name">${v.name}</span>
+              <span class="villager-loc">${v.loc}</span>
+            </div>
+            <span class="card-counter">${vDoneCount} / ${v.wants.length}</span>
           </div>
           <div class="wants-grid">
-            ${v.wants.map(w => {
-              const key = `${v.name}-${w}`;
-              const isDone = !!state[key];
-              return `<div class="badge ${isDone ? 'done' : ''}" onclick="toggle('${key}')">${isDone ? '✓' : '🎁'} ${w}</div>`;
-            }).join('')}
+            ${wantsHtml}
           </div>
         </div>
-      `).join('');
+      `;
+    }).join('');
+
+    document.getElementById('progress-text').innerText = `Completed: ${completedGifts} / ${totalGifts}`;
   }
 
   renderList();
