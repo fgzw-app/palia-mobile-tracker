@@ -262,7 +262,7 @@
       <button class="btn-reset" id="reset-btn">Reset</button>
     </div>
   </div>
-  <input type="text" id="search" class="search-box" placeholder="Search villager, fish, location, or bait..." autocomplete="off">
+  <input type="text" id="search" class="search-box" placeholder="Search villager or item..." autocomplete="off">
   
   <div id="fish-filters" style="display: none; flex-direction: column;">
     <div class="filter-scroll">
@@ -309,7 +309,13 @@
   let fishZoneFilter = 'all';
   let fishBaitFilter = 'all';
 
-  // 123 Palia Fish Database strictly populated from Palia_Fish_Location_and_Bait_Guide
+  // Independent Search States per Tab
+  const searchStates = {
+    weekly: '',
+    fish: ''
+  };
+
+  // 123 Palia Fish Database
   const FISH_DATABASE = [
     { name: "Albino Eel", zone: "Caves", bait: "Worms", time: "Anytime", rarity: "common" },
     { name: "Alligator Gar", zone: "Kilima Lake", bait: "Glow Worms", time: "Anytime", rarity: "common" },
@@ -522,15 +528,21 @@
     
     const filters = document.getElementById('fish-filters');
     const resetBtn = document.getElementById('reset-btn');
+    const searchInput = document.getElementById('search');
+
+    // Restore search input value from isolated tab state
+    searchInput.value = searchStates[tab] || '';
 
     if (tab === 'weekly') {
       document.getElementById('page-title').innerHTML = '<span>✨ Weekly Wants</span>';
       document.getElementById('sub-info').innerText = 'Reset: Mon 5:00 AM (SGT)';
+      searchInput.placeholder = 'Search villager or item...';
       filters.style.display = 'none';
       resetBtn.style.display = 'block';
     } else {
-      document.getElementById('page-title').innerHTML = '<span>🎣 Fish Compendium</span>';
+      document.getElementById('page-title').innerHTML = '<span>🎣 Fish Guide</span>';
       document.getElementById('sub-info').innerText = '123 Species Directory';
+      searchInput.placeholder = 'Search fish, location, or bait...';
       filters.style.display = 'flex';
       resetBtn.style.display = 'none';
     }
@@ -624,7 +636,7 @@
   }
 
   function renderList() {
-    const q = document.getElementById('search').value.toLowerCase();
+    const q = (searchStates[currentTab] || '').toLowerCase();
     const container = document.getElementById('list');
 
     if (currentTab === 'weekly') {
@@ -738,7 +750,10 @@
   });
 
   document.getElementById('reset-btn').addEventListener('click', resetAll);
-  document.getElementById('search').addEventListener('input', renderList);
+  document.getElementById('search').addEventListener('input', (e) => {
+    searchStates[currentTab] = e.target.value;
+    renderList();
+  });
 
   async function loadData() {
     try {
