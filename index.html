@@ -254,11 +254,11 @@
   <div id="fish-filters" class="filter-scroll" style="display: none;">
     <button class="filter-pill active" onclick="setFishFilter('all')">All Water</button>
     <button class="filter-pill" onclick="setFishFilter('Kilima Lake')">Kilima Lake</button>
-    <button class="filter-pill" onclick="setFishFilter('Kilima River')">Kilima River</button>
+    <button class="filter-pill" onclick="setFishFilter('Kilima Rivers')">Kilima Rivers</button>
     <button class="filter-pill" onclick="setFishFilter('Bahari Coast')">Bahari Coast</button>
-    <button class="filter-pill" onclick="setFishFilter('Bahari River')">Bahari River</button>
+    <button class="filter-pill" onclick="setFishFilter('Bahari Rivers')">Bahari Rivers</button>
     <button class="filter-pill" onclick="setFishFilter('Caves')">Caves</button>
-    <button class="filter-pill" onclick="setFishFilter('Pond')">Ponds</button>
+    <button class="filter-pill" onclick="setFishFilter('Ponds')">Ponds</button>
   </div>
 
   <div class="stats-bar">
@@ -284,7 +284,7 @@
   let currentTab = 'weekly';
   let fishZoneFilter = 'all';
 
-  // Canonical Palia Wiki (palia.wiki.gg/wiki/Fish) Database
+  // 100% Strict Palia Wiki (palia.wiki.gg/wiki/Fish) Database
   const FISH_DATABASE = [
     // --- KILIMA LAKE ---
     { name: "Albino Eel", zone: "Kilima Lake", bait: "Worm", time: "Morning / Evening / Night", rarity: "uncommon", vault: null },
@@ -295,6 +295,7 @@
     { name: "Chub", zone: "Kilima Lake", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
     { name: "Enchanted Pupfish", zone: "Kilima Lake", bait: "Glow Worm", time: "Any Time", rarity: "rare", vault: null },
     { name: "Gila Trout", zone: "Kilima Lake", bait: "Worm", time: "Day / Evening", rarity: "uncommon", vault: null },
+    { name: "Golden Salmon", zone: "Kilima Lake", bait: "Worm", time: "Morning / Day", rarity: "uncommon", vault: null },
     { name: "Kilima Grayling", zone: "Kilima Lake", bait: "No Bait", time: "Morning / Day / Evening", rarity: "common", vault: null },
     { name: "Kilima Redfin", zone: "Kilima Lake", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: null },
     { name: "Largemouth Bass", zone: "Kilima Lake", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
@@ -305,32 +306,46 @@
     { name: "Pikemini", zone: "Kilima Lake", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
     { name: "Platinum Chad", zone: "Kilima Lake", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: null },
     { name: "Prism Trout", zone: "Kilima Lake", bait: "Worm", time: "Morning / Day", rarity: "rare", vault: null },
+    { name: "Radiant Sunfish", zone: "Kilima Lake", bait: "Worm", time: "Day", rarity: "rare", vault: null },
     { name: "Rosy Bitterling", zone: "Kilima Lake", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
     { name: "Shimmerfin", zone: "Kilima Lake", bait: "Worm", time: "Any Time", rarity: "rare", vault: "Vault of the Waves" },
-    { name: "Silver Salmon", zone: "Kilima River", bait: "No Bait", time: "Evening / Night", rarity: "common", vault: "Vault of the Waves" },
+    { name: "Silver Salmon", zone: "Kilima Lake", bait: "No Bait", time: "Evening / Night", rarity: "common", vault: null },
+    { name: "Spotted Bullhead", zone: "Kilima Lake", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Stalking Catfish", zone: "Kilima Lake", bait: "Glow Worm", time: "Evening / Night", rarity: "rare", vault: null },
     { name: "Striped Sturgeon", zone: "Kilima Lake", bait: "Worm", time: "Evening / Night", rarity: "uncommon", vault: null },
+    { name: "Yellow Perch", zone: "Kilima Lake", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
 
     // --- KILIMA RIVERS ---
-    { name: "Flametongue Ray", zone: "Kilima River", bait: "Glow Worm", time: "Morning / Day", rarity: "epic", vault: "Vault of the Flames" },
-    { name: "Indigo Lamprey", zone: "Kilima River", bait: "Worm", time: "Evening / Night", rarity: "rare", vault: null },
-    { name: "Kilima Catfish", zone: "Kilima River", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
-    { name: "Radiant Sunfish", zone: "Kilima River", bait: "Worm", time: "Day", rarity: "rare", vault: null },
-    { name: "Red-bellied Piranha", zone: "Kilima River", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: null },
-    { name: "River Lamprey", zone: "Kilima River", bait: "Worm", time: "Evening / Night", rarity: "uncommon", vault: null },
-    { name: "Silvery Minnow", zone: "Kilima River", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Alligator Gar", zone: "Kilima Rivers", bait: "Glow Worm", time: "Any Time", rarity: "rare", vault: null },
+    { name: "Crucian Carp", zone: "Kilima Rivers", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Energized Piranha", zone: "Kilima Rivers", bait: "Worm", time: "Any Time", rarity: "rare", vault: null },
+    { name: "Flametongue Ray", zone: "Kilima Rivers", bait: "Glow Worm", time: "Morning / Day", rarity: "epic", vault: "Vault of the Flames" },
+    { name: "Giant Kilima Stingray", zone: "Kilima Rivers", bait: "Glow Worm", time: "Morning / Day", rarity: "epic", vault: "Vault of the Waves" },
+    { name: "Indigo Lamprey", zone: "Kilima Rivers", bait: "Worm", time: "Evening / Night", rarity: "rare", vault: null },
+    { name: "Kilima Catfish", zone: "Kilima Rivers", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Paddlefish", zone: "Kilima Rivers", bait: "Worm", time: "Morning / Day", rarity: "uncommon", vault: null },
+    { name: "Rainbow Trout", zone: "Kilima Rivers", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Red-bellied Piranha", zone: "Kilima Rivers", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: null },
+    { name: "River Lamprey", zone: "Kilima Rivers", bait: "Worm", time: "Evening / Night", rarity: "uncommon", vault: null },
+    { name: "Striped Dace", zone: "Kilima Rivers", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
 
-    // --- PONDS (Farm, Village & Home Plot) ---
-    { name: "Cantankerous Koi", zone: "Pond", bait: "No Bait", time: "Day", rarity: "uncommon", vault: null },
-    { name: "Giant Goldfish", zone: "Pond", bait: "Glow Worm", time: "Any Time", rarity: "epic", vault: "Vault of the Waves" },
-    { name: "Goldfish", zone: "Pond", bait: "Glow Worm", time: "Any Time", rarity: "rare", vault: null },
-    { name: "Mottled Goby", zone: "Pond", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: null },
-    { name: "Mudminnow", zone: "Pond", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
-    { name: "Scarlet Koi", zone: "Pond", bait: "No Bait", time: "Any Time", rarity: "uncommon", vault: null },
-    { name: "Smallmouth Bass", zone: "Pond", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
-    { name: "Spotted Bullhead", zone: "Pond", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
-    { name: "Stalking Catfish", zone: "Pond", bait: "Glow Worm", time: "Evening / Night", rarity: "rare", vault: null },
+    // --- BAHARI RIVERS ---
+    { name: "Bahari Pike", zone: "Bahari Rivers", bait: "No Bait", time: "Morning / Day / Evening", rarity: "common", vault: null },
+    { name: "Chainperch", zone: "Bahari Rivers", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: null },
+    { name: "Char", zone: "Bahari Rivers", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: null },
+    { name: "Cutthroat Trout", zone: "Bahari Rivers", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: null },
+    { name: "Dawn Trout", zone: "Bahari Rivers", bait: "No Bait", time: "Morning", rarity: "uncommon", vault: null },
+    { name: "Fathead Minnow", zone: "Bahari Rivers", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Honey Loach", zone: "Bahari Rivers", bait: "No Bait", time: "Day / Evening / Night", rarity: "uncommon", vault: null },
+    { name: "Kilima Striped Bass", zone: "Bahari Rivers", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Rock Bass", zone: "Bahari Rivers", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Silvery Minnow", zone: "Bahari Rivers", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Stormray", zone: "Bahari Rivers", bait: "Glow Worm", time: "Morning / Evening", rarity: "epic", vault: "Vault of the Waves" },
+    { name: "Swordfin Eel", zone: "Bahari Rivers", bait: "No Bait", time: "Evening / Night", rarity: "uncommon", vault: null },
+    { name: "Thundering Eel", zone: "Bahari Rivers", bait: "Worm", time: "Any Time", rarity: "rare", vault: null },
+    { name: "Willow Lamprey", zone: "Bahari Rivers", bait: "Worm", time: "Night", rarity: "uncommon", vault: null },
 
-    // --- BAHARI COAST (Ocean) ---
+    // --- BAHARI COAST ---
     { name: "Bahari Bream", zone: "Bahari Coast", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: null },
     { name: "Barracuda", zone: "Bahari Coast", bait: "No Bait", time: "Evening / Night", rarity: "uncommon", vault: null },
     { name: "Black Sea Bass", zone: "Bahari Coast", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
@@ -339,7 +354,6 @@
     { name: "Blue Spotted Ray", zone: "Bahari Coast", bait: "Worm", time: "Morning / Day", rarity: "rare", vault: null },
     { name: "Cactus Moray", zone: "Bahari Coast", bait: "Glow Worm", time: "Morning / Night", rarity: "rare", vault: null },
     { name: "Duskwing Butterflyfish", zone: "Bahari Coast", bait: "Worm", time: "Evening", rarity: "uncommon", vault: null },
-    { name: "Giant Kilima Stingray", zone: "Bahari Coast", bait: "Glow Worm", time: "Morning / Day", rarity: "epic", vault: "Vault of the Waves" },
     { name: "Golden Dory", zone: "Bahari Coast", bait: "Worm", time: "Morning / Day", rarity: "uncommon", vault: null },
     { name: "Grimalkin Fish", zone: "Bahari Coast", bait: "No Bait", time: "Morning / Evening / Night", rarity: "common", vault: null },
     { name: "Long Nosed Unicorn Fish", zone: "Bahari Coast", bait: "Glow Worm", time: "Day", rarity: "epic", vault: "Vault of the Waves" },
@@ -347,25 +361,7 @@
     { name: "Sardine", zone: "Bahari Coast", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
     { name: "Yellowfin Tuna", zone: "Bahari Coast", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
 
-    // --- BAHARI RIVERS ---
-    { name: "Alligator Gar", zone: "Bahari River", bait: "Glow Worm", time: "Any Time", rarity: "rare", vault: null },
-    { name: "Bahari Pike", zone: "Bahari River", bait: "No Bait", time: "Morning / Day / Evening", rarity: "common", vault: null },
-    { name: "Chainperch", zone: "Bahari River", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: null },
-    { name: "Char", zone: "Bahari River", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: null },
-    { name: "Cutthroat Trout", zone: "Bahari River", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: null },
-    { name: "Dawn Trout", zone: "Bahari River", bait: "No Bait", time: "Morning", rarity: "uncommon", vault: null },
-    { name: "Fathead Minnow", zone: "Bahari River", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
-    { name: "Honey Loach", zone: "Bahari River", bait: "No Bait", time: "Day / Evening / Night", rarity: "uncommon", vault: null },
-    { name: "Kilima Striped Bass", zone: "Bahari River", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
-    { name: "Paddlefish", zone: "Bahari River", bait: "Worm", time: "Morning / Day", rarity: "uncommon", vault: null },
-    { name: "Rock Bass", zone: "Bahari River", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
-    { name: "Stormray", zone: "Bahari River", bait: "Glow Worm", time: "Morning / Evening", rarity: "epic", vault: "Vault of the Waves" },
-    { name: "Swordfin Eel", zone: "Bahari River", bait: "No Bait", time: "Evening / Night", rarity: "uncommon", vault: null },
-    { name: "Thundering Eel", zone: "Bahari River", bait: "Worm", time: "Any Time", rarity: "rare", vault: null },
-    { name: "Willow Lamprey", zone: "Bahari River", bait: "Worm", time: "Night", rarity: "uncommon", vault: null },
-    { name: "Yellow Perch", zone: "Bahari River", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
-
-    // --- CAVES / UNDERGROUND (Pavel Mines & Black Market) ---
+    // --- CAVES & THE UNDERGROUND ---
     { name: "Bat Ray", zone: "Caves", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: null },
     { name: "Blobfish", zone: "Caves", bait: "Glow Worm", time: "Any Time", rarity: "rare", vault: null },
     { name: "Crimson Fangtooth", zone: "Caves", bait: "Worm", time: "Any Time", rarity: "rare", vault: null },
@@ -375,8 +371,27 @@
     { name: "Manglerfish", zone: "Caves", bait: "Worm", time: "Any Time", rarity: "rare", vault: null },
     { name: "Midnight Floatfish", zone: "Caves", bait: "Glow Worm", time: "Night", rarity: "rare", vault: "Vault of the Waves" },
     { name: "Mutated Angler", zone: "Caves", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: "Vault of the Waves" },
+    { name: "Stonefish", zone: "Caves", bait: "Glow Worm", time: "Any Time", rarity: "epic", vault: null },
     { name: "Umbran Carp", zone: "Caves", bait: "No Bait", time: "Any Time", rarity: "uncommon", vault: null },
-    { name: "Void Ray", zone: "Caves", bait: "Glow Worm", time: "Morning / Day / Evening", rarity: "epic", vault: "Vault of the Flames" }
+    { name: "Void Ray", zone: "Caves", bait: "Glow Worm", time: "Morning / Day / Evening", rarity: "epic", vault: "Vault of the Flames" },
+
+    // --- PONDS ---
+    { name: "Cantankerous Koi", zone: "Ponds", bait: "No Bait", time: "Day", rarity: "uncommon", vault: null },
+    { name: "Cloudfish", zone: "Ponds", bait: "Glow Worm", time: "Morning / Day", rarity: "rare", vault: null },
+    { name: "Fairytale Carp", zone: "Ponds", bait: "Glow Worm", time: "Morning / Day / Evening", rarity: "rare", vault: null },
+    { name: "Giant Goldfish", zone: "Ponds", bait: "Glow Worm", time: "Any Time", rarity: "epic", vault: "Vault of the Waves" },
+    { name: "Gikkit Fish", zone: "Ponds", bait: "Glow Worm", time: "Any Time", rarity: "uncommon", vault: null },
+    { name: "Goldfish", zone: "Ponds", bait: "Glow Worm", time: "Any Time", rarity: "rare", vault: null },
+    { name: "Hydra Eel", zone: "Ponds", bait: "Worm", time: "Night", rarity: "rare", vault: null },
+    { name: "Inky Dragonfly", zone: "Ponds", bait: "Glow Worm", time: "Day", rarity: "rare", vault: null },
+    { name: "Mirror Pond Carp", zone: "Ponds", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Mottled Goby", zone: "Ponds", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: null },
+    { name: "Mudminnow", zone: "Ponds", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Scarlet Koi", zone: "Ponds", bait: "No Bait", time: "Any Time", rarity: "uncommon", vault: null },
+    { name: "Smallmouth Bass", zone: "Ponds", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+
+    // --- FAIRGROUNDS ---
+    { name: "Ribbon Eel", zone: "Fairgrounds", bait: "Worm", time: "Evening / Night", rarity: "uncommon", vault: null }
   ];
 
   const VILLAGERS = [
@@ -427,7 +442,7 @@
       resetBtn.style.display = 'block';
     } else {
       document.getElementById('page-title').innerHTML = '<span>🎣 Fish Compendium</span>';
-      document.getElementById('sub-info').innerText = 'Official Wiki Guide';
+      document.getElementById('sub-info').innerText = 'Palia Wiki (83 Fish)';
       filters.style.display = 'flex';
       resetBtn.style.display = 'none';
     }
