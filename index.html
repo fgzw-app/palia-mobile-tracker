@@ -154,10 +154,10 @@
     <h1><span>✨ Palia Guide</span></h1>
     <div style="display: flex; gap: 8px; align-items: center;">
       <span class="timer-pill" id="reset-timer">⏳ --:--:--</span>
-      <button class="btn-reset" onclick="resetAll()">Reset</button>
+      <button class="btn-reset" id="reset-btn">Reset</button>
     </div>
   </div>
-  <input type="text" id="search" class="search-box" placeholder="Search villager or item..." oninput="renderList()">
+  <input type="text" id="search" class="search-box" placeholder="Search villager or item..." autocomplete="off">
   <div class="stats-bar">
     <span id="progress-text">Completed: 0 / 0</span>
     <span>Reset: Mon 5:00 AM (SGT)</span>
@@ -167,7 +167,7 @@
 <div class="container" id="list"></div>
 
 <script>
-  // Palia Villagers & Weekly Wants (Excluding The Gardener & Ulfe)
+  // Palia Villagers & Weekly Wants
   const VILLAGERS = [
     { name: "Ashura", loc: "Kilima Tavern", wants: [{name: "Sweet Leaf", love: false}, {name: "Kilima Catfish", love: false}, {name: "Fish Stew", love: true}, {name: "Celebration Cake", love: true}] },
     { name: "Auni", loc: "Tavern / Kilima Fields", wants: [{name: "Ship Fragments", love: false}, {name: "Garden Mantis", love: false}, {name: "Firebreathing Dragonfly", love: true}, {name: "Blueberry Pie", love: true}] },
@@ -198,19 +198,16 @@
 
   let state = JSON.parse(localStorage.getItem('palia_paliapedia_wants') || '{}');
 
-  // Calculates the next Monday 05:00 SGT (equivalent to Sunday 21:00 UTC)
+  // Calculates next Monday 05:00 SGT (Sunday 21:00 UTC)
   function getNextResetTime() {
     const now = new Date();
-    // Calculate current time in UTC ms
     const nowUtc = now.getTime() + (now.getTimezoneOffset() * 60000);
-    // Singapore is UTC+8
     const sgtNow = new Date(nowUtc + (8 * 3600000));
     
     const nextReset = new Date(sgtNow);
-    const day = sgtNow.getDay(); // 0 = Sunday, 1 = Monday
+    const day = sgtNow.getDay(); // 0 = Sun, 1 = Mon
     let daysUntilReset = (1 - day + 7) % 7;
     
-    // If today is Monday and after 5 AM SGT, next reset is next Monday
     if (day === 1 && (sgtNow.getHours() > 5 || (sgtNow.getHours() === 5 && sgtNow.getMinutes() > 0))) {
       daysUntilReset = 7;
     }
@@ -218,7 +215,6 @@
     nextReset.setDate(sgtNow.getDate() + daysUntilReset);
     nextReset.setHours(5, 0, 0, 0);
     
-    // Convert target SGT time back to local user timestamp
     const diffMs = nextReset.getTime() - sgtNow.getTime();
     return new Date(Date.now() + diffMs);
   }
@@ -230,7 +226,6 @@
     let diff = nextResetDate - now;
 
     if (diff <= 0) {
-      // Automatic weekly reset trigger
       state = {};
       localStorage.removeItem('palia_paliapedia_wants');
       nextResetDate = getNextResetTime();
@@ -252,8 +247,8 @@
   setInterval(updateTimer, 1000);
   updateTimer();
 
-  function toggle(id) {
-    state[id] = !state[id];
+  function toggle(key) {
+    state[key] = !state[key];
     localStorage.setItem('palia_paliapedia_wants', JSON.stringify(state));
     renderList();
   }
@@ -264,6 +259,15 @@
       localStorage.removeItem('palia_paliapedia_wants');
       renderList();
     }
+  }
+
+  function escapeHtml(str) {
+    return str
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
   }
 
   function renderList() {
@@ -292,10 +296,14 @@
         }
         const icon = isDone ? '✓' : (w.love ? '❤️' : '👍');
         return `
-          <div class="badge ${w.love ? 'love' : ''} ${isDone ? 'done' : ''}" onclick="toggle('${key}')">
+          <button 
+            type="button"
+            class="badge ${w.love ? 'love' : ''} ${isDone ? 'done' : ''}" 
+            data-key="${escapeHtml(key)}"
+          >
             <span>${icon}</span>
-            <span>${w.name}</span>
-          </div>
+            <span>${escapeHtml(w.name)}</span>
+          </button>
         `;
       }).join('');
 
@@ -305,8 +313,8 @@
         <div class="card ${isAllDone ? 'all-done' : ''}">
           <div class="card-top">
             <div class="villager-title">
-              <span class="villager-name">${v.name}</span>
-              <span class="villager-loc">${v.loc}</span>
+              <span class="villager-name">${escapeHtml(v.name)}</span>
+              <span class="villager-loc">${escapeHtml(v.loc)}</span>
             </div>
             <span class="card-counter">${vDoneCount} / ${v.wants.length}</span>
           </div>
@@ -319,6 +327,18 @@
 
     document.getElementById('progress-text').innerText = `Completed: ${completedGifts} / ${totalGifts}`;
   }
+
+  // Safe event delegation for all dynamic buttons
+  document.getElementById('list').addEventListener('click', (e) => {
+    const btn = e.target.closest('.badge');
+    if (btn) {
+      const key = btn.getAttribute('data-key');
+      if (key) toggle(key);
+    }
+  });
+
+  document.getElementById('reset-btn').addEventListener('click', resetAll);
+  document.getElementById('search').addEventListener('input', renderList);
 
   renderList();
 </script>
