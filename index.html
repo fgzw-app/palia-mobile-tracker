@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#1F1829">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Palia Weekly Tracker</title>
+  <title>Palia Companion Guide</title>
   <link rel="manifest" href="manifest.json">
   <style>
     :root {
@@ -20,9 +20,14 @@
       --badge-love: #441A33;
       --done-bg: #174E3E;
       --done-border: #288066;
+      --tab-active: #E5A853;
+      --common: #7E788B;
+      --uncommon: #48A868;
+      --rare: #3B82F6;
+      --epic: #A855F7;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: var(--bg); color: var(--text); padding-bottom: 50px; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; }
     
     header {
       background: #1F1829;
@@ -83,15 +88,38 @@
       color: var(--text-muted);
     }
 
+    /* Filter Pills Horizontal Scroll for Mobile */
+    .filter-scroll {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      margin-top: 10px;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+    }
+    .filter-scroll::-webkit-scrollbar { display: none; }
+    .filter-pill {
+      background: #251B33;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      padding: 5px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .filter-pill.active { background: #3E2F54; border-color: var(--accent); color: #FFF; font-weight: 600; }
+
     .container {
       padding: 12px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       max-width: 650px;
       margin: 0 auto;
     }
     
+    /* Card Layouts */
     .card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -133,11 +161,7 @@
       gap: 6px;
       line-height: 1.2;
     }
-    .badge.love {
-      background: var(--badge-love);
-      border-color: #64284D;
-      color: #FFD3E8;
-    }
+    .badge.love { background: var(--badge-love); border-color: #64284D; color: #FFD3E8; }
     .badge.done {
       background: var(--done-bg) !important;
       border-color: var(--done-border) !important;
@@ -145,29 +169,216 @@
       text-decoration: line-through;
       opacity: 0.65;
     }
+
+    /* Dedicated Fish Card */
+    .fish-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-left: 4px solid var(--common);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .fish-card.uncommon { border-left-color: var(--uncommon); }
+    .fish-card.rare { border-left-color: var(--rare); }
+    .fish-card.epic { border-left-color: var(--epic); }
+
+    .fish-header { display: flex; justify-content: space-between; align-items: flex-start; }
+    .fish-name { font-weight: 700; font-size: 1rem; color: #FFF; }
+    .fish-vault { background: #4D3319; color: #F8C074; font-size: 0.68rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+
+    .fish-details { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 0.78rem; color: var(--text-muted); }
+    .fish-detail-item { display: flex; align-items: center; gap: 4px; }
+    .fish-detail-item strong { color: #E5DDF0; }
+
+    .fish-actions { display: flex; gap: 8px; margin-top: 4px; }
+    .fish-btn {
+      flex: 1;
+      background: #251B33;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 6px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .fish-btn.active-regular { background: #174E3E; border-color: #288066; color: #A3F3DB; }
+    .fish-btn.active-star { background: #523512; border-color: #A36B20; color: #FFD485; }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #1B1425;
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+      z-index: 200;
+      box-shadow: 0 -4px 16px rgba(0,0,0,0.4);
+    }
+    .nav-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+    .nav-btn .icon { font-size: 1.25rem; }
+    .nav-btn.active { color: var(--tab-active); }
   </style>
 </head>
 <body>
 
 <header>
   <div class="header-top">
-    <h1><span>✨ Palia Weekly Wants</span></h1>
+    <h1 id="page-title"><span>✨ Weekly Wants</span></h1>
     <div style="display: flex; gap: 8px; align-items: center;">
       <span class="timer-pill" id="reset-timer">⏳ --:--:--</span>
       <button class="btn-reset" id="reset-btn">Reset</button>
     </div>
   </div>
-  <input type="text" id="search" class="search-box" placeholder="Search villager or item..." autocomplete="off">
+  <input type="text" id="search" class="search-box" placeholder="Search villager, fish, or location..." autocomplete="off">
+  
+  <!-- Dynamic Filters (Rendered on Fish Page) -->
+  <div id="fish-filters" class="filter-scroll" style="display: none;">
+    <button class="filter-pill active" onclick="setFishFilter('zone', 'all')">All Zones</button>
+    <button class="filter-pill" onclick="setFishFilter('zone', 'Kilima Lake')">Kilima Lake</button>
+    <button class="filter-pill" onclick="setFishFilter('zone', 'Kilima River')">Kilima River</button>
+    <button class="filter-pill" onclick="setFishFilter('zone', 'Bahari Coast')">Bahari Coast</button>
+    <button class="filter-pill" onclick="setFishFilter('zone', 'Bahari River')">Bahari River</button>
+    <button class="filter-pill" onclick="setFishFilter('zone', 'Caves')">Caves</button>
+    <button class="filter-pill" onclick="setFishFilter('zone', 'Pond')">Ponds</button>
+  </div>
+
   <div class="stats-bar">
     <span id="progress-text">Completed: 0 / 0</span>
-    <span>Reset: Mon 5:00 AM (SGT)</span>
+    <span id="sub-info">Reset: Mon 5:00 AM (SGT)</span>
   </div>
 </header>
 
 <div class="container" id="list"></div>
 
+<!-- Mobile Bottom Navigation -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="tab-weekly" onclick="switchTab('weekly')">
+    <span class="icon">🎁</span>
+    <span>Weekly Wants</span>
+  </button>
+  <button class="nav-btn" id="tab-fish" onclick="switchTab('fish')">
+    <span class="icon">🎣</span>
+    <span>Fish Guide</span>
+  </button>
+</nav>
+
 <script>
-  // Palia Villagers Weekly Wants
+  let currentTab = 'weekly';
+  let fishZoneFilter = 'all';
+
+  // Complete Palia Fish Compendium (Locations, Baits, Times, Rarities & Bundles)
+  const FISH_DATABASE = [
+    // --- KILIMA LAKE ---
+    { name: "Albino Eel", zone: "Kilima Lake", bait: "Worm", time: "Morning / Evening / Night", rarity: "uncommon", vault: null },
+    { name: "Ancient Fish", zone: "Kilima Lake", bait: "Glow Worm", time: "Any Time", rarity: "epic", vault: "Vault of Waves" },
+    { name: "Beluga Sturgeon", zone: "Kilima Lake", bait: "Glow Worm", time: "Any Time", rarity: "rare", vault: "Vault of Flames" },
+    { name: "Calico Koi", zone: "Kilima Lake", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Channel Catfish", zone: "Kilima Lake", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Chub", zone: "Kilima Lake", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Enchanted Pupfish", zone: "Kilima Lake", bait: "Glow Worm", time: "Any Time", rarity: "rare", vault: null },
+    { name: "Eyeless Minnow", zone: "Kilima Lake", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Gila Trout", zone: "Kilima Lake", bait: "Worm", time: "Day / Evening", rarity: "uncommon", vault: null },
+    { name: "Goldfish", zone: "Pond", bait: "Glow Worm", time: "Any Time", rarity: "rare", vault: null },
+    { name: "Kilima Grayling", zone: "Kilima Lake", bait: "No Bait", time: "Morning / Day / Evening", rarity: "common", vault: null },
+    { name: "Kilima Redfin", zone: "Kilima Lake", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: null },
+    { name: "Largemouth Bass", zone: "Kilima Lake", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Midnight Floatfish", zone: "Caves", bait: "Glow Worm", time: "Night", rarity: "rare", vault: "Vault of Waves" },
+    { name: "Mirror Carp", zone: "Kilima Lake", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Oily Anchovy", zone: "Kilima Lake", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: null },
+    { name: "Orange Bluegill", zone: "Kilima Lake", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: null },
+    { name: "Painter Trout", zone: "Kilima Lake", bait: "Worm", time: "Morning / Day / Evening", rarity: "uncommon", vault: null },
+    { name: "Pikemini", zone: "Kilima Lake", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Platinum Chad", zone: "Kilima Lake", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: null },
+    { name: "Radiant Sunfish", zone: "Kilima River", bait: "Worm", time: "Day", rarity: "rare", vault: null },
+    { name: "Red-bellied Piranha", zone: "Kilima River", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: null },
+    { name: "Rosy Bitterling", zone: "Kilima Lake", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Sardine", zone: "Bahari Coast", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Shimmerfin", zone: "Kilima Lake", bait: "Worm", time: "Any Time", rarity: "rare", vault: "Vault of Waves" },
+    { name: "Silver Salmon", zone: "Kilima River", bait: "No Bait", time: "Evening / Night", rarity: "common", vault: null },
+    { name: "Silvery Minnow", zone: "Kilima River", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Smallmouth Bass", zone: "Pond", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Spotted Bullhead", zone: "Pond", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Stalking Catfish", zone: "Pond", bait: "Glow Worm", time: "Evening / Night", rarity: "rare", vault: null },
+    { name: "Stormray", zone: "Bahari River", bait: "Glow Worm", time: "Morning / Evening", rarity: "epic", vault: "Vault of Waves" },
+    { name: "Striped Sturgeon", zone: "Kilima Lake", bait: "Worm", time: "Evening / Night", rarity: "uncommon", vault: null },
+    { name: "Umbran Carp", zone: "Caves", bait: "No Bait", time: "Any Time", rarity: "uncommon", vault: null },
+    { name: "Void Ray", zone: "Caves", bait: "Glow Worm", time: "Morning / Day / Evening", rarity: "epic", vault: "Vault of Flames" },
+    { name: "Willow Lamprey", zone: "Bahari River", bait: "Worm", time: "Night", rarity: "uncommon", vault: null },
+    { name: "Yellow Perch", zone: "Bahari River", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+
+    // --- BAHARI BAY COAST & RIVERS ---
+    { name: "Alligator Gar", zone: "Bahari River", bait: "Glow Worm", time: "Any Time", rarity: "rare", vault: null },
+    { name: "Bahari Bream", zone: "Bahari Coast", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: null },
+    { name: "Bahari Pike", zone: "Bahari River", bait: "No Bait", time: "Morning / Day / Evening", rarity: "common", vault: null },
+    { name: "Barracuda", zone: "Bahari Coast", bait: "No Bait", time: "Evening / Night", rarity: "uncommon", vault: null },
+    { name: "Bat Ray", zone: "Caves", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: null },
+    { name: "Black Sea Bass", zone: "Bahari Coast", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Blobfish", zone: "Caves", bait: "Glow Worm", time: "Any Time", rarity: "rare", vault: null },
+    { name: "Bluefin Tuna", zone: "Bahari Coast", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: null },
+    { name: "Blue Marlin", zone: "Bahari Coast", bait: "Worm", time: "Any Time", rarity: "rare", vault: null },
+    { name: "Blue Spotted Ray", zone: "Bahari Coast", bait: "Worm", time: "Morning / Day", rarity: "rare", vault: null },
+    { name: "Cactus Moray", zone: "Bahari Coast", bait: "Glow Worm", time: "Morning / Night", rarity: "rare", vault: null },
+    { name: "Cantankerous Koi", zone: "Pond", bait: "No Bait", time: "Day", rarity: "uncommon", vault: null },
+    { name: "Chainperch", zone: "Bahari River", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: null },
+    { name: "Char", zone: "Bahari River", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: null },
+    { name: "Chub", zone: "Bahari River", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Crimson Fangtooth", zone: "Caves", bait: "Worm", time: "Any Time", rarity: "rare", vault: null },
+    { name: "Cutthroat Trout", zone: "Bahari River", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: null },
+    { name: "Dawn Trout", zone: "Bahari River", bait: "No Bait", time: "Morning", rarity: "uncommon", vault: null },
+    { name: "Duskwing Butterflyfish", zone: "Bahari Coast", bait: "Worm", time: "Evening", rarity: "uncommon", vault: null },
+    { name: "Eyeless Minnow", zone: "Caves", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Fathead Minnow", zone: "Bahari River", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Flametongue Ray", zone: "Kilima River", bait: "Glow Worm", time: "Morning / Day", rarity: "epic", vault: "Vault of Flames" },
+    { name: "Giant Goldfish", zone: "Pond", bait: "Glow Worm", time: "Any Time", rarity: "epic", vault: "Vault of Waves" },
+    { name: "Giant Kilima Stingray", zone: "Bahari Coast", bait: "Glow Worm", time: "Morning / Day", rarity: "epic", vault: "Vault of Waves" },
+    { name: "Gloomfin", zone: "Caves", bait: "Worm", time: "Any Time", rarity: "rare", vault: null },
+    { name: "Golden Dory", zone: "Bahari Coast", bait: "Worm", time: "Morning / Day", rarity: "uncommon", vault: null },
+    { name: "Grimalkin Fish", zone: "Bahari Coast", bait: "No Bait", time: "Morning / Evening / Night", rarity: "common", vault: null },
+    { name: "Honey Loach", zone: "Bahari River", bait: "No Bait", time: "Day / Evening / Night", rarity: "uncommon", vault: null },
+    { name: "Hypnotic Moray", zone: "Caves", bait: "Glow Worm", time: "Any Time", rarity: "rare", vault: "Vault of Waves" },
+    { name: "Inky Dragonfly", zone: "Pond", bait: "Glow Worm", time: "Day", rarity: "rare", vault: null },
+    { name: "Kilima Catfish", zone: "Kilima River", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Long Nosed Unicorn Fish", zone: "Bahari Coast", bait: "Glow Worm", time: "Day", rarity: "epic", vault: "Vault of Waves" },
+    { name: "Manglerfish", zone: "Caves", bait: "Worm", time: "Any Time", rarity: "rare", vault: null },
+    { name: "Mutated Angler", zone: "Caves", bait: "Worm", time: "Any Time", rarity: "uncommon", vault: "Vault of Waves" },
+    { name: "Paddlefish", zone: "Bahari River", bait: "Worm", time: "Morning / Day", rarity: "uncommon", vault: null },
+    { name: "Prism Trout", zone: "Kilima Lake", bait: "Worm", time: "Morning / Day", rarity: "rare", vault: null },
+    { name: "Ribbontail Ray", zone: "Bahari Coast", bait: "Worm", time: "Morning", rarity: "uncommon", vault: null },
+    { name: "Rock Bass", zone: "Bahari River", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Scarlet Koi", zone: "Pond", bait: "No Bait", time: "Any Time", rarity: "uncommon", vault: null },
+    { name: "Silver Salmon", zone: "Bahari River", bait: "No Bait", time: "Evening / Night", rarity: "common", vault: null },
+    { name: "Spotted Bullhead", zone: "Kilima Lake", bait: "No Bait", time: "Any Time", rarity: "common", vault: null },
+    { name: "Swordfin Eel", zone: "Bahari River", bait: "No Bait", time: "Evening / Night", rarity: "uncommon", vault: null },
+    { name: "Thundering Eel", zone: "Bahari River", bait: "Worm", time: "Any Time", rarity: "rare", vault: null },
+    { name: "Willow Lamprey", zone: "Bahari River", bait: "Worm", time: "Night", rarity: "uncommon", vault: null },
+    { name: "Yellowfin Tuna", zone: "Bahari Coast", bait: "No Bait", time: "Any Time", rarity: "common", vault: null }
+  ];
+
+  // Palia Villagers Weekly Wants Data
   const VILLAGERS = [
     { name: "Ashura", loc: "Kilima Tavern", wants: [{name: "Sweet Leaf", love: false}, {name: "Kilima Catfish", love: false}, {name: "Fish Stew", love: true}, {name: "Celebration Cake", love: true}] },
     { name: "Auni", loc: "Tavern / Kilima Fields", wants: [{name: "Ship Fragments", love: false}, {name: "Garden Mantis", love: false}, {name: "Firebreathing Dragonfly", love: true}, {name: "Blueberry Pie", love: true}] },
@@ -197,7 +408,39 @@
   ];
 
   let villagersData = VILLAGERS;
-  let state = JSON.parse(localStorage.getItem('palia_weekly_state') || '{}');
+  let weeklyState = JSON.parse(localStorage.getItem('palia_weekly_state') || '{}');
+  let fishCaughtState = JSON.parse(localStorage.getItem('palia_fish_caught') || '{}');
+  let fishStarState = JSON.parse(localStorage.getItem('palia_fish_star') || '{}');
+
+  function switchTab(tab) {
+    currentTab = tab;
+    document.getElementById('tab-weekly').classList.toggle('active', tab === 'weekly');
+    document.getElementById('tab-fish').classList.toggle('active', tab === 'fish');
+    
+    const filters = document.getElementById('fish-filters');
+    const resetBtn = document.getElementById('reset-btn');
+
+    if (tab === 'weekly') {
+      document.getElementById('page-title').innerHTML = '<span>✨ Weekly Wants</span>';
+      document.getElementById('sub-info').innerText = 'Reset: Mon 5:00 AM (SGT)';
+      filters.style.display = 'none';
+      resetBtn.style.display = 'block';
+    } else {
+      document.getElementById('page-title').innerHTML = '<span>🎣 Fish Compendium</span>';
+      document.getElementById('sub-info').innerText = 'Palia Angler Guide';
+      filters.style.display = 'flex';
+      resetBtn.style.display = 'none';
+    }
+    renderList();
+  }
+
+  function setFishFilter(type, val) {
+    fishZoneFilter = val;
+    const pills = document.querySelectorAll('#fish-filters .filter-pill');
+    pills.forEach(p => p.classList.remove('active'));
+    event.target.classList.add('active');
+    renderList();
+  }
 
   // Next Monday 05:00 SGT (Sunday 21:00 UTC)
   function getNextResetTime() {
@@ -225,7 +468,7 @@
     let diff = nextResetDate - now;
 
     if (diff <= 0) {
-      state = {};
+      weeklyState = {};
       localStorage.removeItem('palia_weekly_state');
       nextResetDate = getNextResetTime();
       loadData();
@@ -246,93 +489,147 @@
   setInterval(updateTimer, 1000);
   updateTimer();
 
-  function toggle(key) {
-    state[key] = !state[key];
-    localStorage.setItem('palia_weekly_state', JSON.stringify(state));
+  function toggleWeeklyWant(key) {
+    weeklyState[key] = !weeklyState[key];
+    localStorage.setItem('palia_weekly_state', JSON.stringify(weeklyState));
+    renderList();
+  }
+
+  function toggleFish(key, type) {
+    if (type === 'regular') {
+      fishCaughtState[key] = !fishCaughtState[key];
+      localStorage.setItem('palia_fish_caught', JSON.stringify(fishCaughtState));
+    } else {
+      fishStarState[key] = !fishStarState[key];
+      localStorage.setItem('palia_fish_star', JSON.stringify(fishStarState));
+    }
     renderList();
   }
 
   function resetAll() {
     if (confirm("Reset all tracked gifts for the week?")) {
-      state = {};
+      weeklyState = {};
       localStorage.removeItem('palia_weekly_state');
       renderList();
     }
   }
 
   function escapeHtml(str) {
-    return str
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;");
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
   }
 
   function renderList() {
     const q = document.getElementById('search').value.toLowerCase();
     const container = document.getElementById('list');
 
-    let totalGifts = 0;
-    let completedGifts = 0;
+    if (currentTab === 'weekly') {
+      let totalGifts = 0;
+      let completedGifts = 0;
 
-    const filtered = villagersData.filter(v => 
-      v.name.toLowerCase().includes(q) || 
-      v.loc.toLowerCase().includes(q) ||
-      v.wants.some(w => w.name.toLowerCase().includes(q))
-    );
+      const filtered = villagersData.filter(v => 
+        v.name.toLowerCase().includes(q) || 
+        v.loc.toLowerCase().includes(q) ||
+        v.wants.some(w => w.name.toLowerCase().includes(q))
+      );
 
-    container.innerHTML = filtered.map(v => {
-      let vDoneCount = 0;
-      
-      const wantsHtml = v.wants.map(w => {
-        totalGifts++;
-        const key = `${v.name}-${w.name}`;
-        const isDone = !!state[key];
-        if (isDone) {
-          completedGifts++;
-          vDoneCount++;
-        }
-        const icon = isDone ? '✓' : (w.love ? '❤️' : '👍');
+      container.innerHTML = filtered.map(v => {
+        let vDoneCount = 0;
+        const wantsHtml = v.wants.map(w => {
+          totalGifts++;
+          const key = `${v.name}-${w.name}`;
+          const isDone = !!weeklyState[key];
+          if (isDone) { completedGifts++; vDoneCount++; }
+          const icon = isDone ? '✓' : (w.love ? '❤️' : '👍');
+          return `
+            <button type="button" class="badge ${w.love ? 'love' : ''} ${isDone ? 'done' : ''}" data-key="${escapeHtml(key)}">
+              <span>${icon}</span>
+              <span>${escapeHtml(w.name)}</span>
+            </button>
+          `;
+        }).join('');
+
+        const isAllDone = vDoneCount === v.wants.length;
+
         return `
-          <button 
-            type="button"
-            class="badge ${w.love ? 'love' : ''} ${isDone ? 'done' : ''}" 
-            data-key="${escapeHtml(key)}"
-          >
-            <span>${icon}</span>
-            <span>${escapeHtml(w.name)}</span>
-          </button>
+          <div class="card ${isAllDone ? 'all-done' : ''}">
+            <div class="card-top">
+              <div class="villager-title">
+                <span class="villager-name">${escapeHtml(v.name)}</span>
+                <span class="villager-loc">${escapeHtml(v.loc)}</span>
+              </div>
+              <span class="card-counter">${vDoneCount} / ${v.wants.length}</span>
+            </div>
+            <div class="wants-grid">
+              ${wantsHtml}
+            </div>
+          </div>
         `;
       }).join('');
 
-      const isAllDone = vDoneCount === v.wants.length;
+      document.getElementById('progress-text').innerText = `Completed: ${completedGifts} / ${totalGifts}`;
+    } else {
+      // FISH COMPENDIUM RENDER
+      let caughtCount = 0;
+      let starCount = 0;
 
-      return `
-        <div class="card ${isAllDone ? 'all-done' : ''}">
-          <div class="card-top">
-            <div class="villager-title">
-              <span class="villager-name">${escapeHtml(v.name)}</span>
-              <span class="villager-loc">${escapeHtml(v.loc)}</span>
+      const filteredFish = FISH_DATABASE.filter(f => {
+        const matchesQuery = f.name.toLowerCase().includes(q) || 
+                             f.zone.toLowerCase().includes(q) || 
+                             f.bait.toLowerCase().includes(q) ||
+                             (f.vault && f.vault.toLowerCase().includes(q));
+        const matchesZone = fishZoneFilter === 'all' || f.zone.toLowerCase().includes(fishZoneFilter.toLowerCase());
+        return matchesQuery && matchesZone;
+      });
+
+      container.innerHTML = filteredFish.map(f => {
+        const isCaught = !!fishCaughtState[f.name];
+        const isStar = !!fishStarState[f.name];
+        if (isCaught) caughtCount++;
+        if (isStar) starCount++;
+
+        return `
+          <div class="fish-card ${f.rarity}">
+            <div class="fish-header">
+              <span class="fish-name">${escapeHtml(f.name)}</span>
+              ${f.vault ? `<span class="fish-vault">🏛️ ${escapeHtml(f.vault)}</span>` : ''}
             </div>
-            <span class="card-counter">${vDoneCount} / ${v.wants.length}</span>
+            <div class="fish-details">
+              <div class="fish-detail-item">📍 <strong>${escapeHtml(f.zone)}</strong></div>
+              <div class="fish-detail-item">🪱 <strong>${escapeHtml(f.bait)}</strong></div>
+              <div class="fish-detail-item">⏰ <strong>${escapeHtml(f.time)}</strong></div>
+            </div>
+            <div class="fish-actions">
+              <button 
+                type="button" 
+                class="fish-btn ${isCaught ? 'active-regular' : ''}" 
+                onclick="toggleFish('${escapeHtml(f.name)}', 'regular')"
+              >
+                ${isCaught ? '✓ Caught' : 'Mark Caught'}
+              </button>
+              <button 
+                type="button" 
+                class="fish-btn ${isStar ? 'active-star' : ''}" 
+                onclick="toggleFish('${escapeHtml(f.name)}', 'star')"
+              >
+                ${isStar ? '★ Star Quality' : 'Mark Star ★'}
+              </button>
+            </div>
           </div>
-          <div class="wants-grid">
-            ${wantsHtml}
-          </div>
-        </div>
-      `;
-    }).join('');
+        `;
+      }).join('');
 
-    document.getElementById('progress-text').innerText = `Completed: ${completedGifts} / ${totalGifts}`;
+      document.getElementById('progress-text').innerText = `Caught: ${caughtCount}/${FISH_DATABASE.length} | Star: ${starCount}/${FISH_DATABASE.length}`;
+    }
   }
 
-  // Safe event delegation for badge clicks
+  // Safe event delegation for Weekly Wants badges
   document.getElementById('list').addEventListener('click', (e) => {
-    const btn = e.target.closest('.badge');
-    if (btn) {
-      const key = btn.getAttribute('data-key');
-      if (key) toggle(key);
+    if (currentTab === 'weekly') {
+      const btn = e.target.closest('.badge');
+      if (btn) {
+        const key = btn.getAttribute('data-key');
+        if (key) toggleWeeklyWant(key);
+      }
     }
   });
 
