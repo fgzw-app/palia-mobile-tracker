@@ -35,6 +35,20 @@
     }
     .header-top { display: flex; justify-content: space-between; align-items: center; }
     h1 { font-size: 1.15rem; font-weight: 700; color: #FFF; display: flex; align-items: center; gap: 6px; }
+    
+    .timer-pill {
+      background: #2D2240;
+      border: 1px solid #43335D;
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
     .btn-reset {
       font-size: 0.75rem;
       background: #312347;
@@ -63,6 +77,7 @@
     .stats-bar {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       margin-top: 10px;
       font-size: 0.78rem;
       color: var(--text-muted);
@@ -137,19 +152,22 @@
 <header>
   <div class="header-top">
     <h1><span>✨ Palia Guide</span></h1>
-    <button class="btn-reset" onclick="resetAll()">Reset Week</button>
+    <div style="display: flex; gap: 8px; align-items: center;">
+      <span class="timer-pill" id="reset-timer">⏳ --:--:--</span>
+      <button class="btn-reset" onclick="resetAll()">Reset</button>
+    </div>
   </div>
   <input type="text" id="search" class="search-box" placeholder="Search villager or item..." oninput="renderList()">
   <div class="stats-bar">
     <span id="progress-text">Completed: 0 / 0</span>
-    <span>Source: Paliapedia</span>
+    <span>Reset: Mon 5:00 AM (SGT)</span>
   </div>
 </header>
 
 <div class="container" id="list"></div>
 
 <script>
-  // Complete Paliapedia Weekly Wants Dataset
+  // Palia Villagers & Weekly Wants (Excluding The Gardener & Ulfe)
   const VILLAGERS = [
     { name: "Ashura", loc: "Kilima Tavern", wants: [{name: "Sweet Leaf", love: false}, {name: "Kilima Catfish", love: false}, {name: "Fish Stew", love: true}, {name: "Celebration Cake", love: true}] },
     { name: "Auni", loc: "Tavern / Kilima Fields", wants: [{name: "Ship Fragments", love: false}, {name: "Garden Mantis", love: false}, {name: "Firebreathing Dragonfly", love: true}, {name: "Blueberry Pie", love: true}] },
@@ -174,13 +192,65 @@
     { name: "Subira", loc: "Inn (Upstairs)", wants: [{name: "Potato", love: false}, {name: "Grilled Oyster", love: false}, {name: "Ogopuu Skin", love: true}, {name: "Spitfire Cicada", love: true}] },
     { name: "Tamala", loc: "Bahari Woods", wants: [{name: "Common Field Cricket", love: false}, {name: "Garden Millipede", love: false}, {name: "Palian Betta", love: true}, {name: "Ancient Amber Beetle", love: true}] },
     { name: "Tau", loc: "Village / Farm", wants: [{name: "Trout Dinner", love: false}, {name: "Heartwood Plank", love: false}, {name: "Lantern Ashwood", love: true}, {name: "Apple", love: true}] },
-    { name: "The Gardener", loc: "Temple of the Roots", wants: [{name: "Plant Fiber", love: false}, {name: "Glow Worm", love: false}, {name: "Flow-Infused Wood", love: true}, {name: "Will-o-wisp Rockhopper", love: true}] },
     { name: "Tish", loc: "Furniture Store", wants: [{name: "Sundrop Lily", love: false}, {name: "Heartwood Plank", love: false}, {name: "Ashwood Plank", love: true}, {name: "Jadium Bar", love: true}] },
-    { name: "Ulfe", loc: "Bahari Bay", wants: [{name: "Yellow Perch", love: false}, {name: "Platinum Chad", love: false}, {name: "Bluefin Tuna", love: true}, {name: "Crab Gumbo", love: true}] },
     { name: "Zeki", loc: "General Store", wants: [{name: "Silvery Minnow", love: false}, {name: "Silk", love: false}, {name: "Bronze Bluegill", love: true}, {name: "Black Pearl", love: true}] }
   ];
 
   let state = JSON.parse(localStorage.getItem('palia_paliapedia_wants') || '{}');
+
+  // Calculates the next Monday 05:00 SGT (equivalent to Sunday 21:00 UTC)
+  function getNextResetTime() {
+    const now = new Date();
+    // Calculate current time in UTC ms
+    const nowUtc = now.getTime() + (now.getTimezoneOffset() * 60000);
+    // Singapore is UTC+8
+    const sgtNow = new Date(nowUtc + (8 * 3600000));
+    
+    const nextReset = new Date(sgtNow);
+    const day = sgtNow.getDay(); // 0 = Sunday, 1 = Monday
+    let daysUntilReset = (1 - day + 7) % 7;
+    
+    // If today is Monday and after 5 AM SGT, next reset is next Monday
+    if (day === 1 && (sgtNow.getHours() > 5 || (sgtNow.getHours() === 5 && sgtNow.getMinutes() > 0))) {
+      daysUntilReset = 7;
+    }
+    
+    nextReset.setDate(sgtNow.getDate() + daysUntilReset);
+    nextReset.setHours(5, 0, 0, 0);
+    
+    // Convert target SGT time back to local user timestamp
+    const diffMs = nextReset.getTime() - sgtNow.getTime();
+    return new Date(Date.now() + diffMs);
+  }
+
+  let nextResetDate = getNextResetTime();
+
+  function updateTimer() {
+    const now = new Date();
+    let diff = nextResetDate - now;
+
+    if (diff <= 0) {
+      // Automatic weekly reset trigger
+      state = {};
+      localStorage.removeItem('palia_paliapedia_wants');
+      nextResetDate = getNextResetTime();
+      renderList();
+      diff = nextResetDate - now;
+    }
+
+    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const m = Math.floor((diff / 1000 / 60) % 60);
+    const s = Math.floor((diff / 1000) % 60);
+
+    const timerEl = document.getElementById('reset-timer');
+    if (timerEl) {
+      timerEl.innerText = `⏳ ${d}d ${h}h ${m}m ${s}s`;
+    }
+  }
+
+  setInterval(updateTimer, 1000);
+  updateTimer();
 
   function toggle(id) {
     state[id] = !state[id];
