@@ -201,19 +201,8 @@
     .rarity-pill.legendary { background: #4D3319; color: #FCD34D; }
 
     .item-details { display: grid; grid-template-columns: 1fr; gap: 4px; font-size: 0.78rem; color: var(--text-muted); }
-    .item-detail-row { display: flex; align-items: center; gap: 4px; }
-    .item-detail-row strong { color: #E5DDF0; }
-    .bundle-tag {
-      background: #3B2A1D;
-      border: 1px solid #754B22;
-      color: #F8C074;
-      font-size: 0.72rem;
-      font-weight: 600;
-      padding: 2px 6px;
-      border-radius: 4px;
-      display: inline-block;
-      margin-top: 2px;
-    }
+    .item-detail-row { display: flex; align-items: flex-start; gap: 4px; line-height: 1.35; }
+    .item-detail-row strong { color: #E5DDF0; white-space: nowrap; }
 
     .item-actions { display: flex; gap: 8px; margin-top: 4px; }
     .action-btn {
@@ -302,19 +291,13 @@
   <!-- Bug Filters -->
   <div id="bug-filters" style="display: none; flex-direction: column;">
     <div class="filter-scroll">
-      <button class="filter-pill active" onclick="setBugFilter('zone', 'all', this)">All Locations</button>
-      <button class="filter-pill" onclick="setBugFilter('zone', 'Bahari', this)">Bahari Bay</button>
-      <button class="filter-pill" onclick="setBugFilter('zone', 'Kilima', this)">Kilima Valley</button>
-      <button class="filter-pill" onclick="setBugFilter('zone', 'Royal', this)">Royal Highlands</button>
-      <button class="filter-pill" onclick="setBugFilter('zone', 'Elderwood', this)">Elderwood</button>
-      <button class="filter-pill" onclick="setBugFilter('zone', 'Temple', this)">Temple of the Gales</button>
-    </div>
-    <div class="filter-scroll">
-      <button class="filter-pill active" onclick="setBugFilter('behavior', 'all', this)">All Behaviors</button>
-      <button class="filter-pill" onclick="setBugFilter('behavior', 'Flying', this)">Flying</button>
-      <button class="filter-pill" onclick="setBugFilter('behavior', 'Running', this)">Running</button>
-      <button class="filter-pill" onclick="setBugFilter('behavior', 'Jumping', this)">Jumping</button>
-      <button class="filter-pill" onclick="setBugFilter('behavior', 'Dashing', this)">Dashing</button>
+      <button class="filter-pill active" onclick="setBugFilter('all', this)">All Locations</button>
+      <button class="filter-pill" onclick="setBugFilter('Bahari', this)">Bahari Bay</button>
+      <button class="filter-pill" onclick="setBugFilter('Kilima', this)">Kilima Valley</button>
+      <button class="filter-pill" onclick="setBugFilter('Royal', this)">Royal Highlands</button>
+      <button class="filter-pill" onclick="setBugFilter('Elderwood', this)">Elderwood</button>
+      <button class="filter-pill" onclick="setBugFilter('Caves', this)">Caves</button>
+      <button class="filter-pill" onclick="setBugFilter('Temple', this)">Temple of the Gales</button>
     </div>
   </div>
 
@@ -347,9 +330,8 @@
   let fishZoneFilter = 'all';
   let fishBaitFilter = 'all';
   let bugZoneFilter = 'all';
-  let bugBehaviorFilter = 'all';
 
-  // Isolated Tab Search States
+  // Isolated Search States
   const searchStates = {
     weekly: '',
     fish: '',
@@ -529,72 +511,75 @@
     { name: "Yellowfin Tuna", zone: "Bahari Coast", bait: "Glow Worms", time: "Anytime", rarity: "common" }
   ];
 
-  // 64 Palia Bugs Database populated from Palia_Bugs_Guide.xlsx
+  // 64 Palia Bugs Database (Cleaned of "Needed for")
   const BUGS_DATABASE = [
-    { name: "Amber Mantis", rarity: "common", loc: "Formae Amphitheatre • Royal Hunting Grounds", time: "Any Time", behavior: "Jumping", needed: "Sapping Away" },
-    { name: "Ancient Amber Beetle", rarity: "epic", loc: "Bahari Forest", time: "Any Time", behavior: "Running", needed: "Creatures of the Abyss Bundle" },
-    { name: "Ancient Flowbug", rarity: "legendary", loc: "Temple of the Gales", time: "Any Time", behavior: "Flying", needed: "It Takes a Village - Elouisa" },
-    { name: "Azure Stonehopper", rarity: "rare", loc: "Bahari Fields", time: "Any Time", behavior: "Jumping", needed: "" },
-    { name: "Bahari Bee", rarity: "uncommon", loc: "Bahari Fields • Bahari Forest", time: "Any Time", behavior: "Dashing", needed: "Bee Ware" },
-    { name: "Bahari Crab", rarity: "common", loc: "Bahari Coast • Flooded Fortress", time: "Any Time", behavior: "Running", needed: "In a Pinch I" },
-    { name: "Bahari Glowbug", rarity: "rare", loc: "Bahari Fields", time: "Evening and Night (6:00 PM - 3:00 AM)", behavior: "Flying", needed: "Brightbug Bundle" },
-    { name: "Bark Cicada", rarity: "uncommon", loc: "Bahari Forest", time: "Morning and Day (3:00 AM - 6:00 PM)", behavior: "Flying", needed: "" },
-    { name: "Bluehorn Stag Beetle", rarity: "rare", loc: "Royal Hunting Grounds • The Standing Cliffs", time: "Any Time", behavior: "Running", needed: "Trophy Animal" },
-    { name: "Brighteye Butterfly", rarity: "rare", loc: "Bahari Forest", time: "Morning and Day (3:00 AM - 6:00 PM)", behavior: "Flying", needed: "" },
-    { name: "Brinefly", rarity: "common", loc: "Bahari Coast • Flooded Fortress", time: "Any Time", behavior: "Flying", needed: "" },
-    { name: "Cerulean Cicada", rarity: "uncommon", loc: "Bahari Coast • Bahari Forest • Flooded Fortress", time: "Morning and Day (3:00 AM - 6:00 PM)", behavior: "Flying", needed: "" },
-    { name: "Cobalt Field Cricket", rarity: "common", loc: "Elderwood Swamps", time: "Any Time", behavior: "Jumping", needed: "" },
-    { name: "Common Bark Cicada", rarity: "common", loc: "Kilima Fields • Kilima Lake", time: "Morning and Day (3:00 AM - 6:00 PM)", behavior: "Flying", needed: "" },
-    { name: "Common Bluebutterfly", rarity: "common", loc: "Daiya Family Farm • Kilima Fields • Kilima Lake • Kilima Valley", time: "Morning and Day (3:00 AM - 6:00 PM)", behavior: "Flying", needed: "A Century in the Making" },
-    { name: "Common Field Cricket", rarity: "common", loc: "Daiya Family Farm • Kilima Fields • Kilima Lake", time: "Any Time", behavior: "Jumping", needed: "Catching Bugs" },
-    { name: "Copperwing Butterfly", rarity: "common", loc: "Dragon Shrine • Kilima Fields • Kilima Lake", time: "Morning and Day (3:00 AM - 6:00 PM)", behavior: "Flying", needed: "" },
-    { name: "Corrupted Beetle", rarity: "common", loc: "Elderwood Caves • Elderwood Forest", time: "Any Time", behavior: "Running", needed: "" },
-    { name: "Corrupted Dragonfly", rarity: "uncommon", loc: "Elderwood Caves • Elderwood Swamps", time: "Any Time", behavior: "Flying", needed: "" },
-    { name: "Corrupted Snail", rarity: "common", loc: "Elderwood Caves • Elderwood Swamps", time: "Any Time", behavior: "Running", needed: "" },
-    { name: "Dragon's Beard Ladybug", rarity: "rare", loc: "Amber Lake • Steps of Renova • The Forum", time: "Any Time", behavior: "Dashing", needed: "" },
-    { name: "Duskwing Butterfly", rarity: "uncommon", loc: "Dragon Shrine", time: "Morning and Day (3:00 AM - 6:00 PM)", behavior: "Flying", needed: "" },
-    { name: "Fairy Mantis", rarity: "rare", loc: "Bahari Fields • Bahari Forest", time: "Any Time", behavior: "Jumping", needed: "Fairy Catcher Bundle" },
-    { name: "Flame Queen", rarity: "legendary", loc: "Formae Amphitheatre • House of Nightshade • Royal Hunting Grounds • The Standing Cliffs", time: "Any Time", behavior: "Flying", needed: "" },
-    { name: "Firebreathing Dragonfly", rarity: "rare", loc: "Kilima Fields", time: "Any Time", behavior: "Flying", needed: "Flaming Brew" },
-    { name: "Garden Ladybug", rarity: "common", loc: "Bahari Coast • Bahari Fields • Bahari Forest", time: "Any Time", behavior: "Dashing", needed: "Bug Catching 101" },
-    { name: "Garden Mantis", rarity: "uncommon", loc: "Bahari Coast • Bahari Fields • Bahari Forest", time: "Any Time", behavior: "Jumping", needed: "Bug Catching 101" },
-    { name: "Garden Millipede", rarity: "uncommon", loc: "Bahari Fields • Bahari Forest", time: "Any Time", behavior: "Dashing", needed: "Bug Catching 101" },
-    { name: "Garden Snail", rarity: "uncommon", loc: "Bahari Coast • Bahari Fields • Bahari Forest", time: "Any Time", behavior: "Running", needed: "Bug Catching 101" },
-    { name: "Golden Glory Bee", rarity: "rare", loc: "Kilima Fields", time: "Morning and Day (3:00 AM - 6:00 PM)", behavior: "Dashing", needed: "" },
-    { name: "Gilded Snail", rarity: "epic", loc: "Amber Lake • Enfield Manor • Steps of Renova • The Forum", time: "Any Time", behavior: "Running", needed: "" },
-    { name: "Gossamer Moth", rarity: "common", loc: "Kilima Fields", time: "Evening and Night (6:00 PM - 3:00 AM)", behavior: "Flying", needed: "" },
-    { name: "Grand Pearlbug", rarity: "uncommon", loc: "Elderwood Forest", time: "Any Time", behavior: "Dashing", needed: "" },
-    { name: "Great Amethyst Centipede", rarity: "uncommon", loc: "Bahari Forest", time: "Any Time", behavior: "Dashing", needed: "" },
-    { name: "Hairy Millipede", rarity: "rare", loc: "Bahari Forest", time: "Any Time", behavior: "Dashing", needed: "" },
-    { name: "Inky Dragonfly", rarity: "rare", loc: "Bahari Rivers • Ponds", time: "Any Time", behavior: "Flying", needed: "" },
-    { name: "Jewelled Mantis", rarity: "rare", loc: "Special / Unspecified", time: "Any Time", behavior: "Jumping", needed: "" },
-    { name: "Kilima Night Moth", rarity: "common", loc: "Dragon Shrine • Kilima Fields", time: "Evening and Night (6:00 PM - 3:00 AM)", behavior: "Flying", needed: "Bug Catching 101" },
-    { name: "Leafhopper Hills Dragonfly", rarity: "common", loc: "Kilima Fields", time: "Any Time", behavior: "Flying", needed: "" },
-    { name: "Lunar Fairy Moth", rarity: "uncommon", loc: "Bahari Forest • Flooded Fortress", time: "Evening and Night (6:00 PM - 3:00 AM)", behavior: "Flying", needed: "Fairy Catcher Bundle" },
-    { name: "Mirage Butterfly", rarity: "rare", loc: "Enfield Manor • Lonely Glen • Royal Hunting Grounds", time: "Any Time", behavior: "Flying", needed: "" },
-    { name: "Moonflower Butterfly", rarity: "epic", loc: "Elderwood Forest", time: "Evening and Night (6:00 PM - 3:00 AM)", behavior: "Flying", needed: "" },
-    { name: "Moss Centipede", rarity: "common", loc: "Elderwood Caves • Elderwood Forest", time: "Any Time", behavior: "Dashing", needed: "" },
-    { name: "Paper Lantern Bug", rarity: "uncommon", loc: "Bahari Forest • Flooded Fortress", time: "Evening and Night (6:00 PM - 3:00 AM)", behavior: "Flying", needed: "" },
-    { name: "Pebble Snail", rarity: "common", loc: "Elderwood Caves", time: "Any Time", behavior: "Running", needed: "" },
-    { name: "Pine Beetle", rarity: "uncommon", loc: "Amber Lake • Enfield Manor • Lonely Glen • Royal Hunting Grounds", time: "Any Time", behavior: "Running", needed: "" },
-    { name: "Proudhorned Beetle", rarity: "epic", loc: "Kilima Fields", time: "Any Time", behavior: "Running", needed: "" },
-    { name: "Princess Ladybug", rarity: "rare", loc: "Kilima Fields", time: "Any Time", behavior: "Dashing", needed: "A Century in the Making" },
-    { name: "Pumpkin Rockhopper", rarity: "uncommon", loc: "Special / Unspecified", time: "All Day", behavior: "Jumping", needed: "" },
-    { name: "Rainbow-Tipped Butterfly", rarity: "epic", loc: "Bahari Fields", time: "Morning and Day (3:00 AM - 6:00 PM)", behavior: "Flying", needed: "" },
-    { name: "Raspberry Beetle", rarity: "rare", loc: "Bahari Forest", time: "Any Time", behavior: "Running", needed: "" },
-    { name: "Rosy Dragonfly", rarity: "rare", loc: "Bahari Rivers • Ponds", time: "Morning and Day (3:00 AM - 6:00 PM)", behavior: "Flying", needed: "" },
-    { name: "Shadvaraak Beetle", rarity: "epic", loc: "Amber Lake • Dawnspur Canyon • Royal Hunting Grounds • Steps of Renova", time: "Any Time", behavior: "Running", needed: "" },
-    { name: "Shimmercricket", rarity: "rare", loc: "Amber Lake • Dawnspur Canyon • Enfield Manor • Lonely Glen • Royal Hunting Grounds • Royal Highlands Shores • Steps of Renova • The Forum", time: "Any Time", behavior: "Jumping", needed: "" },
-    { name: "Spinepincer Beetle", rarity: "uncommon", loc: "Elderwood Forest", time: "Any Time", behavior: "Running", needed: "" },
-    { name: "Spitfire Cicada", rarity: "rare", loc: "Bahari Forest • Flooded Fortress", time: "Morning and Day (3:00 AM - 6:00 PM)", behavior: "Flying", needed: "" },
-    { name: "Spotted Mantis", rarity: "rare", loc: "Bahari Fields", time: "Any Time", behavior: "Jumping", needed: "Fairy Catcher Bundle" },
-    { name: "Spotted Stinkbug", rarity: "common", loc: "Kilima Fields", time: "Any Time", behavior: "Running", needed: "" },
-    { name: "Star-Wing Butterfly", rarity: "rare", loc: "Elderwood Swamps", time: "Morning and Day (3:00 AM - 6:00 PM)", behavior: "Flying", needed: "" },
-    { name: "Stormfly", rarity: "rare", loc: "Formae Amphitheatre • Royal Highlands Shores • Steps of Renova • The Forum", time: "Any Time", behavior: "Flying", needed: "" },
-    { name: "Striped Hills Centipede", rarity: "uncommon", loc: "Cliffs Above Pavel Mines • Flooded Fortress", time: "Any Time", behavior: "Dashing", needed: "" },
-    { name: "Vampire Crab", rarity: "rare", loc: "Flooded Fortress", time: "Evening and Night (6:00 PM - 3:00 AM)", behavior: "Running", needed: "Spooky Bundle" },
-    { name: "Vibrant Weevil", rarity: "common", loc: "Cliffs Above Pavel Mines • Flooded Fortress", time: "Any Time", behavior: "Running", needed: "" },
-    { name: "Willow Mantis", rarity: "uncommon", loc: "Caves • Cliffs Above Pavel Mines", time: "Any Time", behavior: "Jumping", needed: "" }
+    { name: "Amber Mantis", rarity: "common", loc: "Formae Amphitheatre • Royal Hunting Grounds", time: "Any Time" },
+    { name: "Ancient Amber Beetle", rarity: "epic", loc: "Bahari Forest", time: "Any Time" },
+    { name: "Ancient Flowbug", rarity: "legendary", loc: "Temple of the Gales", time: "Any Time" },
+    { name: "Azure Stonehopper", rarity: "rare", loc: "Bahari Fields", time: "Any Time" },
+    { name: "Bahari Bee", rarity: "uncommon", loc: "Bahari Fields • Bahari Forest", time: "Any Time" },
+    { name: "Bahari Crab", rarity: "common", loc: "Bahari Coast • Flooded Fortress", time: "Any Time" },
+    { name: "Bahari Glowbug", rarity: "rare", loc: "Bahari Fields", time: "Evening and Night (6:00 PM - 3:00 AM)" },
+    { name: "Bark Cicada", rarity: "uncommon", loc: "Bahari Forest", time: "Morning and Day (3:00 AM - 6:00 PM)" },
+    { name: "Blue Crab", rarity: "common", loc: "Royal Highlands Shores", time: "Any Time" },
+    { name: "Bluehorn Stag Beetle", rarity: "rare", loc: "Royal Hunting Grounds • The Standing Cliffs", time: "Any Time" },
+    { name: "Brighteye Butterfly", rarity: "rare", loc: "Bahari Forest", time: "Morning and Day (3:00 AM - 6:00 PM)" },
+    { name: "Brinefly", rarity: "common", loc: "Bahari Coast • Flooded Fortress", time: "Any Time" },
+    { name: "Cerulean Cicada", rarity: "uncommon", loc: "Bahari Coast • Bahari Forest • Flooded Fortress", time: "Morning and Day (3:00 AM - 6:00 PM)" },
+    { name: "Cobalt Field Cricket", rarity: "common", loc: "Elderwood Swamps", time: "Any Time" },
+    { name: "Common Bark Cicada", rarity: "common", loc: "Kilima Fields • Kilima Lake", time: "Morning and Day (3:00 AM - 6:00 PM)" },
+    { name: "Common Bluebutterfly", rarity: "common", loc: "Daiya Family Farm • Kilima Fields • Kilima Lake • Kilima Valley", time: "Morning and Day (3:00 AM - 6:00 PM)" },
+    { name: "Common Field Cricket", rarity: "common", loc: "Daiya Family Farm • Kilima Fields • Kilima Lake", time: "Any Time" },
+    { name: "Copperwing Butterfly", rarity: "common", loc: "Dragon Shrine • Kilima Fields • Kilima Lake", time: "Morning and Day (3:00 AM - 6:00 PM)" },
+    { name: "Corrupted Beetle", rarity: "common", loc: "Elderwood Caves • Elderwood Forest", time: "Any Time" },
+    { name: "Corrupted Dragonfly", rarity: "uncommon", loc: "Elderwood Caves • Elderwood Swamps", time: "Any Time" },
+    { name: "Corrupted Snail", rarity: "common", loc: "Elderwood Caves • Elderwood Swamps", time: "Any Time" },
+    { name: "Dragon's Beard Ladybug", rarity: "rare", loc: "Amber Lake • Steps of Renova • The Forum", time: "Any Time" },
+    { name: "Duskwing Butterfly", rarity: "uncommon", loc: "Dragon Shrine", time: "Morning and Day (3:00 AM - 6:00 PM)" },
+    { name: "Fairy Mantis", rarity: "rare", loc: "Bahari Fields • Bahari Forest", time: "Any Time" },
+    { name: "Flame Queen", rarity: "legendary", loc: "Formae Amphitheatre • House of Nightshade • Royal Hunting Grounds • The Standing Cliffs", time: "Any Time" },
+    { name: "Firebreathing Dragonfly", rarity: "rare", loc: "Kilima Fields", time: "Any Time" },
+    { name: "Garden Ladybug", rarity: "common", loc: "Bahari Coast • Bahari Fields • Bahari Forest", time: "Any Time" },
+    { name: "Garden Mantis", rarity: "uncommon", loc: "Bahari Coast • Bahari Fields • Bahari Forest", time: "Any Time" },
+    { name: "Garden Millipede", rarity: "uncommon", loc: "Bahari Fields • Bahari Forest", time: "Any Time" },
+    { name: "Garden Snail", rarity: "uncommon", loc: "Bahari Coast • Bahari Fields • Bahari Forest", time: "Any Time" },
+    { name: "Golden Glory Bee", rarity: "rare", loc: "Kilima Fields", time: "Morning and Day (3:00 AM - 6:00 PM)" },
+    { name: "Gilded Snail", rarity: "epic", loc: "Amber Lake • Enfield Manor • Steps of Renova • The Forum", time: "Any Time" },
+    { name: "Gossamer Moth", rarity: "common", loc: "Kilima Fields", time: "Evening and Night (6:00 PM - 3:00 AM)" },
+    { name: "Grand Pearlbug", rarity: "uncommon", loc: "Elderwood Forest", time: "Any Time" },
+    { name: "Great Amethyst Centipede", rarity: "uncommon", loc: "Bahari Forest", time: "Any Time" },
+    { name: "Hairy Millipede", rarity: "rare", loc: "Bahari Forest", time: "Any Time" },
+    { name: "Inky Dragonfly", rarity: "rare", loc: "Bahari Rivers • Ponds", time: "Any Time" },
+    { name: "Jewelled Mantis", rarity: "rare", loc: "Bahari Bay Caves • Cliffs Above Pavel Mines", time: "Any Time" },
+    { name: "Kilima Night Moth", rarity: "common", loc: "Dragon Shrine • Kilima Fields", time: "Evening and Night (6:00 PM - 3:00 AM)" },
+    { name: "King Crab", rarity: "rare", loc: "Royal Highlands Shores", time: "Any Time" },
+    { name: "Leafhopper Hills Dragonfly", rarity: "common", loc: "Kilima Fields", time: "Any Time" },
+    { name: "Lunar Fairy Moth", rarity: "uncommon", loc: "Bahari Forest • Flooded Fortress", time: "Evening and Night (6:00 PM - 3:00 AM)" },
+    { name: "Mirage Butterfly", rarity: "rare", loc: "Enfield Manor • Lonely Glen • Royal Hunting Grounds", time: "Any Time" },
+    { name: "Moonflower Butterfly", rarity: "epic", loc: "Elderwood Forest", time: "Evening and Night (6:00 PM - 3:00 AM)" },
+    { name: "Moss Centipede", rarity: "common", loc: "Elderwood Caves • Elderwood Forest", time: "Any Time" },
+    { name: "Paper Lantern Bug", rarity: "uncommon", loc: "Bahari Forest • Flooded Fortress", time: "Evening and Night (6:00 PM - 3:00 AM)" },
+    { name: "Pebble Snail", rarity: "common", loc: "Elderwood Caves", time: "Any Time" },
+    { name: "Pine Beetle", rarity: "uncommon", loc: "Amber Lake • Enfield Manor • Lonely Glen • Royal Hunting Grounds", time: "Any Time" },
+    { name: "Proudhorned Beetle", rarity: "epic", loc: "Kilima Fields", time: "Any Time" },
+    { name: "Princess Ladybug", rarity: "rare", loc: "Kilima Fields", time: "Any Time" },
+    { name: "Pumpkin Rockhopper", rarity: "uncommon", loc: "Kilima Valley • Bahari Bay", time: "All Day" },
+    { name: "Rainbow-Tipped Butterfly", rarity: "epic", loc: "Bahari Fields", time: "Morning and Day (3:00 AM - 6:00 PM)" },
+    { name: "Raspberry Beetle", rarity: "rare", loc: "Bahari Forest", time: "Any Time" },
+    { name: "Rosy Dragonfly", rarity: "rare", loc: "Bahari Rivers • Ponds", time: "Morning and Day (3:00 AM - 6:00 PM)" },
+    { name: "Shadvaraak Beetle", rarity: "epic", loc: "Amber Lake • Dawnspur Canyon • Royal Hunting Grounds • Steps of Renova", time: "Any Time" },
+    { name: "Shimmercricket", rarity: "rare", loc: "Amber Lake • Dawnspur Canyon • Enfield Manor • Lonely Glen • Royal Hunting Grounds • Royal Highlands Shores • Steps of Renova • The Forum", time: "Any Time" },
+    { name: "Spinepincer Beetle", rarity: "uncommon", loc: "Elderwood Forest", time: "Any Time" },
+    { name: "Spineshell Crab", rarity: "uncommon", loc: "Bahari Coast • Flooded Fortress", time: "Any Time" },
+    { name: "Spitfire Cicada", rarity: "rare", loc: "Bahari Forest • Flooded Fortress", time: "Morning and Day (3:00 AM - 6:00 PM)" },
+    { name: "Spotted Mantis", rarity: "rare", loc: "Bahari Fields", time: "Any Time" },
+    { name: "Spotted Stinkbug", rarity: "common", loc: "Kilima Fields", time: "Any Time" },
+    { name: "Star-Wing Butterfly", rarity: "rare", loc: "Elderwood Swamps", time: "Morning and Day (3:00 AM - 6:00 PM)" },
+    { name: "Stormfly", rarity: "rare", loc: "Formae Amphitheatre • Royal Highlands Shores • Steps of Renova • The Forum", time: "Any Time" },
+    { name: "Striped Hills Centipede", rarity: "uncommon", loc: "Cliffs Above Pavel Mines • Flooded Fortress", time: "Any Time" },
+    { name: "Vampire Crab", rarity: "rare", loc: "Flooded Fortress", time: "Evening and Night (6:00 PM - 3:00 AM)" },
+    { name: "Vibrant Weevil", rarity: "common", loc: "Cliffs Above Pavel Mines • Flooded Fortress", time: "Any Time" },
+    { name: "Willow Mantis", rarity: "uncommon", loc: "Caves • Cliffs Above Pavel Mines", time: "Any Time" }
   ];
 
   const VILLAGERS = [
@@ -662,7 +647,7 @@
     } else {
       document.getElementById('page-title').innerHTML = '<span>🦋 Bug Catching</span>';
       document.getElementById('sub-info').innerText = '64 Species Directory';
-      searchInput.placeholder = 'Search bug, location, behavior, or bundle...';
+      searchInput.placeholder = 'Search bug or location...';
       fishFilters.style.display = 'none';
       bugFilters.style.display = 'flex';
       resetBtn.style.display = 'none';
@@ -680,10 +665,8 @@
     renderList();
   }
 
-  function setBugFilter(type, val, el) {
-    if (type === 'zone') bugZoneFilter = val;
-    if (type === 'behavior') bugBehaviorFilter = val;
-    
+  function setBugFilter(val, el) {
+    bugZoneFilter = val;
     const parent = el.parentElement;
     parent.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
     el.classList.add('active');
@@ -852,9 +835,9 @@
               <span class="rarity-pill ${f.rarity}">${escapeHtml(f.rarity)}</span>
             </div>
             <div class="item-details">
-              <div class="item-detail-row">📍 <strong>Location:</strong> ${escapeHtml(f.zone)}</div>
-              <div class="item-detail-row">🪱 <strong>Bait:</strong> ${escapeHtml(f.bait)}</div>
-              <div class="item-detail-row">⏰ <strong>Time:</strong> ${escapeHtml(f.time)}</div>
+              <div class="item-detail-row">📍 <strong>Location:</strong> <span>${escapeHtml(f.zone)}</span></div>
+              <div class="item-detail-row">🪱 <strong>Bait:</strong> <span>${escapeHtml(f.bait)}</span></div>
+              <div class="item-detail-row">⏰ <strong>Time:</strong> <span>${escapeHtml(f.time)}</span></div>
             </div>
             <div class="item-actions">
               <button 
@@ -878,19 +861,16 @@
 
       document.getElementById('progress-text').innerText = `Caught: ${caughtCount}/${FISH_DATABASE.length} | Star: ${starCount}/${FISH_DATABASE.length}`;
     } else {
-      // BUGS COMPENDIUM RENDER
+      // BUGS COMPENDIUM RENDER (NO "NEEDED FOR")
       let caughtCount = 0;
       let starCount = 0;
 
       const filteredBugs = BUGS_DATABASE.filter(b => {
         const matchesQuery = b.name.toLowerCase().includes(q) || 
                              b.loc.toLowerCase().includes(q) || 
-                             b.time.toLowerCase().includes(q) ||
-                             b.behavior.toLowerCase().includes(q) ||
-                             b.needed.toLowerCase().includes(q);
+                             b.time.toLowerCase().includes(q);
         const matchesZone = bugZoneFilter === 'all' || b.loc.toLowerCase().includes(bugZoneFilter.toLowerCase());
-        const matchesBehavior = bugBehaviorFilter === 'all' || b.behavior.toLowerCase() === bugBehaviorFilter.toLowerCase();
-        return matchesQuery && matchesZone && matchesBehavior;
+        return matchesQuery && matchesZone;
       });
 
       container.innerHTML = filteredBugs.map(b => {
@@ -906,10 +886,8 @@
               <span class="rarity-pill ${b.rarity}">${escapeHtml(b.rarity)}</span>
             </div>
             <div class="item-details">
-              <div class="item-detail-row">📍 <strong>Location:</strong> ${escapeHtml(b.loc)}</div>
-              <div class="item-detail-row">⏰ <strong>Time:</strong> ${escapeHtml(b.time)}</div>
-              <div class="item-detail-row">🏃 <strong>Behavior:</strong> ${escapeHtml(b.behavior)}</div>
-              ${b.needed ? `<div class="bundle-tag">🏛️ ${escapeHtml(b.needed)}</div>` : ''}
+              <div class="item-detail-row">📍 <strong>Location:</strong> <span>${escapeHtml(b.loc)}</span></div>
+              <div class="item-detail-row">⏰ <strong>Time:</strong> <span>${escapeHtml(b.time)}</span></div>
             </div>
             <div class="item-actions">
               <button 
