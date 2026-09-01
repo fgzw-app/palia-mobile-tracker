@@ -1,0 +1,9 @@
+{
+  "name": "palia-tracker",
+  "version": "1.0.0",
+  "description": "Weekly wants updater",
+  "main": "scripts/update_wants.js",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.12"
+  }
+}
