@@ -378,6 +378,14 @@
     </div>
   </div>
 
+  <!-- Map Region Switcher -->
+  <div id="map-filters" style="display: none; flex-direction: column;">
+    <div class="filter-scroll">
+      <button class="filter-pill active" onclick="switchMapRegion('kilima', this)">📍 Kilima Valley</button>
+      <button class="filter-pill" onclick="switchMapRegion('bahari', this)">📍 Bahari Bay</button>
+    </div>
+  </div>
+
   <div class="stats-bar">
     <span id="progress-text">Completed: 0 / 0</span>
     <span id="sub-info">Reset: Mon 5:00 AM (SGT)</span>
@@ -411,6 +419,7 @@
   let fishZoneFilter = 'all';
   let fishBaitFilter = 'all';
   let bugZoneFilter = 'all';
+  let currentMapRegion = 'kilima';
 
   // Resilient Gesture State
   let mapScale = 1;
@@ -715,6 +724,7 @@
     
     const fishFilters = document.getElementById('fish-filters');
     const bugFilters = document.getElementById('bug-filters');
+    const mapFilters = document.getElementById('map-filters');
     const resetBtn = document.getElementById('reset-btn');
     const searchInput = document.getElementById('search');
 
@@ -722,6 +732,7 @@
 
     fishFilters.style.display = 'none';
     bugFilters.style.display = 'none';
+    mapFilters.style.display = 'none';
     resetBtn.style.display = 'none';
 
     if (tab === 'weekly') {
@@ -743,10 +754,28 @@
       searchInput.style.display = 'block';
       bugFilters.style.display = 'flex';
     } else {
-      document.getElementById('page-title').innerHTML = '<span>🗺️ Kilima Valley Map</span>';
+      const title = currentMapRegion === 'kilima' ? 'Kilima Valley Map' : 'Bahari Bay Map';
+      document.getElementById('page-title').innerHTML = `<span>🗺️ ${title}</span>`;
       document.getElementById('sub-info').innerText = 'Pinch & Pan to Explore';
       searchInput.style.display = 'none';
+      mapFilters.style.display = 'flex';
     }
+    renderList();
+  }
+
+  function switchMapRegion(region, el) {
+    if (currentMapRegion === region) return;
+    currentMapRegion = region;
+    resetMapZoom();
+
+    if (el) {
+      const parent = el.parentElement;
+      parent.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    const title = currentMapRegion === 'kilima' ? 'Kilima Valley Map' : 'Bahari Bay Map';
+    document.getElementById('page-title').innerHTML = `<span>🗺️ ${title}</span>`;
     renderList();
   }
 
@@ -768,7 +797,7 @@
   }
 
   function applyMapTransform() {
-    const img = document.getElementById('kilima-map-img');
+    const img = document.getElementById('region-map-img');
     if (img) {
       img.style.transform = `translate3d(${mapX}px, ${mapY}px, 0) scale(${mapScale})`;
     }
@@ -1115,16 +1144,23 @@
 
       document.getElementById('progress-text').innerText = `Caught: ${caughtCount}/${BUGS_DATABASE.length} | Star: ${starCount}/${BUGS_DATABASE.length}`;
     } else {
-      // STATIC CLEAN MAP VIEWER
+      // STATIC CLEAN MAP VIEWER (KILIMA OR BAHARI)
+      const isKilima = currentMapRegion === 'kilima';
+      const mapSrc = isKilima ? './kilima-map.jpg' : './bahari-map.jpg';
+      const mapAlt = isKilima ? 'Kilima Valley Map' : 'Bahari Bay Map';
+      const fallbackSrc = isKilima 
+        ? 'https://palia.wiki.gg/images/b/b5/Kilima_Valley_Map.png' 
+        : 'https://paliamaps.com/images/maps/bahari.png';
+
       container.innerHTML = `
         <div class="map-container">
           <div class="map-viewport" id="map-viewport">
             <img 
-              id="kilima-map-img" 
+              id="region-map-img" 
               class="map-image" 
-              src="./kilima-map.jpg" 
-              alt="Kilima Valley Map"
-              onerror="this.onerror=null; this.src='https://palia.wiki.gg/images/b/b5/Kilima_Valley_Map.png';"
+              src="${mapSrc}" 
+              alt="${mapAlt}"
+              onerror="this.onerror=null; this.src='${fallbackSrc}';"
             />
           </div>
           <div class="map-controls">
@@ -1136,7 +1172,7 @@
         </div>
       `;
 
-      document.getElementById('progress-text').innerText = 'Kilima Valley Clean Map';
+      document.getElementById('progress-text').innerText = isKilima ? 'Kilima Valley Clean Map' : 'Bahari Bay Clean Map';
       initMapGestures();
       applyMapTransform();
     }
