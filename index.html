@@ -26,13 +26,9 @@
       --rare: #3B82F6;
       --epic: #A855F7;
       --legendary: #F59E0B;
-      --map-water: #1C2D4A;
-      --map-land: #1E1729;
-      --map-stroke: #3E2F54;
-      --map-path: #2E223D;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; overflow-x: hidden; }
     
     header {
       background: #1F1829;
@@ -173,6 +169,7 @@
       opacity: 0.65;
     }
 
+    /* Compendium Cards */
     .item-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -225,49 +222,76 @@
     }
     .action-btn.active-regular { background: #174E3E; border-color: #288066; color: #A3F3DB; }
     .action-btn.active-star { background: #523512; border-color: #A36B20; color: #FFD485; }
-    .action-btn.nav-link { background: #322544; border-color: #4C3766; color: #DDD0F0; }
-    .action-btn.nav-link:active { background: #43335D; }
 
-    /* Map Specific Styles */
-    .map-wrapper {
-      background: #0E0916;
+    /* Interactive Map Viewer */
+    .map-container {
+      position: relative;
+      width: 100%;
+      height: 72vh;
+      min-height: 480px;
+      background: #0D0814;
       border: 1px solid var(--card-border);
       border-radius: 14px;
       overflow: hidden;
-      position: relative;
-      width: 100%;
-      box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
+      touch-action: none;
+      box-shadow: inset 0 0 24px rgba(0,0,0,0.8);
     }
-    .map-svg {
+    .map-viewport {
       width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+    }
+    .map-viewport:active { cursor: grabbing; }
+    .map-image {
+      max-width: 100%;
       height: auto;
-      display: block;
+      transform-origin: center center;
       user-select: none;
+      -webkit-user-drag: none;
+      pointer-events: none;
+      border-radius: 8px;
     }
-    .map-pin {
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    .map-pin:hover, .map-pin.active {
-      transform: scale(1.15);
-      transform-origin: center;
-    }
-    .map-pin-pulse {
-      animation: pinPulse 2s infinite;
-    }
-    @keyframes pinPulse {
-      0% { r: 6; opacity: 0.8; }
-      50% { r: 10; opacity: 0.2; }
-      100% { r: 6; opacity: 0.8; }
-    }
-    .map-modal {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 14px;
-      padding: 14px;
+    .map-controls {
+      position: absolute;
+      right: 14px;
+      bottom: 16px;
       display: flex;
       flex-direction: column;
       gap: 8px;
+      z-index: 50;
+    }
+    .map-ctrl-btn {
+      width: 38px;
+      height: 38px;
+      background: rgba(31, 24, 41, 0.9);
+      border: 1px solid var(--card-border);
+      color: #FFF;
+      font-size: 1.15rem;
+      font-weight: 700;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+    }
+    .map-ctrl-btn:active { background: var(--accent); color: #1F1829; }
+    .map-hint {
+      position: absolute;
+      left: 14px;
+      bottom: 16px;
+      background: rgba(20, 14, 28, 0.85);
+      border: 1px solid var(--card-border);
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      pointer-events: none;
+      backdrop-filter: blur(4px);
     }
 
     /* Bottom Navigation */
@@ -348,14 +372,6 @@
     </div>
   </div>
 
-  <!-- Region Map Selector -->
-  <div id="map-filters" style="display: none; flex-direction: column;">
-    <div class="filter-scroll">
-      <button class="filter-pill active" onclick="switchMapRegion('kilima', this)">📍 Kilima Valley</button>
-      <button class="filter-pill" onclick="switchMapRegion('bahari', this)">📍 Bahari Bay</button>
-    </div>
-  </div>
-
   <div class="stats-bar">
     <span id="progress-text">Completed: 0 / 0</span>
     <span id="sub-info">Reset: Mon 5:00 AM (SGT)</span>
@@ -380,7 +396,7 @@
   </button>
   <button class="nav-btn" id="tab-maps" onclick="switchTab('maps')">
     <span class="icon">🗺️</span>
-    <span>Maps</span>
+    <span>Map</span>
   </button>
 </nav>
 
@@ -389,14 +405,19 @@
   let fishZoneFilter = 'all';
   let fishBaitFilter = 'all';
   let bugZoneFilter = 'all';
-  let selectedMapRegion = 'kilima';
-  let selectedLandmark = null;
+
+  // Map Zoom & Pan State
+  let mapScale = 1;
+  let mapX = 0;
+  let mapY = 0;
+  let isDragging = false;
+  let startX = 0, startY = 0;
+  let initialPinchDist = null;
 
   const searchStates = {
     weekly: '',
     fish: '',
-    bugs: '',
-    maps: ''
+    bugs: ''
   };
 
   // 123 Palia Fish Database
@@ -640,38 +661,6 @@
     { name: "Will-o-wisp Rockhopper", loc: "Elderwood Forest • Elderwood Swamps", time: "Any Time" }
   ];
 
-  // Static Regional Maps Landmark Data
-  const REGION_MAPS = {
-    kilima: {
-      title: "Kilima Valley",
-      viewBox: "0 0 500 450",
-      landmarks: [
-        { id: "k1", name: "Kilima Village", x: 250, y: 190, desc: "Civic center, shops, town hall, tavern, and library.", villagers: "Eshe, Kenli, Kenyatta, Tish, Jel, Zeki, Chayne, Caleri, Reth", fishKey: "Kilima Lake", bugKey: "Kilima Fields", type: "town" },
-        { id: "k2", name: "Fisherman's Lagoon", x: 330, y: 310, desc: "Serene wooden piers overlooking Kilima Lake.", villagers: "Einar, Ashura (wandering)", fishKey: "Kilima Lake", bugKey: "Kilima Lake", type: "water" },
-        { id: "k3", name: "Daiya Family Farm", x: 140, y: 260, desc: "Agricultural valley, crop fields, and barn.", villagers: "Badruu, Delaila, Nai'o, Auni", fishKey: "Ponds", bugKey: "Daiya Family Farm", type: "farm" },
-        { id: "k4", name: "Mirror Pond Ruins", x: 180, y: 80, desc: "Ancient Human ruins alongside mountain waterfalls.", villagers: "Jina, Hekla", fishKey: "Kilima Rivers", bugKey: "Kilima Fields", type: "ruins" },
-        { id: "k5", name: "Phoenix Falls", x: 280, y: 50, desc: "Sacred entrance waterfall where Humans emerge.", villagers: "Jina (investigating)", fishKey: "Kilima Rivers", bugKey: "Kilima Fields", type: "ruins" },
-        { id: "k6", name: "Dragon Shrine", x: 370, y: 130, desc: "Ancestral Majiri shrine engulfed in ancient trees.", villagers: "Chayne, Hassian (patrols)", fishKey: "Kilima Rivers", bugKey: "Dragon Shrine", type: "shrine" },
-        { id: "k7", name: "Whispering Banks", x: 260, y: 340, desc: "Southern shoreline and river inlet.", villagers: "Ashura (fishing spot)", fishKey: "Kilima Lake", bugKey: "Kilima Lake", type: "water" },
-        { id: "k8", name: "Leafhopper Hills", x: 120, y: 340, desc: "Rolling southern hills bordering the coast.", villagers: "Auni (insect hunts)", fishKey: "Ponds", bugKey: "Kilima Fields", type: "nature" }
-      ]
-    },
-    bahari: {
-      title: "Bahari Bay",
-      viewBox: "0 0 500 500",
-      landmarks: [
-        { id: "b1", name: "Pavel Mines", x: 210, y: 160, desc: "Multi-level mining caverns rich in minerals.", villagers: "Hodari (frequents inside)", fishKey: "Caves", bugKey: "Cliffs Above Pavel Mines", type: "mine" },
-        { id: "b2", name: "Flooded Fortress", x: 220, y: 270, desc: "Ancient flooded fortress with high stone arches.", villagers: "Subira (investigating)", fishKey: "Caves", bugKey: "Flooded Fortress", type: "ruins" },
-        { id: "b3", name: "Coral Shores", x: 380, y: 260, desc: "Expansive ocean coastline, shipwrecks, and tide pools.", villagers: "Jel (beach visits)", fishKey: "Bahari Coast", bugKey: "Bahari Coast", type: "water" },
-        { id: "b4", name: "Lighthouse Lagoon", x: 360, y: 390, desc: "Southern rocky cliffs and old stone lighthouse.", villagers: "Najuma (observatory)", fishKey: "Bahari Coast", bugKey: "Bahari Coast", type: "water" },
-        { id: "b5", name: "Proudhorn Pass", x: 150, y: 100, desc: "Mountain passage leading into northern forests.", villagers: "Hassian, Tau", fishKey: "Bahari Rivers", bugKey: "Bahari Forest", type: "nature" },
-        { id: "b6", name: "Hodari & Najuma's Workshop", x: 130, y: 210, desc: "Rustic blacksmith and invention home plot.", villagers: "Hodari, Najuma", fishKey: "Ponds", bugKey: "Bahari Fields", type: "town" },
-        { id: "b7", name: "The Outskirts & Woods", x: 120, y: 330, desc: "Dense wilderness bordering the witch's lodge.", villagers: "Tamala", fishKey: "Bahari Rivers", bugKey: "Bahari Forest", type: "nature" },
-        { id: "b8", name: "Windy Ruins & Central Fields", x: 270, y: 180, desc: "Open central plains with ancient flow aqueducts.", villagers: "Auni (insect hunts)", fishKey: "Bahari Rivers", bugKey: "Bahari Fields", type: "ruins" }
-      ]
-    }
-  };
-
   const VILLAGERS = [
     { name: "Ashura", loc: "Kilima Tavern", wants: [{name: "Sweet Leaf", love: false}, {name: "Kilima Catfish", love: false}, {name: "Fish Stew", love: true}, {name: "Celebration Cake", love: true}] },
     { name: "Auni", loc: "Tavern / Kilima Fields", wants: [{name: "Ship Fragments", love: false}, {name: "Garden Mantis", love: false}, {name: "Firebreathing Dragonfly", love: true}, {name: "Blueberry Pie", love: true}] },
@@ -716,7 +705,6 @@
     
     const fishFilters = document.getElementById('fish-filters');
     const bugFilters = document.getElementById('bug-filters');
-    const mapFilters = document.getElementById('map-filters');
     const resetBtn = document.getElementById('reset-btn');
     const searchInput = document.getElementById('search');
 
@@ -724,7 +712,6 @@
 
     fishFilters.style.display = 'none';
     bugFilters.style.display = 'none';
-    mapFilters.style.display = 'none';
     resetBtn.style.display = 'none';
 
     if (tab === 'weekly') {
@@ -746,14 +733,9 @@
       searchInput.style.display = 'block';
       bugFilters.style.display = 'flex';
     } else {
-      document.getElementById('page-title').innerHTML = '<span>🗺️ Region Maps</span>';
-      document.getElementById('sub-info').innerText = 'Interactive Landmarks';
-      searchInput.placeholder = 'Search landmark or NPC...';
-      searchInput.style.display = 'block';
-      mapFilters.style.display = 'flex';
-      if (!selectedLandmark) {
-        selectedLandmark = REGION_MAPS[selectedMapRegion].landmarks[0];
-      }
+      document.getElementById('page-title').innerHTML = '<span>🗺️ Kilima Valley Map</span>';
+      document.getElementById('sub-info').innerText = 'Pinch & Pan to Explore';
+      searchInput.style.display = 'none';
     }
     renderList();
   }
@@ -775,29 +757,92 @@
     renderList();
   }
 
-  function switchMapRegion(region, el) {
-    selectedMapRegion = region;
-    selectedLandmark = REGION_MAPS[region].landmarks[0];
-    const parent = el.parentElement;
-    parent.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
-    el.classList.add('active');
-    renderList();
-  }
-
-  function selectLandmark(id) {
-    const region = REGION_MAPS[selectedMapRegion];
-    const lm = region.landmarks.find(l => l.id === id);
-    if (lm) {
-      selectedLandmark = lm;
-      renderList();
+  function applyMapTransform() {
+    const img = document.getElementById('kilima-map-img');
+    if (img) {
+      img.style.transform = `translate(${mapX}px, ${mapY}px) scale(${mapScale})`;
     }
   }
 
-  function jumpToCompendium(targetTab, queryTerm) {
-    switchTab(targetTab);
-    searchStates[targetTab] = queryTerm;
-    document.getElementById('search').value = queryTerm;
-    renderList();
+  function zoomMap(delta) {
+    mapScale = Math.min(Math.max(0.8, mapScale + delta), 3.5);
+    applyMapTransform();
+  }
+
+  function resetMapZoom() {
+    mapScale = 1;
+    mapX = 0;
+    mapY = 0;
+    applyMapTransform();
+  }
+
+  function initMapGestures() {
+    const viewport = document.getElementById('map-viewport');
+    if (!viewport) return;
+
+    // Mouse Dragging
+    viewport.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      startX = e.clientX - mapX;
+      startY = e.clientY - mapY;
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      mapX = e.clientX - startX;
+      mapY = e.clientY - startY;
+      applyMapTransform();
+    });
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
+    // Touch Dragging & Pinch Zoom
+    viewport.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        isDragging = true;
+        startX = e.touches[0].clientX - mapX;
+        startY = e.touches[0].clientY - mapY;
+      } else if (e.touches.length === 2) {
+        isDragging = false;
+        initialPinchDist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+      }
+    }, { passive: false });
+
+    viewport.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      if (isDragging && e.touches.length === 1) {
+        mapX = e.touches[0].clientX - startX;
+        mapY = e.touches[0].clientY - startY;
+        applyMapTransform();
+      } else if (e.touches.length === 2 && initialPinchDist) {
+        const currentDist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        const diff = (currentDist - initialPinchDist) * 0.005;
+        mapScale = Math.min(Math.max(0.8, mapScale + diff), 3.5);
+        initialPinchDist = currentDist;
+        applyMapTransform();
+      }
+    }, { passive: false });
+
+    viewport.addEventListener('touchend', (e) => {
+      if (e.touches.length < 2) initialPinchDist = null;
+      if (e.touches.length === 0) isDragging = false;
+    });
+
+    // Double-tap to reset
+    let lastTap = 0;
+    viewport.addEventListener('touchend', (e) => {
+      const currentTime = new Date().getTime();
+      const tapLength = currentTime - lastTap;
+      if (tapLength < 300 && tapLength > 0) {
+        resetMapZoom();
+        e.preventDefault();
+      }
+      lastTap = currentTime;
+    });
   }
 
   function getNextResetTime() {
@@ -1036,88 +1081,30 @@
 
       document.getElementById('progress-text').innerText = `Caught: ${caughtCount}/${BUGS_DATABASE.length} | Star: ${starCount}/${BUGS_DATABASE.length}`;
     } else {
-      // STATIC VECTOR REGIONAL MAP RENDER
-      const reg = REGION_MAPS[selectedMapRegion];
-      const lm = selectedLandmark || reg.landmarks[0];
-
-      // Build SVG markers dynamically
-      const pinsHtml = reg.landmarks.map(l => {
-        const isSel = lm && lm.id === l.id;
-        const pinFill = isSel ? "#E5A853" : "#F2ECFB";
-        const pinStroke = isSel ? "#FFFFFF" : "#1E162B";
-        return `
-          <g class="map-pin ${isSel ? 'active' : ''}" onclick="selectLandmark('${l.id}')">
-            ${isSel ? `<circle cx="${l.x}" cy="${l.y}" r="12" fill="none" stroke="#E5A853" stroke-width="2" class="map-pin-pulse" />` : ''}
-            <circle cx="${l.x}" cy="${l.y}" r="8" fill="${pinFill}" stroke="${pinStroke}" stroke-width="2" />
-            <text x="${l.x}" y="${l.y - 12}" text-anchor="middle" fill="#F2ECFB" font-size="10" font-weight="700" style="text-shadow: 0 1px 4px #000;">${escapeHtml(l.name)}</text>
-          </g>
-        `;
-      }).join('');
-
-      let mapSvgGraphics = '';
-      if (selectedMapRegion === 'kilima') {
-        mapSvgGraphics = `
-          <!-- Kilima Valley Land & Water Paths -->
-          <rect width="500" height="450" fill="var(--map-land)" />
-          <!-- Kilima Lake -->
-          <path d="M 230 250 C 270 240, 360 260, 390 320 C 410 370, 360 420, 280 410 C 210 400, 190 340, 230 250 Z" fill="var(--map-water)" stroke="var(--map-stroke)" stroke-width="2" />
-          <!-- Phoenix River / Waterfalls -->
-          <path d="M 280 20 Q 260 80, 220 120 T 170 180 Q 200 210, 230 250" fill="none" stroke="var(--map-water)" stroke-width="12" stroke-linecap="round" />
-          <!-- Primary Dirt Paths -->
-          <path d="M 250 190 L 140 260 M 250 190 L 330 310 M 250 190 L 280 50 M 250 190 L 370 130" fill="none" stroke="var(--map-path)" stroke-width="4" stroke-dasharray="4,4" />
-        `;
-      } else {
-        mapSvgGraphics = `
-          <!-- Bahari Bay Land & Ocean Paths -->
-          <rect width="500" height="500" fill="var(--map-land)" />
-          <!-- Bahari Coast Ocean Boundary -->
-          <path d="M 330 0 C 310 100, 330 200, 310 320 C 290 400, 340 480, 350 500 L 500 500 L 500 0 Z" fill="var(--map-water)" stroke="var(--map-stroke)" stroke-width="2" />
-          <!-- Mountain Rivers & Flooded Steps -->
-          <path d="M 150 50 Q 220 120, 200 200 T 250 300 L 320 330" fill="none" stroke="var(--map-water)" stroke-width="10" stroke-linecap="round" />
-          <!-- Ridge Roads -->
-          <path d="M 150 100 L 210 160 L 220 270 L 130 210 M 220 270 L 360 390 M 210 160 L 270 180 L 380 260" fill="none" stroke="var(--map-path)" stroke-width="4" stroke-dasharray="4,4" />
-        `;
-      }
-
+      // STATIC CLEAN MAP VIEWER
       container.innerHTML = `
-        <div class="map-wrapper">
-          <svg class="map-svg" viewBox="${reg.viewBox}" xmlns="http://www.w3.org/2000/svg">
-            ${mapSvgGraphics}
-            ${pinsHtml}
-          </svg>
-        </div>
-
-        <div class="map-modal">
-          <div class="item-header">
-            <span class="item-name">📌 ${escapeHtml(lm.name)}</span>
-            <span class="region-badge">${escapeHtml(reg.title)}</span>
+        <div class="map-container">
+          <div class="map-viewport" id="map-viewport">
+            <img 
+              id="kilima-map-img" 
+              class="map-image" 
+              src="./kilima-map.jpg" 
+              alt="Kilima Valley Map"
+              onerror="this.onerror=null; this.src='https://palia.wiki.gg/images/b/b5/Kilima_Valley_Map.png';"
+            />
           </div>
-          <div class="item-details">
-            <p style="color: #BAADC9; font-size: 0.78rem; line-height: 1.35;">${escapeHtml(lm.desc)}</p>
-            <div class="item-detail-row">👥 <strong>Resident NPCs:</strong> <span>${escapeHtml(lm.villagers)}</span></div>
-            <div class="item-detail-row">🎣 <strong>Fish Pool:</strong> <span>${escapeHtml(lm.fishKey)}</span></div>
-            <div class="item-detail-row">🦋 <strong>Native Bugs:</strong> <span>${escapeHtml(lm.bugKey)}</span></div>
+          <div class="map-controls">
+            <button type="button" class="map-ctrl-btn" onclick="zoomMap(0.25)">+</button>
+            <button type="button" class="map-ctrl-btn" onclick="zoomMap(-0.25)">−</button>
+            <button type="button" class="map-ctrl-btn" onclick="resetMapZoom()">⟲</button>
           </div>
-          <div class="item-actions">
-            <button 
-              type="button" 
-              class="action-btn nav-link" 
-              onclick="jumpToCompendium('fish', '${escapeHtml(lm.fishKey)}')"
-            >
-              🎣 View Fish
-            </button>
-            <button 
-              type="button" 
-              class="action-btn nav-link" 
-              onclick="jumpToCompendium('bugs', '${escapeHtml(lm.bugKey)}')"
-            >
-              🦋 View Bugs
-            </button>
-          </div>
+          <div class="map-hint">Pinch or drag to explore • Double-tap to reset</div>
         </div>
       `;
 
-      document.getElementById('progress-text').innerText = `${reg.landmarks.length} Landmarks in ${reg.title}`;
+      document.getElementById('progress-text').innerText = 'Kilima Valley Clean Map';
+      initMapGestures();
+      applyMapTransform();
     }
   }
 
