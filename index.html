@@ -234,6 +234,7 @@
       border-radius: 14px;
       overflow: hidden;
       touch-action: none;
+      overscroll-behavior: none;
       box-shadow: inset 0 0 24px rgba(0,0,0,0.8);
     }
     .map-viewport {
@@ -242,17 +243,22 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
       cursor: grab;
     }
     .map-viewport:active { cursor: grabbing; }
     .map-image {
       max-width: 100%;
       height: auto;
-      transform-origin: center center;
+      transform-origin: 0 0;
       user-select: none;
       -webkit-user-drag: none;
+      -webkit-touch-callout: none;
       pointer-events: none;
       border-radius: 8px;
+      will-change: transform;
     }
     .map-controls {
       position: absolute;
@@ -406,13 +412,17 @@
   let fishBaitFilter = 'all';
   let bugZoneFilter = 'all';
 
-  // Map Zoom & Pan State
+  // Resilient Gesture State
   let mapScale = 1;
   let mapX = 0;
   let mapY = 0;
   let isDragging = false;
-  let startX = 0, startY = 0;
+  let startX = 0;
+  let startY = 0;
   let initialPinchDist = null;
+  let pinchStartScale = 1;
+  let lastTapTime = 0;
+  let touchCount = 0;
 
   const searchStates = {
     weekly: '',
@@ -760,12 +770,21 @@
   function applyMapTransform() {
     const img = document.getElementById('kilima-map-img');
     if (img) {
-      img.style.transform = `translate(${mapX}px, ${mapY}px) scale(${mapScale})`;
+      img.style.transform = `translate3d(${mapX}px, ${mapY}px, 0) scale(${mapScale})`;
     }
   }
 
   function zoomMap(delta) {
-    mapScale = Math.min(Math.max(0.8, mapScale + delta), 3.5);
+    const newScale = Math.min(Math.max(0.6, mapScale + delta), 4.0);
+    const container = document.querySelector('.map-container');
+    if (container) {
+      const rect = container.getBoundingClientRect();
+      const cx = rect.width / 2;
+      const cy = rect.height / 2;
+      mapX = cx - (cx - mapX) * (newScale / mapScale);
+      mapY = cy - (cy - mapY) * (newScale / mapScale);
+    }
+    mapScale = newScale;
     applyMapTransform();
   }
 
@@ -780,6 +799,71 @@
     const viewport = document.getElementById('map-viewport');
     if (!viewport) return;
 
+    const getDistance = (t1, t2) => Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+    const getMidpoint = (t1, t2) => ({
+      x: (t1.clientX + t2.clientX) / 2,
+      y: (t1.clientY + t2.clientY) / 2
+    });
+
+    viewport.addEventListener('touchstart', (e) => {
+      touchCount = e.touches.length;
+
+      if (e.touches.length === 1) {
+        isDragging = true;
+        startX = e.touches[0].clientX - mapX;
+        startY = e.touches[0].clientY - mapY;
+      } else if (e.touches.length === 2) {
+        isDragging = false;
+        initialPinchDist = getDistance(e.touches[0], e.touches[1]);
+        pinchStartScale = mapScale;
+      }
+    }, { passive: false });
+
+    viewport.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+
+      if (e.touches.length === 1 && isDragging) {
+        mapX = e.touches[0].clientX - startX;
+        mapY = e.touches[0].clientY - startY;
+        applyMapTransform();
+      } else if (e.touches.length === 2 && initialPinchDist) {
+        const currentDist = getDistance(e.touches[0], e.touches[1]);
+        const factor = currentDist / initialPinchDist;
+        const targetScale = Math.min(Math.max(0.6, pinchStartScale * factor), 4.0);
+
+        const mid = getMidpoint(e.touches[0], e.touches[1]);
+        const rect = viewport.getBoundingClientRect();
+        const localX = mid.x - rect.left;
+        const localY = mid.y - rect.top;
+
+        mapX = localX - (localX - mapX) * (targetScale / mapScale);
+        mapY = localY - (localY - mapY) * (targetScale / mapScale);
+        mapScale = targetScale;
+
+        applyMapTransform();
+      }
+    }, { passive: false });
+
+    viewport.addEventListener('touchend', (e) => {
+      if (e.touches.length === 1) {
+        isDragging = true;
+        startX = e.touches[0].clientX - mapX;
+        startY = e.touches[0].clientY - mapY;
+        initialPinchDist = null;
+      } else if (e.touches.length === 0) {
+        isDragging = false;
+        initialPinchDist = null;
+
+        const now = Date.now();
+        if (touchCount === 1) {
+          if (now - lastTapTime < 280) {
+            resetMapZoom();
+          }
+          lastTapTime = now;
+        }
+      }
+    });
+
     // Mouse Dragging
     viewport.addEventListener('mousedown', (e) => {
       isDragging = true;
@@ -793,56 +877,6 @@
       applyMapTransform();
     });
     window.addEventListener('mouseup', () => { isDragging = false; });
-
-    // Touch Dragging & Pinch Zoom
-    viewport.addEventListener('touchstart', (e) => {
-      if (e.touches.length === 1) {
-        isDragging = true;
-        startX = e.touches[0].clientX - mapX;
-        startY = e.touches[0].clientY - mapY;
-      } else if (e.touches.length === 2) {
-        isDragging = false;
-        initialPinchDist = Math.hypot(
-          e.touches[0].clientX - e.touches[1].clientX,
-          e.touches[0].clientY - e.touches[1].clientY
-        );
-      }
-    }, { passive: false });
-
-    viewport.addEventListener('touchmove', (e) => {
-      e.preventDefault();
-      if (isDragging && e.touches.length === 1) {
-        mapX = e.touches[0].clientX - startX;
-        mapY = e.touches[0].clientY - startY;
-        applyMapTransform();
-      } else if (e.touches.length === 2 && initialPinchDist) {
-        const currentDist = Math.hypot(
-          e.touches[0].clientX - e.touches[1].clientX,
-          e.touches[0].clientY - e.touches[1].clientY
-        );
-        const diff = (currentDist - initialPinchDist) * 0.005;
-        mapScale = Math.min(Math.max(0.8, mapScale + diff), 3.5);
-        initialPinchDist = currentDist;
-        applyMapTransform();
-      }
-    }, { passive: false });
-
-    viewport.addEventListener('touchend', (e) => {
-      if (e.touches.length < 2) initialPinchDist = null;
-      if (e.touches.length === 0) isDragging = false;
-    });
-
-    // Double-tap to reset
-    let lastTap = 0;
-    viewport.addEventListener('touchend', (e) => {
-      const currentTime = new Date().getTime();
-      const tapLength = currentTime - lastTap;
-      if (tapLength < 300 && tapLength > 0) {
-        resetMapZoom();
-        e.preventDefault();
-      }
-      lastTap = currentTime;
-    });
   }
 
   function getNextResetTime() {
