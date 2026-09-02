@@ -26,6 +26,10 @@
       --rare: #3B82F6;
       --epic: #A855F7;
       --legendary: #F59E0B;
+      --map-water: #1C2D4A;
+      --map-land: #1E1729;
+      --map-stroke: #3E2F54;
+      --map-path: #2E223D;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; }
@@ -169,7 +173,6 @@
       opacity: 0.65;
     }
 
-    /* Compendium & Map Cards */
     .item-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -184,7 +187,6 @@
     .item-card.rare { border-left-color: var(--rare); }
     .item-card.epic { border-left-color: var(--epic); }
     .item-card.legendary { border-left-color: var(--legendary); }
-    .item-card.region-card { border-left-color: var(--accent); }
 
     .item-header { display: flex; justify-content: space-between; align-items: flex-start; }
     .item-name { font-weight: 700; font-size: 1rem; color: #FFF; }
@@ -200,7 +202,6 @@
     .rarity-pill.rare { background: #1E2D4A; color: #93C5FD; }
     .rarity-pill.epic { background: #3B1D4A; color: #D8B4FE; }
     .rarity-pill.legendary { background: #4D3319; color: #FCD34D; }
-    .region-badge { background: #392817; color: #F59E0B; font-size: 0.72rem; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
 
     .item-details { display: grid; grid-template-columns: 1fr; gap: 4px; font-size: 0.78rem; color: var(--text-muted); }
     .item-detail-row { display: flex; align-items: flex-start; gap: 4px; line-height: 1.35; }
@@ -227,7 +228,49 @@
     .action-btn.nav-link { background: #322544; border-color: #4C3766; color: #DDD0F0; }
     .action-btn.nav-link:active { background: #43335D; }
 
-    /* Bottom Navigation Bar */
+    /* Map Specific Styles */
+    .map-wrapper {
+      background: #0E0916;
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      overflow: hidden;
+      position: relative;
+      width: 100%;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
+    }
+    .map-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      user-select: none;
+    }
+    .map-pin {
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .map-pin:hover, .map-pin.active {
+      transform: scale(1.15);
+      transform-origin: center;
+    }
+    .map-pin-pulse {
+      animation: pinPulse 2s infinite;
+    }
+    @keyframes pinPulse {
+      0% { r: 6; opacity: 0.8; }
+      50% { r: 10; opacity: 0.2; }
+      100% { r: 6; opacity: 0.8; }
+    }
+    .map-modal {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Bottom Navigation */
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -305,15 +348,11 @@
     </div>
   </div>
 
-  <!-- Map Filters -->
+  <!-- Region Map Selector -->
   <div id="map-filters" style="display: none; flex-direction: column;">
     <div class="filter-scroll">
-      <button class="filter-pill active" onclick="setMapFilter('all', this)">All Regions</button>
-      <button class="filter-pill" onclick="setMapFilter('Kilima Valley', this)">Kilima Valley</button>
-      <button class="filter-pill" onclick="setMapFilter('Bahari Bay', this)">Bahari Bay</button>
-      <button class="filter-pill" onclick="setMapFilter('Elderwood', this)">Elderwood</button>
-      <button class="filter-pill" onclick="setMapFilter('Royal Highlands', this)">Royal Highlands</button>
-      <button class="filter-pill" onclick="setMapFilter('Special Zones', this)">Special / Caves</button>
+      <button class="filter-pill active" onclick="switchMapRegion('kilima', this)">📍 Kilima Valley</button>
+      <button class="filter-pill" onclick="switchMapRegion('bahari', this)">📍 Bahari Bay</button>
     </div>
   </div>
 
@@ -350,9 +389,9 @@
   let fishZoneFilter = 'all';
   let fishBaitFilter = 'all';
   let bugZoneFilter = 'all';
-  let mapRegionFilter = 'all';
+  let selectedMapRegion = 'kilima';
+  let selectedLandmark = null;
 
-  // Isolated Search States per Tab
   const searchStates = {
     weekly: '',
     fish: '',
@@ -601,126 +640,37 @@
     { name: "Will-o-wisp Rockhopper", loc: "Elderwood Forest • Elderwood Swamps", time: "Any Time" }
   ];
 
-  // Palia Regions Directory
-  const REGIONS_DATABASE = [
-    {
-      name: "Kilima Village & Town Center",
-      region: "Kilima Valley",
-      description: "The primary social and civic hub of Kilima Valley. Houses shops, the library, apothecary, and town hall.",
-      villagers: "Eshe, Kenli, Kenyatta, Tish, Jel, Zeki, Chayne, Caleri, Reth",
-      fastTravel: "Central Kilima Stable (Near Ormuu Horn)",
-      resources: "Kilima Rivers, Common Field Crickets, Copper Nodes",
-      filterTag: "Kilima"
+  // Static Regional Maps Landmark Data
+  const REGION_MAPS = {
+    kilima: {
+      title: "Kilima Valley",
+      viewBox: "0 0 500 450",
+      landmarks: [
+        { id: "k1", name: "Kilima Village", x: 250, y: 190, desc: "Civic center, shops, town hall, tavern, and library.", villagers: "Eshe, Kenli, Kenyatta, Tish, Jel, Zeki, Chayne, Caleri, Reth", fishKey: "Kilima Lake", bugKey: "Kilima Fields", type: "town" },
+        { id: "k2", name: "Fisherman's Lagoon", x: 330, y: 310, desc: "Serene wooden piers overlooking Kilima Lake.", villagers: "Einar, Ashura (wandering)", fishKey: "Kilima Lake", bugKey: "Kilima Lake", type: "water" },
+        { id: "k3", name: "Daiya Family Farm", x: 140, y: 260, desc: "Agricultural valley, crop fields, and barn.", villagers: "Badruu, Delaila, Nai'o, Auni", fishKey: "Ponds", bugKey: "Daiya Family Farm", type: "farm" },
+        { id: "k4", name: "Mirror Pond Ruins", x: 180, y: 80, desc: "Ancient Human ruins alongside mountain waterfalls.", villagers: "Jina, Hekla", fishKey: "Kilima Rivers", bugKey: "Kilima Fields", type: "ruins" },
+        { id: "k5", name: "Phoenix Falls", x: 280, y: 50, desc: "Sacred entrance waterfall where Humans emerge.", villagers: "Jina (investigating)", fishKey: "Kilima Rivers", bugKey: "Kilima Fields", type: "ruins" },
+        { id: "k6", name: "Dragon Shrine", x: 370, y: 130, desc: "Ancestral Majiri shrine engulfed in ancient trees.", villagers: "Chayne, Hassian (patrols)", fishKey: "Kilima Rivers", bugKey: "Dragon Shrine", type: "shrine" },
+        { id: "k7", name: "Whispering Banks", x: 260, y: 340, desc: "Southern shoreline and river inlet.", villagers: "Ashura (fishing spot)", fishKey: "Kilima Lake", bugKey: "Kilima Lake", type: "water" },
+        { id: "k8", name: "Leafhopper Hills", x: 120, y: 340, desc: "Rolling southern hills bordering the coast.", villagers: "Auni (insect hunts)", fishKey: "Ponds", bugKey: "Kilima Fields", type: "nature" }
+      ]
     },
-    {
-      name: "Fisherman's Lagoon & Remembrance Beach",
-      region: "Kilima Valley",
-      description: "Expansive shoreline facing Kilima Lake. Prime angling grounds with wooden piers and serene shores.",
-      villagers: "Einar, Ashura (wandering)",
-      fastTravel: "Fisherman's Lagoon Stable",
-      resources: "Kilima Lake Fish (Ancient Fish, Shimmerfin), Princess Ladybug",
-      filterTag: "Kilima Lake"
-    },
-    {
-      name: "Daiya Family Farm & Leafhopper Hills",
-      region: "Kilima Valley",
-      description: "Rolling agricultural hills, farm pastures, and open fields south of the town center.",
-      villagers: "Badruu, Delaila, Nai'o, Auni",
-      fastTravel: "Daiya Farm Stable",
-      resources: "Farm Ponds, Raspberry Beetle, Common Blue Butterfly",
-      filterTag: "Daiya"
-    },
-    {
-      name: "Mirror Pond Ruins & Phoenix Falls",
-      region: "Kilima Valley",
-      description: "Ancient Human ruins nestled beside towering waterfalls and tranquil mountain streams.",
-      villagers: "Jina, Hekla",
-      fastTravel: "Mirror Pond Stable",
-      resources: "Kilima Rivers, Freshwater Eels, Copper & Clay nodes",
-      filterTag: "Kilima Rivers"
-    },
-    {
-      name: "Dragon Shrine & Whispering Banks",
-      region: "Kilima Valley",
-      description: "A sacred ancestral shrine enveloped by dense trees and steep river embankments.",
-      villagers: "Chayne (visits), Hassian & Tau (patrols)",
-      fastTravel: "Whispering Banks Stable",
-      resources: "Spotted Mantis, Duskwing Butterfly, Willow Trees",
-      filterTag: "Dragon Shrine"
-    },
-    {
-      name: "Bahari Bay Coast & Coral Shores",
-      region: "Bahari Bay",
-      description: "Sweeping ocean beachline dotted with shipwrecks, tide pools, and towering sandstone cliffs.",
-      villagers: "Hodari, Najuma, Jel (visits beach)",
-      fastTravel: "Beachcomber Cove Stable",
-      resources: "Bahari Coast Fish (Unicorn Fish, Marlin), Bahari Crab, Coral",
-      filterTag: "Bahari Coast"
-    },
-    {
-      name: "Flooded Fortress & Pavel Mines",
-      region: "Bahari Bay",
-      description: "Ancient stone fortress submerged in tides alongside cavernous multi-level mining tunnels.",
-      villagers: "Hodari (frequents mines)",
-      fastTravel: "Flooded Fortress Stable",
-      resources: "Cave Fish (Void Ray, Bat Ray), Vampire Crab, Palium Ore",
-      filterTag: "Caves"
-    },
-    {
-      name: "Proudhorn Pass & The Outskirts",
-      region: "Bahari Bay",
-      description: "Forested mountain trails, winding river chasms, and wilderness campsite hideaways.",
-      villagers: "Hassian, Tau, Tamala (path to woods)",
-      fastTravel: "Proudhorn Pass Stable",
-      resources: "Bahari Rivers (Stormray, Willow Lamprey), Heartwood, Sernuk",
-      filterTag: "Bahari Rivers"
-    },
-    {
-      name: "Bahari Central Fields & Windy Ruins",
-      region: "Bahari Bay",
-      description: "Open grassy plains dotted with ancient stone arches and flow-powered wind relics.",
-      villagers: "Auni (insect hunts)",
-      fastTravel: "Central Stables",
-      resources: "Rainbow-tipped Butterfly, Fairy Mantis, Bahari Glowbug",
-      filterTag: "Bahari Fields"
-    },
-    {
-      name: "The Underground (Black Market)",
-      region: "Special Zones",
-      description: "Subterranean cavern market hidden beneath Kilima Tavern. Hosts games, decor shops, and night fishing.",
-      villagers: "Zeki, Reth (evenings)",
-      fastTravel: "Direct sewer hatch or cellar doorway",
-      resources: "Cave Water fishing (Albino Eel, Blobfish, Void Ray)",
-      filterTag: "Caves"
-    },
-    {
-      name: "Temple of the Gales",
-      region: "Special Zones",
-      description: "Floating sky islands high above the clouds powered by ancient flow turbines.",
-      villagers: "Elouisa, Caleri (quest hub)",
-      fastTravel: "Breeze Gate portal",
-      resources: "Ancient Cloudminnow, Ancient Flowbug",
-      filterTag: "Temple of the Gales"
-    },
-    {
-      name: "Elderwood Forest & Swamps",
-      region: "Elderwood",
-      description: "Dense, primeval woodland territory rich with magical flow-infused fauna and deep bogs.",
-      villagers: "Subira, Tamala (wilderness boundary)",
-      fastTravel: "Elderwood Boundary Gate",
-      resources: "Elderwood Freshwater/Saltwater fish, Sunburst Batterfly",
-      filterTag: "Elderwood"
-    },
-    {
-      name: "Royal Highlands & Amber Lake",
-      region: "Royal Highlands",
-      description: "Prestigious elevated plateau with grand estates, cliff-top forums, and serene highland tarns.",
-      villagers: "Subira (diplomatic visits), Eshe",
-      fastTravel: "Highlands Forum Gate",
-      resources: "Highland Shark, King Crab, Amber Moray",
-      filterTag: "Royal Highlands"
+    bahari: {
+      title: "Bahari Bay",
+      viewBox: "0 0 500 500",
+      landmarks: [
+        { id: "b1", name: "Pavel Mines", x: 210, y: 160, desc: "Multi-level mining caverns rich in minerals.", villagers: "Hodari (frequents inside)", fishKey: "Caves", bugKey: "Cliffs Above Pavel Mines", type: "mine" },
+        { id: "b2", name: "Flooded Fortress", x: 220, y: 270, desc: "Ancient flooded fortress with high stone arches.", villagers: "Subira (investigating)", fishKey: "Caves", bugKey: "Flooded Fortress", type: "ruins" },
+        { id: "b3", name: "Coral Shores", x: 380, y: 260, desc: "Expansive ocean coastline, shipwrecks, and tide pools.", villagers: "Jel (beach visits)", fishKey: "Bahari Coast", bugKey: "Bahari Coast", type: "water" },
+        { id: "b4", name: "Lighthouse Lagoon", x: 360, y: 390, desc: "Southern rocky cliffs and old stone lighthouse.", villagers: "Najuma (observatory)", fishKey: "Bahari Coast", bugKey: "Bahari Coast", type: "water" },
+        { id: "b5", name: "Proudhorn Pass", x: 150, y: 100, desc: "Mountain passage leading into northern forests.", villagers: "Hassian, Tau", fishKey: "Bahari Rivers", bugKey: "Bahari Forest", type: "nature" },
+        { id: "b6", name: "Hodari & Najuma's Workshop", x: 130, y: 210, desc: "Rustic blacksmith and invention home plot.", villagers: "Hodari, Najuma", fishKey: "Ponds", bugKey: "Bahari Fields", type: "town" },
+        { id: "b7", name: "The Outskirts & Woods", x: 120, y: 330, desc: "Dense wilderness bordering the witch's lodge.", villagers: "Tamala", fishKey: "Bahari Rivers", bugKey: "Bahari Forest", type: "nature" },
+        { id: "b8", name: "Windy Ruins & Central Fields", x: 270, y: 180, desc: "Open central plains with ancient flow aqueducts.", villagers: "Auni (insect hunts)", fishKey: "Bahari Rivers", bugKey: "Bahari Fields", type: "ruins" }
+      ]
     }
-  ];
+  };
 
   const VILLAGERS = [
     { name: "Ashura", loc: "Kilima Tavern", wants: [{name: "Sweet Leaf", love: false}, {name: "Kilima Catfish", love: false}, {name: "Fish Stew", love: true}, {name: "Celebration Cake", love: true}] },
@@ -772,7 +722,6 @@
 
     searchInput.value = searchStates[tab] || '';
 
-    // Hide all filters initially
     fishFilters.style.display = 'none';
     bugFilters.style.display = 'none';
     mapFilters.style.display = 'none';
@@ -782,22 +731,29 @@
       document.getElementById('page-title').innerHTML = '<span>✨ Weekly Wants</span>';
       document.getElementById('sub-info').innerText = 'Reset: Mon 5:00 AM (SGT)';
       searchInput.placeholder = 'Search villager or item...';
+      searchInput.style.display = 'block';
       resetBtn.style.display = 'block';
     } else if (tab === 'fish') {
       document.getElementById('page-title').innerHTML = '<span>🎣 Fish Guide</span>';
       document.getElementById('sub-info').innerText = '123 Species Directory';
       searchInput.placeholder = 'Search fish, location, or bait...';
+      searchInput.style.display = 'block';
       fishFilters.style.display = 'flex';
     } else if (tab === 'bugs') {
       document.getElementById('page-title').innerHTML = '<span>🦋 Bug Catching</span>';
       document.getElementById('sub-info').innerText = '64 Species Directory';
       searchInput.placeholder = 'Search bug or location...';
+      searchInput.style.display = 'block';
       bugFilters.style.display = 'flex';
     } else {
       document.getElementById('page-title').innerHTML = '<span>🗺️ Region Maps</span>';
-      document.getElementById('sub-info').innerText = 'Points of Interest & Routes';
-      searchInput.placeholder = 'Search area, resident, or resource...';
+      document.getElementById('sub-info').innerText = 'Interactive Landmarks';
+      searchInput.placeholder = 'Search landmark or NPC...';
+      searchInput.style.display = 'block';
       mapFilters.style.display = 'flex';
+      if (!selectedLandmark) {
+        selectedLandmark = REGION_MAPS[selectedMapRegion].landmarks[0];
+      }
     }
     renderList();
   }
@@ -805,7 +761,6 @@
   function setFishFilter(type, val, el) {
     if (type === 'zone') fishZoneFilter = val;
     if (type === 'bait') fishBaitFilter = val;
-    
     const parent = el.parentElement;
     parent.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
     el.classList.add('active');
@@ -820,15 +775,24 @@
     renderList();
   }
 
-  function setMapFilter(val, el) {
-    mapRegionFilter = val;
+  function switchMapRegion(region, el) {
+    selectedMapRegion = region;
+    selectedLandmark = REGION_MAPS[region].landmarks[0];
     const parent = el.parentElement;
     parent.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
     el.classList.add('active');
     renderList();
   }
 
-  // Cross-tab direct filter link
+  function selectLandmark(id) {
+    const region = REGION_MAPS[selectedMapRegion];
+    const lm = region.landmarks.find(l => l.id === id);
+    if (lm) {
+      selectedLandmark = lm;
+      renderList();
+    }
+  }
+
   function jumpToCompendium(targetTab, queryTerm) {
     switchTab(targetTab);
     searchStates[targetTab] = queryTerm;
@@ -919,7 +883,7 @@
   }
 
   function escapeHtml(str) {
-    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
   }
 
   function renderList() {
@@ -1072,49 +1036,88 @@
 
       document.getElementById('progress-text').innerText = `Caught: ${caughtCount}/${BUGS_DATABASE.length} | Star: ${starCount}/${BUGS_DATABASE.length}`;
     } else {
-      // MAPS & REGIONS DIRECTORY RENDER
-      const filteredRegions = REGIONS_DATABASE.filter(r => {
-        const matchesQuery = r.name.toLowerCase().includes(q) ||
-                             r.region.toLowerCase().includes(q) ||
-                             r.villagers.toLowerCase().includes(q) ||
-                             r.resources.toLowerCase().includes(q) ||
-                             r.description.toLowerCase().includes(q);
-        const matchesRegion = mapRegionFilter === 'all' || r.region.toLowerCase() === mapRegionFilter.toLowerCase();
-        return matchesQuery && matchesRegion;
-      });
+      // STATIC VECTOR REGIONAL MAP RENDER
+      const reg = REGION_MAPS[selectedMapRegion];
+      const lm = selectedLandmark || reg.landmarks[0];
 
-      container.innerHTML = filteredRegions.map(r => `
-        <div class="item-card region-card">
+      // Build SVG markers dynamically
+      const pinsHtml = reg.landmarks.map(l => {
+        const isSel = lm && lm.id === l.id;
+        const pinFill = isSel ? "#E5A853" : "#F2ECFB";
+        const pinStroke = isSel ? "#FFFFFF" : "#1E162B";
+        return `
+          <g class="map-pin ${isSel ? 'active' : ''}" onclick="selectLandmark('${l.id}')">
+            ${isSel ? `<circle cx="${l.x}" cy="${l.y}" r="12" fill="none" stroke="#E5A853" stroke-width="2" class="map-pin-pulse" />` : ''}
+            <circle cx="${l.x}" cy="${l.y}" r="8" fill="${pinFill}" stroke="${pinStroke}" stroke-width="2" />
+            <text x="${l.x}" y="${l.y - 12}" text-anchor="middle" fill="#F2ECFB" font-size="10" font-weight="700" style="text-shadow: 0 1px 4px #000;">${escapeHtml(l.name)}</text>
+          </g>
+        `;
+      }).join('');
+
+      let mapSvgGraphics = '';
+      if (selectedMapRegion === 'kilima') {
+        mapSvgGraphics = `
+          <!-- Kilima Valley Land & Water Paths -->
+          <rect width="500" height="450" fill="var(--map-land)" />
+          <!-- Kilima Lake -->
+          <path d="M 230 250 C 270 240, 360 260, 390 320 C 410 370, 360 420, 280 410 C 210 400, 190 340, 230 250 Z" fill="var(--map-water)" stroke="var(--map-stroke)" stroke-width="2" />
+          <!-- Phoenix River / Waterfalls -->
+          <path d="M 280 20 Q 260 80, 220 120 T 170 180 Q 200 210, 230 250" fill="none" stroke="var(--map-water)" stroke-width="12" stroke-linecap="round" />
+          <!-- Primary Dirt Paths -->
+          <path d="M 250 190 L 140 260 M 250 190 L 330 310 M 250 190 L 280 50 M 250 190 L 370 130" fill="none" stroke="var(--map-path)" stroke-width="4" stroke-dasharray="4,4" />
+        `;
+      } else {
+        mapSvgGraphics = `
+          <!-- Bahari Bay Land & Ocean Paths -->
+          <rect width="500" height="500" fill="var(--map-land)" />
+          <!-- Bahari Coast Ocean Boundary -->
+          <path d="M 330 0 C 310 100, 330 200, 310 320 C 290 400, 340 480, 350 500 L 500 500 L 500 0 Z" fill="var(--map-water)" stroke="var(--map-stroke)" stroke-width="2" />
+          <!-- Mountain Rivers & Flooded Steps -->
+          <path d="M 150 50 Q 220 120, 200 200 T 250 300 L 320 330" fill="none" stroke="var(--map-water)" stroke-width="10" stroke-linecap="round" />
+          <!-- Ridge Roads -->
+          <path d="M 150 100 L 210 160 L 220 270 L 130 210 M 220 270 L 360 390 M 210 160 L 270 180 L 380 260" fill="none" stroke="var(--map-path)" stroke-width="4" stroke-dasharray="4,4" />
+        `;
+      }
+
+      container.innerHTML = `
+        <div class="map-wrapper">
+          <svg class="map-svg" viewBox="${reg.viewBox}" xmlns="http://www.w3.org/2000/svg">
+            ${mapSvgGraphics}
+            ${pinsHtml}
+          </svg>
+        </div>
+
+        <div class="map-modal">
           <div class="item-header">
-            <span class="item-name">${escapeHtml(r.name)}</span>
-            <span class="region-badge">${escapeHtml(r.region)}</span>
+            <span class="item-name">📌 ${escapeHtml(lm.name)}</span>
+            <span class="region-badge">${escapeHtml(reg.title)}</span>
           </div>
           <div class="item-details">
-            <p style="color: #BAADC9; font-size: 0.76rem; line-height: 1.35; margin-bottom: 4px;">${escapeHtml(r.description)}</p>
-            <div class="item-detail-row">👥 <strong>Resident NPCs:</strong> <span>${escapeHtml(r.villagers)}</span></div>
-            <div class="item-detail-row">🐎 <strong>Fast Travel:</strong> <span>${escapeHtml(r.fastTravel)}</span></div>
-            <div class="item-detail-row">💎 <strong>Key Spawns:</strong> <span>${escapeHtml(r.resources)}</span></div>
+            <p style="color: #BAADC9; font-size: 0.78rem; line-height: 1.35;">${escapeHtml(lm.desc)}</p>
+            <div class="item-detail-row">👥 <strong>Resident NPCs:</strong> <span>${escapeHtml(lm.villagers)}</span></div>
+            <div class="item-detail-row">🎣 <strong>Fish Pool:</strong> <span>${escapeHtml(lm.fishKey)}</span></div>
+            <div class="item-detail-row">🦋 <strong>Native Bugs:</strong> <span>${escapeHtml(lm.bugKey)}</span></div>
           </div>
           <div class="item-actions">
             <button 
               type="button" 
               class="action-btn nav-link" 
-              onclick="jumpToCompendium('fish', '${escapeHtml(r.filterTag)}')"
+              onclick="jumpToCompendium('fish', '${escapeHtml(lm.fishKey)}')"
             >
-              🎣 Filter Fish
+              🎣 View Fish
             </button>
             <button 
               type="button" 
               class="action-btn nav-link" 
-              onclick="jumpToCompendium('bugs', '${escapeHtml(r.filterTag)}')"
+              onclick="jumpToCompendium('bugs', '${escapeHtml(lm.bugKey)}')"
             >
-              🦋 Filter Bugs
+              🦋 View Bugs
             </button>
           </div>
         </div>
-      `).join('');
+      `;
 
-      document.getElementById('progress-text').innerText = `Locations: ${filteredRegions.length} of ${REGIONS_DATABASE.length}`;
+      document.getElementById('progress-text').innerText = `${reg.landmarks.length} Landmarks in ${reg.title}`;
     }
   }
 
