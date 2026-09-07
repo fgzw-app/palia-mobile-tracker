@@ -2,7 +2,6 @@ name: Auto-Sync Palia Weekly Wants
 
 on:
   schedule:
-    # Runs Monday at 02:00 UTC (10:00 AM SGT), after reset and data confirmation
     - cron: '0 2 * * 1'
   workflow_dispatch:
 
@@ -24,7 +23,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Extract Wants from Paliapedia
+      - name: Scrape Clean Paliapedia Wants
         run: |
           python - << 'EOF'
           import json
@@ -36,16 +35,17 @@ jobs:
           URL = "https://paliapedia.com/tools/weekly-wants"
           HEADERS = {
               "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-              "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-              "Accept-Language": "en-US,en;q=0.9"
+              "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
           }
 
-          VILLAGER_NAMES = [
+          VILLAGERS = [
               "Ashura", "Auni", "Badruu", "Caleri", "Chayne", "Delaila", "Einar",
               "Elouisa", "Eshe", "Hassian", "Hekla", "Hodari", "Jel", "Jina",
               "Kenli", "Kenyatta", "Nai'o", "Najuma", "Reth", "Sifuu", "Subira",
-              "Tamala", "Tau", "Tish", "Zeki"
+              "Tamala", "Tau", "The Gardener", "Tish", "Ulfe", "Zeki"
           ]
+
+          BANNED = {"gifts", "gift", "div", "class", "like", "love", "items", "wants", "true", "false", "item"}
 
           try:
               print(f"Requesting {URL}...")
@@ -53,64 +53,38 @@ jobs:
               with urllib.request.urlopen(req, timeout=25) as res:
                   html = res.read().decode("utf-8")
 
-              # 1. Search for embedded Nuxt or Next.js state data
-              nuxt_match = re.search(r'<script[^>]*id="__NUXT_DATA__"[^>]*>(.*?)</script>', html, re.DOTALL)
-              next_match = re.search(r'<script[^>]*id="__NEXT_DATA__"[^>]*>(.*?)</script>', html, re.DOTALL)
-
-              data_payload = None
-              if nuxt_match:
-                  print("Found __NUXT_DATA__ script block.")
-                  data_payload = json.loads(nuxt_match.group(1))
-              elif next_match:
-                  print("Found __NEXT_DATA__ script block.")
-                  data_payload = json.loads(next_match.group(1))
+              # Strip HTML tags and normalize text
+              clean_text = re.sub(r'<[^>]+>', '\n', html)
+              lines = [re.sub(r'\s+', ' ', l).strip() for l in clean_text.splitlines() if l.strip()]
 
               villagers_dict = {}
 
-              # Extract items if structured script was found
-              if data_payload:
-                  # Parse string array references from Nuxt dehydrate format
-                  if isinstance(data_payload, list):
-                      flat_strings = [str(x) for x in data_payload if isinstance(x, str)]
-                      for i, token in enumerate(flat_strings):
-                          for v_name in VILLAGER_NAMES:
-                              if token.strip().lower() == v_name.lower():
-                                  # Collect nearby item candidates
-                                  nearby = flat_strings[i+1:i+15]
-                                  valid_items = [
-                                      item for item in nearby 
-                                      if len(item) > 2 
-                                      and not item.startswith("http") 
-                                      and item not in VILLAGER_NAMES
-                                      and item not in ("like", "love", "items", "wants", "id", "name")
-                                  ]
-                                  if valid_items and v_name not in villagers_dict:
-                                      wants = []
-                                      for idx, itm in enumerate(valid_items[:4]):
-                                          wants.append({"name": itm, "love": idx >= 2})
-                                      villagers_dict[v_name] = wants
+              for i, line in enumerate(lines):
+                  matched_name = None
+                  for v in VILLAGERS:
+                      if line.lower() in (f"{v} gifts".lower(), v.lower()):
+                          matched_name = v
+                          break
 
-              # 2. Fallback: Direct regex scanner across full HTML for villager-item associations
-              if len(villagers_dict) < 5:
-                  print("Scanning raw HTML tokens for villager wants mapping...")
-                  # Matches patterns where items are listed around villager names
-                  for v_name in VILLAGER_NAMES:
-                      pattern = re.compile(rf'{v_name}.*?([A-Z][a-zA-Z\s\']{{3,25}})', re.IGNORECASE)
-                      matches = pattern.findall(html)
-                      clean_matches = [
-                          m.strip() for m in matches 
-                          if m.strip() not in VILLAGER_NAMES 
-                          and len(m.strip()) > 3
-                      ]
-                      if clean_matches and v_name not in villagers_dict:
-                          unique_items = list(dict.fromkeys(clean_matches))[:4]
-                          if unique_items:
-                              wants = [{"name": itm, "love": idx >= 2} for idx, itm in enumerate(unique_items)]
-                              villagers_dict[v_name] = wants
+                  if matched_name and matched_name not in villagers_dict:
+                      wants = []
+                      # Look at the next 12 lines for item names
+                      for candidate in lines[i+1:i+16]:
+                          cand_clean = re.sub(r'[\*\•\-\(\)]', '', candidate).strip()
+                          if (len(cand_clean) > 2 
+                              and cand_clean.lower() not in BANNED 
+                              and not any(cand_clean.lower().startswith(b) for b in ("div", "class", "http"))
+                              and not any(cand_clean.lower() == v.lower() or cand_clean.lower() == f"{v} gifts".lower() for v in VILLAGERS)):
+                              if cand_clean not in [w["name"] for w in wants]:
+                                  is_love = len(wants) >= 2
+                                  wants.append({"name": cand_clean, "love": is_love})
+                          if len(wants) == 4:
+                              break
+                      if len(wants) >= 3:
+                          villagers_dict[matched_name] = wants
 
-              # If scraping still didn't extract full list, preserve existing data rather than writing empty
               if len(villagers_dict) < 5:
-                  print(f"Extraction returned {len(villagers_dict)} villagers. Keeping existing wants.json.", file=sys.stderr)
+                  print("Warning: Parser found insufficient villagers. Preserving existing wants.json.", file=sys.stderr)
                   sys.exit(0)
 
               formatted_list = []
@@ -129,10 +103,10 @@ jobs:
               with open("wants.json", "w", encoding="utf-8") as f:
                   json.dump(output, f, indent=2, ensure_ascii=False)
 
-              print(f"Success: Synced {len(formatted_list)} villagers from Paliapedia!")
+              print(f"Successfully synced {len(formatted_list)} clean villagers from Paliapedia!")
 
           except Exception as e:
-              print(f"Failed to scrape Paliapedia: {e}", file=sys.stderr)
+              print(f"Scraper error: {e}", file=sys.stderr)
               sys.exit(0)
           EOF
 
@@ -144,6 +118,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes in wants.json to commit."
           else
-            git commit -m "chore(data): auto-update weekly wants from paliapedia [skip ci]"
+            git commit -m "chore(data): sync clean weekly wants from paliapedia [skip ci]"
             git push origin HEAD:${{ github.ref_name }}
           fi
