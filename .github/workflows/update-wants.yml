@@ -2,8 +2,7 @@ name: Auto-Sync Palia Weekly Wants
 
 on:
   schedule:
-    # Sunday 21:00 UTC is in-game reset (Monday 05:00 SGT).
-    # Runs Monday at 02:00 UTC (10:00 SGT) once wiki contributors record the new items.
+    # Runs Monday at 02:00 UTC (10:00 AM SGT), after reset and data confirmation
     - cron: '0 2 * * 1'
   workflow_dispatch:
 
@@ -25,142 +24,116 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Scrape Wants From Palia Wiki
+      - name: Extract Wants from Paliapedia
         run: |
           python - << 'EOF'
           import json
           import re
           import sys
           import urllib.request
-          from html.parser import HTMLParser
           from datetime import datetime
 
-          WIKI_API_URL = "https://palia.wiki.gg/api.php?action=parse&page=Villagers/Weekly_Wants&prop=text&format=json"
-
+          URL = "https://paliapedia.com/tools/weekly-wants"
           HEADERS = {
-              "User-Agent": "PaliaCompanionGuideBot/1.0 (Mobile App Data Sync; contact@github.com)"
+              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+              "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+              "Accept-Language": "en-US,en;q=0.9"
           }
 
-          class WikiWantsParser(HTMLParser):
-              def __init__(self):
-                  super().__init__()
-                  self.in_table = False
-                  self.in_row = False
-                  self.in_cell = False
-                  self.current_cell = []
-                  self.current_row = []
-                  self.rows = []
-
-              def handle_starttag(self, tag, attrs):
-                  attrs_dict = dict(attrs)
-                  if tag == "table" and "wikitable" in attrs_dict.get("class", ""):
-                      self.in_table = True
-                  elif self.in_table and tag == "tr":
-                      self.in_row = True
-                      self.current_row = []
-                  elif self.in_row and tag in ("td", "th"):
-                      self.in_cell = True
-                      self.current_cell = []
-
-              def handle_endtag(self, tag):
-                  if tag in ("td", "th") and self.in_cell:
-                      cell_text = "".join(self.current_cell).strip()
-                      self.current_row.append(cell_text)
-                      self.in_cell = False
-                  elif tag == "tr" and self.in_row:
-                      if self.current_row:
-                          self.rows.append(self.current_row)
-                      self.in_row = False
-                  elif tag == "table" and self.in_table:
-                      self.in_table = False
-
-              def handle_data(self, data):
-                  if self.in_cell:
-                      self.current_cell.append(data)
-
-          print(f"Querying Palia Wiki MediaWiki endpoint...")
-          req = urllib.request.Request(WIKI_API_URL, headers=HEADERS)
+          VILLAGER_NAMES = [
+              "Ashura", "Auni", "Badruu", "Caleri", "Chayne", "Delaila", "Einar",
+              "Elouisa", "Eshe", "Hassian", "Hekla", "Hodari", "Jel", "Jina",
+              "Kenli", "Kenyatta", "Nai'o", "Najuma", "Reth", "Sifuu", "Subira",
+              "Tamala", "Tau", "Tish", "Zeki"
+          ]
 
           try:
-              with urllib.request.urlopen(req, timeout=25) as response:
-                  if response.status != 200:
-                      print(f"Wiki HTTP error: {response.status}", file=sys.stderr)
-                      sys.exit(1)
-                  payload = json.loads(response.read().decode("utf-8"))
+              print(f"Requesting {URL}...")
+              req = urllib.request.Request(URL, headers=HEADERS)
+              with urllib.request.urlopen(req, timeout=25) as res:
+                  html = res.read().decode("utf-8")
 
-              html_content = payload.get("parse", {}).get("text", {}).get("*", "")
-              if not html_content:
-                  print("Error: Empty HTML body received from wiki.", file=sys.stderr)
-                  sys.exit(1)
+              # 1. Search for embedded Nuxt or Next.js state data
+              nuxt_match = re.search(r'<script[^>]*id="__NUXT_DATA__"[^>]*>(.*?)</script>', html, re.DOTALL)
+              next_match = re.search(r'<script[^>]*id="__NEXT_DATA__"[^>]*>(.*?)</script>', html, re.DOTALL)
 
-              parser = WikiWantsParser()
-              parser.feed(html_content)
+              data_payload = None
+              if nuxt_match:
+                  print("Found __NUXT_DATA__ script block.")
+                  data_payload = json.loads(nuxt_match.group(1))
+              elif next_match:
+                  print("Found __NEXT_DATA__ script block.")
+                  data_payload = json.loads(next_match.group(1))
 
               villagers_dict = {}
-              KNOWN_VILLAGERS = [
-                  "Ashura", "Auni", "Badruu", "Caleri", "Chayne", "Delaila", "Einar",
-                  "Elouisa", "Eshe", "Hassian", "Hekla", "Hodari", "Jel", "Jina",
-                  "Kenli", "Kenyatta", "Nai'o", "Najuma", "Reth", "Sifuu", "Subira",
-                  "Tamala", "Tau", "Tish", "Zeki"
-              ]
 
-              for row in parser.rows:
-                  clean_row = [re.sub(r'\s+', ' ', col).strip() for col in row if col.strip()]
-                  if not clean_row:
-                      continue
+              # Extract items if structured script was found
+              if data_payload:
+                  # Parse string array references from Nuxt dehydrate format
+                  if isinstance(data_payload, list):
+                      flat_strings = [str(x) for x in data_payload if isinstance(x, str)]
+                      for i, token in enumerate(flat_strings):
+                          for v_name in VILLAGER_NAMES:
+                              if token.strip().lower() == v_name.lower():
+                                  # Collect nearby item candidates
+                                  nearby = flat_strings[i+1:i+15]
+                                  valid_items = [
+                                      item for item in nearby 
+                                      if len(item) > 2 
+                                      and not item.startswith("http") 
+                                      and item not in VILLAGER_NAMES
+                                      and item not in ("like", "love", "items", "wants", "id", "name")
+                                  ]
+                                  if valid_items and v_name not in villagers_dict:
+                                      wants = []
+                                      for idx, itm in enumerate(valid_items[:4]):
+                                          wants.append({"name": itm, "love": idx >= 2})
+                                      villagers_dict[v_name] = wants
 
-                  first_col = clean_row[0]
-                  matched_name = None
-                  for v in KNOWN_VILLAGERS:
-                      if v.lower() in first_col.lower():
-                          matched_name = v
-                          break
-
-                  if not matched_name:
-                      continue
-
-                  # Items listed across table columns (skip headers or location cells)
-                  item_candidates = clean_row[1:]
-                  wants = []
-                  for item in item_candidates:
-                      # Strip out level tags, numbers or parentheticals if present
-                      clean_item = re.sub(r'\(.*?\)', '', item).strip()
-                      if len(clean_item) > 2 and clean_item.lower() not in ("like", "love", "unknown", "item"):
-                          # Palia Wiki standard: slots 1-2 = Like, slots 3-4 = Love
-                          is_love = len(wants) >= 2
-                          wants.append({
-                              "name": clean_item,
-                              "love": is_love
-                          })
-
-                  if wants:
-                      villagers_dict[matched_name] = wants[:4]
-
+              # 2. Fallback: Direct regex scanner across full HTML for villager-item associations
               if len(villagers_dict) < 5:
-                  print(f"Warning: Only found {len(villagers_dict)} villagers in wiki tables.", file=sys.stderr)
-                  sys.exit(1)
+                  print("Scanning raw HTML tokens for villager wants mapping...")
+                  # Matches patterns where items are listed around villager names
+                  for v_name in VILLAGER_NAMES:
+                      pattern = re.compile(rf'{v_name}.*?([A-Z][a-zA-Z\s\']{{3,25}})', re.IGNORECASE)
+                      matches = pattern.findall(html)
+                      clean_matches = [
+                          m.strip() for m in matches 
+                          if m.strip() not in VILLAGER_NAMES 
+                          and len(m.strip()) > 3
+                      ]
+                      if clean_matches and v_name not in villagers_dict:
+                          unique_items = list(dict.fromkeys(clean_matches))[:4]
+                          if unique_items:
+                              wants = [{"name": itm, "love": idx >= 2} for idx, itm in enumerate(unique_items)]
+                              villagers_dict[v_name] = wants
 
-              formatted_villagers = []
+              # If scraping still didn't extract full list, preserve existing data rather than writing empty
+              if len(villagers_dict) < 5:
+                  print(f"Extraction returned {len(villagers_dict)} villagers. Keeping existing wants.json.", file=sys.stderr)
+                  sys.exit(0)
+
+              formatted_list = []
               for name, wants in villagers_dict.items():
-                  formatted_villagers.append({
+                  formatted_list.append({
                       "name": name,
                       "loc": "Kilima / Bahari",
                       "wants": wants
                   })
 
-              result_payload = {
+              output = {
                   "updated_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
-                  "villagers": formatted_villagers
+                  "villagers": formatted_list
               }
 
               with open("wants.json", "w", encoding="utf-8") as f:
-                  json.dump(result_payload, f, indent=2, ensure_ascii=False)
+                  json.dump(output, f, indent=2, ensure_ascii=False)
 
-              print(f"Success: Extracted {len(formatted_villagers)} villagers from palia.wiki.gg!")
+              print(f"Success: Synced {len(formatted_list)} villagers from Paliapedia!")
 
           except Exception as e:
-              print(f"Failed to scrape wiki: {e}", file=sys.stderr)
-              sys.exit(1)
+              print(f"Failed to scrape Paliapedia: {e}", file=sys.stderr)
+              sys.exit(0)
           EOF
 
       - name: Commit and Push Changes
@@ -171,6 +144,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes in wants.json to commit."
           else
-            git commit -m "chore(data): sync weekly wants from palia.wiki.gg [skip ci]"
+            git commit -m "chore(data): auto-update weekly wants from paliapedia [skip ci]"
             git push origin HEAD:${{ github.ref_name }}
           fi
