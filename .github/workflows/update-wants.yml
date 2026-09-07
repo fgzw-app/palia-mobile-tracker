@@ -2,8 +2,10 @@ name: Auto-Sync Palia Weekly Wants
 
 on:
   schedule:
+    # Sunday 21:00 UTC is in-game reset (Monday 05:00 SGT).
+    # Runs Monday at 02:00 UTC (10:00 SGT) once community sites have verified all rolled items.
     - cron: '0 2 * * 1'
-  workflow_dispatch:
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
 
 permissions:
   contents: write
@@ -31,62 +33,74 @@ jobs:
           import urllib.request
           from datetime import datetime
 
-          ENDPOINTS = [
-              "https://paliatracker.com/api/v1/wants",
-              "https://api.paliatracker.com/wants"
-          ]
+          TARGET_URL = "https://paliatracker.com/data/weekly-wants.json"
 
-          HEADERS = {
-              "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148",
-              "Accept": "application/json"
+          headers = {
+              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+              "Accept": "application/json, text/plain, */*"
           }
 
-          def fetch_data():
-              for url in ENDPOINTS:
-                  try:
-                      print(f"Fetching from: {url}")
-                      req = urllib.request.Request(url, headers=HEADERS)
-                      with urllib.request.urlopen(req, timeout=15) as res:
-                          if res.status == 200:
-                              return json.loads(res.read().decode("utf-8"))
-                  except Exception as e:
-                      print(f"Failed pulling from {url}: {e}", file=sys.stderr)
-              return None
+          try:
+              print(f"Fetching from {TARGET_URL}...")
+              req = urllib.request.Request(TARGET_URL, headers=headers)
+              with urllib.request.urlopen(req, timeout=25) as res:
+                  if res.status != 200:
+                      print(f"Failed with status: {res.status}", file=sys.stderr)
+                      sys.exit(1)
+                  raw = json.loads(res.read().decode("utf-8"))
 
-          raw_data = fetch_data()
-          if not raw_data:
-              print("Warning: Could not contact endpoints. Preserving existing wants.json.", file=sys.stderr)
-              sys.exit(0)
+              villagers_list = []
+              records = raw.get("villagers", raw)
+              
+              if isinstance(records, dict):
+                  iterable = [{"name": k, **v} for k, v in records.items()]
+              else:
+                  iterable = records
 
-          villagers_list = []
-          source = raw_data.get("villagers", raw_data if isinstance(raw_data, list) else [])
+              for entry in iterable:
+                  v_name = entry.get("name")
+                  if not v_name:
+                      continue
 
-          for v in source:
-              name = v.get("name")
-              if not name:
-                  continue
-              loc = v.get("loc") or v.get("location") or "Kilima / Bahari"
-              wants = []
-              for w in v.get("wants", []):
-                  item_name = w.get("name") or w.get("item") or "Unknown"
-                  is_love = bool(w.get("love", False) or str(w.get("type", "")).lower() == "love")
-                  wants.append({"name": item_name, "love": is_love})
+                  location = entry.get("loc") or entry.get("location") or "Kilima / Bahari"
+                  wants = []
+                  raw_wants = entry.get("wants") or entry.get("items") or []
+                  
+                  for w in raw_wants:
+                      if isinstance(w, str):
+                          wants.append({"name": w, "love": False})
+                      elif isinstance(w, dict):
+                          item_name = w.get("name") or w.get("item") or w.get("reward") or "Unknown"
+                          is_love = bool(
+                              w.get("love") is True or 
+                              str(w.get("type", "")).lower() == "love" or 
+                              w.get("tier", 0) >= 3
+                          )
+                          wants.append({"name": item_name, "love": is_love})
 
-              villagers_list.append({"name": name, "loc": loc, "wants": wants})
+                  villagers_list.append({
+                      "name": v_name,
+                      "loc": location,
+                      "wants": wants
+                  })
 
-          if len(villagers_list) < 5:
-              print("Received incomplete payload. Skipping write.", file=sys.stderr)
-              sys.exit(0)
+              if not villagers_list:
+                  print("Error: No villager items parsed from payload.", file=sys.stderr)
+                  sys.exit(1)
 
-          output = {
-              "updated_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
-              "villagers": villagers_list
-          }
+              payload = {
+                  "updated_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
+                  "villagers": villagers_list
+              }
 
-          with open("wants.json", "w", encoding="utf-8") as f:
-              json.dump(output, f, indent=2, ensure_ascii=False)
+              with open("wants.json", "w", encoding="utf-8") as f:
+                  json.dump(payload, f, indent=2, ensure_ascii=False)
 
-          print(f"Successfully updated wants.json with {len(villagers_list)} villagers.")
+              print(f"Success: Updated wants.json with {len(villagers_list)} villagers.")
+
+          except Exception as e:
+              print(f"Execution failed: {e}", file=sys.stderr)
+              sys.exit(1)
           EOF
 
       - name: Commit and Push Changes
