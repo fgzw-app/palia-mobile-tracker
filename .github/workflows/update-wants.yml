@@ -2,26 +2,37 @@ name: Auto-Sync Palia Weekly Wants
 
 on:
   schedule:
-    # Runs every Monday at 05:15 SGT (Sunday 21:15 UTC, 15 minutes after reset)
-    - cron: '15 21 * * 0'
-  workflow_dispatch: # Allows manual trigger from GitHub web UI
+    # In-game reset occurs Sunday at 21:00 UTC (Monday 05:00 SGT).
+    # Runs Monday at 02:00 UTC (10:00 SGT) to ensure player community trackers have datamined the list.
+    - cron: '0 2 * * 1'
+  workflow_dispatch: # Enables manual "Run Workflow" button in GitHub Actions tab
+
+permissions:
+  contents: write
 
 jobs:
-  update-wants:
+  sync:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Fetch Latest Wants
-        run: |
-          # Fetch from community API / endpoints or scraper script
-          python .github/scripts/fetch_wants.py
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-      - name: Commit and Push
+      - name: Fetch and Write New Wants
+        run: python .github/scripts/fetch_wants.py
+
+      - name: Commit and Push Changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add wants.json
-          git diff --quiet && git diff --staged --quiet || git commit -m "chore: sync weekly wants for $(date +'%Y-%m-%d')"
-          git push
+          if git diff --staged --quiet; then
+            echo "No updates detected in wants.json."
+          else
+            git commit -m "chore(data): auto-update weekly wants [skip ci]"
+            git push
+          fi
