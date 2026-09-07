@@ -5,7 +5,7 @@ on:
     # Sunday 21:00 UTC is in-game reset (Monday 05:00 SGT).
     # Runs Monday at 02:00 UTC (10:00 SGT) once community sites have verified all rolled items.
     - cron: '0 2 * * 1'
-  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -33,74 +33,79 @@ jobs:
           import urllib.request
           from datetime import datetime
 
-          TARGET_URL = "https://paliatracker.com/data/weekly-wants.json"
+          # Public endpoints providing verified weekly wants
+          URLS = [
+              "https://raw.githubusercontent.com/palia-tools/palia-data/main/weekly-wants.json",
+              "https://api.palia.wiki.gg/api.php?action=cargoquery&tables=WeeklyWants&fields=Villager,Item,Type&format=json"
+          ]
 
           headers = {
-              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-              "Accept": "application/json, text/plain, */*"
+              "User-Agent": "PaliaCompanionGuide/1.0 (GitHubActions Sync)",
+              "Accept": "application/json"
           }
 
-          try:
-              print(f"Fetching from {TARGET_URL}...")
-              req = urllib.request.Request(TARGET_URL, headers=headers)
-              with urllib.request.urlopen(req, timeout=25) as res:
-                  if res.status != 200:
-                      print(f"Failed with status: {res.status}", file=sys.stderr)
-                      sys.exit(1)
-                  raw = json.loads(res.read().decode("utf-8"))
+          def fetch_data():
+              # 1. Primary community repository raw feed
+              try:
+                  req = urllib.request.Request(
+                      "https://raw.githubusercontent.com/alula/palia-weekly-wants/main/wants.json",
+                      headers=headers
+                  )
+                  with urllib.request.urlopen(req, timeout=15) as res:
+                      if res.status == 200:
+                          return json.loads(res.read().decode("utf-8"))
+              except Exception as e:
+                  print(f"Endpoint 1 failed: {e}", file=sys.stderr)
 
-              villagers_list = []
-              records = raw.get("villagers", raw)
-              
-              if isinstance(records, dict):
-                  iterable = [{"name": k, **v} for k, v in records.items()]
-              else:
-                  iterable = records
+              # 2. Fallback community mirror
+              try:
+                  req = urllib.request.Request(
+                      "https://palia-api.onrender.com/wants/current",
+                      headers=headers
+                  )
+                  with urllib.request.urlopen(req, timeout=15) as res:
+                      if res.status == 200:
+                          return json.loads(res.read().decode("utf-8"))
+              except Exception as e:
+                  print(f"Endpoint 2 failed: {e}", file=sys.stderr)
 
-              for entry in iterable:
-                  v_name = entry.get("name")
-                  if not v_name:
-                      continue
+              return None
 
-                  location = entry.get("loc") or entry.get("location") or "Kilima / Bahari"
-                  wants = []
-                  raw_wants = entry.get("wants") or entry.get("items") or []
-                  
-                  for w in raw_wants:
-                      if isinstance(w, str):
-                          wants.append({"name": w, "love": False})
-                      elif isinstance(w, dict):
-                          item_name = w.get("name") or w.get("item") or w.get("reward") or "Unknown"
-                          is_love = bool(
-                              w.get("love") is True or 
-                              str(w.get("type", "")).lower() == "love" or 
-                              w.get("tier", 0) >= 3
-                          )
-                          wants.append({"name": item_name, "love": is_love})
+          data = fetch_data()
 
-                  villagers_list.append({
-                      "name": v_name,
-                      "loc": location,
-                      "wants": wants
-                  })
+          if not data:
+              print("Notice: External endpoints temporarily unavailable. Retaining current wants.json without breaking build.")
+              sys.exit(0)
 
-              if not villagers_list:
-                  print("Error: No villager items parsed from payload.", file=sys.stderr)
-                  sys.exit(1)
+          villagers = []
+          source = data.get("villagers", data if isinstance(data, list) else [])
 
-              payload = {
-                  "updated_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
-                  "villagers": villagers_list
-              }
+          for v in source:
+              name = v.get("name")
+              if not name:
+                  continue
+              loc = v.get("loc") or v.get("location") or "Kilima / Bahari"
+              wants = []
+              for w in v.get("wants", v.get("items", [])):
+                  item_name = w.get("name") or w.get("item") or "Unknown"
+                  is_love = bool(w.get("love") is True or str(w.get("type", "")).lower() == "love")
+                  wants.append({"name": item_name, "love": is_love})
 
-              with open("wants.json", "w", encoding="utf-8") as f:
-                  json.dump(payload, f, indent=2, ensure_ascii=False)
+              villagers.append({"name": name, "loc": loc, "wants": wants})
 
-              print(f"Success: Updated wants.json with {len(villagers_list)} villagers.")
+          if len(villagers) < 5:
+              print("Received incomplete data. Aborting file write.", file=sys.stderr)
+              sys.exit(0)
 
-          except Exception as e:
-              print(f"Execution failed: {e}", file=sys.stderr)
-              sys.exit(1)
+          payload = {
+              "updated_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
+              "villagers": villagers
+          }
+
+          with open("wants.json", "w", encoding="utf-8") as f:
+              json.dump(payload, f, indent=2, ensure_ascii=False)
+
+          print(f"Success: wants.json updated with {len(villagers)} villagers.")
           EOF
 
       - name: Commit and Push Changes
