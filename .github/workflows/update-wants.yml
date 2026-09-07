@@ -2,8 +2,10 @@ name: Auto-Sync Palia Weekly Wants
 
 on:
   schedule:
-    - cron: '0 2 * * 1'
-  workflow_dispatch:
+    # Palia resets Monday at 04:00 UTC (12:00 PM SGT).
+    # Runs Monday at 05:00 UTC (1:00 PM SGT) — 1 hr buffer for Paliapedia to index new wants.
+    - cron: '0 5 * * 1'
+  workflow_dispatch: # Allows manual one-tap sync from GitHub Actions tab
 
 permissions:
   contents: write
@@ -68,7 +70,6 @@ jobs:
 
                   if matched_name and matched_name not in villagers_dict:
                       wants = []
-                      # Look at the next 12 lines for item names
                       for candidate in lines[i+1:i+16]:
                           cand_clean = re.sub(r'[\*\•\-\(\)]', '', candidate).strip()
                           if (len(cand_clean) > 2 
