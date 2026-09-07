@@ -388,7 +388,7 @@
 
   <div class="stats-bar">
     <span id="progress-text">Completed: 0 / 0</span>
-    <span id="sub-info">Reset: Mon 5:00 AM (SGT)</span>
+    <span id="sub-info">Reset: Mon 12:00 PM (SGT)</span>
   </div>
 </header>
 
@@ -421,7 +421,7 @@
   let bugZoneFilter = 'all';
   let currentMapRegion = 'kilima';
 
-  // Resilient Gesture State
+  // Mobile Pinch & Pan Engine State
   let mapScale = 1;
   let mapX = 0;
   let mapY = 0;
@@ -680,32 +680,33 @@
     { name: "Will-o-wisp Rockhopper", loc: "Elderwood Forest • Elderwood Swamps", time: "Any Time" }
   ];
 
+  // Default Fallback Villagers
   const VILLAGERS = [
-    { name: "Ashura", loc: "Kilima Tavern", wants: [{name: "Sweet Leaf", love: false}, {name: "Kilima Catfish", love: false}, {name: "Fish Stew", love: true}, {name: "Celebration Cake", love: true}] },
-    { name: "Auni", loc: "Tavern / Kilima Fields", wants: [{name: "Ship Fragments", love: false}, {name: "Garden Mantis", love: false}, {name: "Firebreathing Dragonfly", love: true}, {name: "Blueberry Pie", love: true}] },
-    { name: "Badruu", loc: "Daiya Family Farm", wants: [{name: "Potato Seed", love: false}, {name: "HydratePro Fertilizer", love: false}, {name: "Batterfly Beans", love: true}, {name: "Rice 'n Beans", love: true}] },
-    { name: "Caleri", loc: "Library", wants: [{name: "Crystal Lake Lotus", love: false}, {name: "Heat Root", love: false}, {name: "Bahari Glowbug", love: true}, {name: "Lotus Leaf Tea", love: true}] },
-    { name: "Chayne", loc: "Apothecary", wants: [{name: "Tomato", love: false}, {name: "Wheat Seed", love: false}, {name: "Candied Kopaa Nuts", love: true}, {name: "Cream of Mushroom Soup", love: true}] },
-    { name: "Delaila", loc: "Daiya Family Farm", wants: [{name: "Channel Catfish", love: false}, {name: "QualityUp Fertilizer", love: false}, {name: "Stalking Catfish", love: true}, {name: "Breakfast Skillet", love: true}] },
-    { name: "Einar", loc: "Fisherman's Lagoon", wants: [{name: "Silver Salmon", love: false}, {name: "Spineshell Crab", love: false}, {name: "Charged Cardinal", love: true}, {name: "Long Nosed Unicorn Fish", love: true}] },
-    { name: "Elouisa", loc: "Kilima Village", wants: [{name: "Ship Fragments", love: false}, {name: "Bahari Bee", love: false}, {name: "Raspberry Beetle", love: true}, {name: "Ancient Amber Beetle", love: true}] },
-    { name: "Eshe", loc: "Mayor's Estate", wants: [{name: "Fur", love: false}, {name: "Silk", love: false}, {name: "Petit Fives", love: true}, {name: "Gold Ore", love: true}] },
-    { name: "Hassian", loc: "Kilima Outskirts", wants: [{name: "Congee", love: false}, {name: "Elder Sernuk Antlers", love: false}, {name: "Azure Chapaa Tail", love: true}, {name: "Eleroo Eel", love: true}] },
-    { name: "Hekla", loc: "Mirror Pond Ruins", wants: [{name: "Grilled Fish", love: false}, {name: "Fried Catfish Dinner", love: false}, {name: "Dawnspur Tea", love: true}, {name: "Celebration Cake", love: true}] },
-    { name: "Hodari", loc: "Bahari Bay", wants: [{name: "Copper Ore", love: false}, {name: "Copper Bar", love: false}, {name: "Jadium Ore", love: true}, {name: "Steak Dinner", love: true}] },
-    { name: "Jel", loc: "Tailor Shop", wants: [{name: "Barracuda", love: false}, {name: "Lunar Fairy Moth", love: false}, {name: "Midnight Floatfish", love: true}, {name: "Jewelled Mantis", love: true}] },
-    { name: "Jina", loc: "Mirror Pond Ruins", wants: [{name: "Grilled Mushroom", love: false}, {name: "Glass Pane", love: false}, {name: "Radiant Sunfish", love: true}, {name: "Cream of Mushroom Soup", love: true}] },
-    { name: "Kenli", loc: "Town Hall", wants: [{name: "Chapaa Meat", love: false}, {name: "Striped Chapaa Tail", love: false}, {name: "Azure Chapaa Tail", love: true}, {name: "Muujin Bahari", love: true}] },
-    { name: "Kenyatta", loc: "Town Hall", wants: [{name: "Garden Mantis", love: false}, {name: "Pickled Onions", love: false}, {name: "Lake Shark", love: true}, {name: "Meaty Stir Fry", love: true}] },
-    { name: "Nai'o", loc: "Daiya Family Farm", wants: [{name: "Waterlogged Boot", love: false}, {name: "Fish Stew", love: false}, {name: "Apple Tree Seed", love: true}, {name: "Fruit Smoothie Bowl", love: true}] },
-    { name: "Najuma", loc: "Bahari Bay Workshop", wants: [{name: "Knapweed", love: false}, {name: "Garden Snail", love: false}, {name: "Ancient Wood Plank", love: true}, {name: "Blueberry Pie", love: true}] },
-    { name: "Reth", loc: "Kilima Tavern", wants: [{name: "Spice Sprouts", love: false}, {name: "Largemouth Bass", love: false}, {name: "Kopaa Nuts", love: true}, {name: "Palian Onion Soup", love: true}] },
-    { name: "Sifuu", loc: "Blacksmith Shop", wants: [{name: "Muujin Meat", love: false}, {name: "Pickled Carrots", love: false}, {name: "Beans On Toast", love: true}, {name: "Jadium Ore", love: true}] },
-    { name: "Subira", loc: "Inn (Upstairs)", wants: [{name: "Potato", love: false}, {name: "Grilled Oyster", love: false}, {name: "Ogopuu Skin", love: true}, {name: "Spitfire Cicada", love: true}] },
-    { name: "Tamala", loc: "Bahari Woods", wants: [{name: "Common Field Cricket", love: false}, {name: "Garden Millipede", love: false}, {name: "Palian Betta", love: true}, {name: "Ancient Amber Beetle", love: true}] },
-    { name: "Tau", loc: "Village / Farm", wants: [{name: "Trout Dinner", love: false}, {name: "Heartwood Plank", love: false}, {name: "Lantern Ashwood", love: true}, {name: "Apple", love: true}] },
-    { name: "Tish", loc: "Furniture Store", wants: [{name: "Sundrop Lily", love: false}, {name: "Heartwood Plank", love: false}, {name: "Ashwood Plank", love: true}, {name: "Jadium Bar", love: true}] },
-    { name: "Zeki", loc: "General Store", wants: [{name: "Silvery Minnow", love: false}, {name: "Silk", love: false}, {name: "Bronze Bluegill", love: true}, {name: "Black Pearl", love: true}] }
+    { name: "Ashura", loc: "Kilima Tavern", wants: [{name: "Sapwood Plank", love: false}, {name: "Golden Salmon", love: false}, {name: "Highland Sturgeon", love: false}, {name: "Sashimi", love: true}] },
+    { name: "Auni", loc: "Tavern / Kilima Fields", wants: [{name: "Brushtail Dragonfly", love: false}, {name: "Stripeshell Snail", love: false}, {name: "Blueberry Pie", love: true}, {name: "Celebration Cake", love: true}] },
+    { name: "Badruu", loc: "Daiya Family Farm", wants: [{name: "Cotton Seed", love: false}, {name: "Loaded Potato Soup", love: false}, {name: "Jewelled Mantis", love: true}, {name: "Meaty Stir Fry", love: true}] },
+    { name: "Caleri", loc: "Library", wants: [{name: "Wild Ginger", love: false}, {name: "Cream of Tomato Soup", love: false}, {name: "Chapaa Masala", love: true}, {name: "Lotus Leaf Tea", love: true}] },
+    { name: "Chayne", loc: "Apothecary", wants: [{name: "Carrot", love: false}, {name: "Jewelled Mantis", love: false}, {name: "Veggie Chili", love: true}, {name: "Green Pearl", love: true}] },
+    { name: "Delaila", loc: "Daiya Family Farm", wants: [{name: "Rainbow Trout", love: false}, {name: "Rice 'n Beans", love: false}, {name: "Rockhopper Pumpkin", love: true}, {name: "Gold Bar", love: true}] },
+    { name: "Einar", loc: "Fisherman's Lagoon", wants: [{name: "Bahari Crab", love: false}, {name: "Midnight Floatfish", love: false}, {name: "Enchanted Pupfish", love: true}, {name: "Fisherman's Brew", love: true}] },
+    { name: "Elouisa", loc: "Kilima Village", wants: [{name: "Spotted Stinkbug", love: false}, {name: "Energized Piranha", love: false}, {name: "Giant Goldfish", love: true}, {name: "Fairy Mantis", love: true}] },
+    { name: "Eshe", loc: "Mayor's Estate", wants: [{name: "Grilled Oyster", love: false}, {name: "Oysters Akwinduu", love: false}, {name: "Emerald Ogopuu Scale", love: true}, {name: "Petit Fives", love: true}] },
+    { name: "Hassian", loc: "Kilima Outskirts", wants: [{name: "Leather", love: false}, {name: "Sabertoothed Anchovy", love: false}, {name: "Piksii Shmole Spore", love: true}, {name: "Eleroo Eel", love: true}] },
+    { name: "Hekla", loc: "Mirror Pond Ruins", wants: [{name: "Grilled Fish", love: false}, {name: "Chub", love: false}, {name: "Enchanted Pupfish", love: true}, {name: "Celebration Cake", love: true}] },
+    { name: "Hodari", loc: "Bahari Bay", wants: [{name: "Spotted Chapaa Tail", love: false}, {name: "Whitestone Slab", love: false}, {name: "Emerald Ogopuu Scale", love: true}, {name: "Steak Dinner", love: true}] },
+    { name: "Jel", loc: "Tailor Shop", wants: [{name: "Eyeless Minnow", love: false}, {name: "Midnight Floatfish", love: false}, {name: "Jade Koi", love: true}, {name: "Bean Burger", love: true}] },
+    { name: "Jina", loc: "Mirror Pond Ruins", wants: [{name: "Shell", love: false}, {name: "Shimmerfin", love: false}, {name: "Apple Pie", love: true}, {name: "Brighteye Butterfly", love: true}] },
+    { name: "Kenli", loc: "Town Hall", wants: [{name: "Grilled Oyster", love: false}, {name: "Petit Fives", love: false}, {name: "Meaty Stir Fry", love: true}, {name: "Pan Fried Dumplings", love: true}] },
+    { name: "Kenyatta", loc: "Town Hall", wants: [{name: "Barracuda", love: false}, {name: "Leafstalker Mantis", love: false}, {name: "Bluebristle Muujin Mane", love: true}, {name: "Elder Sernuk Antlers", love: true}] },
+    { name: "Nai'o", loc: "Daiya Family Farm", wants: [{name: "Spice Sprouts", love: false}, {name: "Corn", love: false}, {name: "Golden Fern", love: true}, {name: "Steak Dinner", love: true}] },
+    { name: "Najuma", loc: "Bahari Bay Workshop", wants: [{name: "Tomato Plant Seed", love: false}, {name: "Garden Snail", love: false}, {name: "Apple Jam", love: true}, {name: "Silver Bar", love: true}] },
+    { name: "Reth", loc: "Kilima Tavern", wants: [{name: "Wild Garlic", love: false}, {name: "Hearty Vegetable Soup", love: false}, {name: "Ogopuu Meat", love: true}, {name: "Palian Onion Soup", love: true}] },
+    { name: "Sifuu", loc: "Blacksmith Shop", wants: [{name: "Chapaa Meat", love: false}, {name: "Oily Anchovy", love: false}, {name: "Beans On Toast", love: true}, {name: "Blood Beetle", love: true}] },
+    { name: "Subira", loc: "Inn (Upstairs)", wants: [{name: "Rainbow Trout", love: false}, {name: "Ancient Amber Beetle", love: false}, {name: "Angelfish", love: true}, {name: "Firebreathing Dragonfly", love: true}] },
+    { name: "Tamala", loc: "Bahari Woods", wants: [{name: "Knapweed", love: false}, {name: "Toadstool Floatfish", love: false}, {name: "Ancient Amber Beetle", love: true}, {name: "Leafstalker Mantis", love: true}] },
+    { name: "Tau", loc: "Village / Farm", wants: [{name: "Calico Koi", love: false}, {name: "Duskwing Butterfly", love: false}, {name: "Azure Chapaa Tail", love: true}, {name: "Akwinduu Chapaa", love: true}] },
+    { name: "Tish", loc: "Furniture Store", wants: [{name: "Briar Daisy", love: false}, {name: "Samara", love: false}, {name: "Silk Thread", love: true}, {name: "Green Pearl", love: true}] },
+    { name: "Zeki", loc: "General Store", wants: [{name: "Coral", love: false}, {name: "Silk", love: false}, {name: "Platinum Chad", love: true}, {name: "Dari Cloves", love: true}] }
   ];
 
   let villagersData = VILLAGERS;
@@ -737,7 +738,6 @@
 
     if (tab === 'weekly') {
       document.getElementById('page-title').innerHTML = '<span>✨ Weekly Wants</span>';
-      document.getElementById('sub-info').innerText = 'Reset: Mon 5:00 AM (SGT)';
       searchInput.placeholder = 'Search villager or item...';
       searchInput.style.display = 'block';
       resetBtn.style.display = 'block';
@@ -893,7 +893,6 @@
       }
     });
 
-    // Mouse Dragging
     viewport.addEventListener('mousedown', (e) => {
       isDragging = true;
       startX = e.clientX - mapX;
@@ -916,12 +915,13 @@
     const day = sgtNow.getDay();
     let daysUntilReset = (1 - day + 7) % 7;
     
-    if (day === 1 && (sgtNow.getHours() > 5 || (sgtNow.getHours() === 5 && sgtNow.getMinutes() > 0))) {
+    // Palia weekly reset occurs Monday at 04:00 UTC (12:00 PM SGT)
+    if (day === 1 && (sgtNow.getHours() > 12 || (sgtNow.getHours() === 12 && sgtNow.getMinutes() > 0))) {
       daysUntilReset = 7;
     }
     
     nextReset.setDate(sgtNow.getDate() + daysUntilReset);
-    nextReset.setHours(5, 0, 0, 0);
+    nextReset.setHours(12, 0, 0, 0);
     const diffMs = nextReset.getTime() - sgtNow.getTime();
     return new Date(Date.now() + diffMs);
   }
@@ -1002,38 +1002,55 @@
       let totalGifts = 0;
       let completedGifts = 0;
 
-      const filtered = villagersData.filter(v => 
-        v.name.toLowerCase().includes(q) || 
-        v.loc.toLowerCase().includes(q) ||
-        v.wants.some(w => w.name.toLowerCase().includes(q))
-      );
+      const filtered = villagersData.filter(v => {
+        const name = (v.name || '').toLowerCase();
+        const loc = (v.loc || '').toLowerCase();
+        const wants = Array.isArray(v.wants) ? v.wants : [];
+        const hasMatchingWant = wants.some(w => {
+          const wName = typeof w === 'string' ? w : (w.name || '');
+          return wName.toLowerCase().includes(q);
+        });
+        return name.includes(q) || loc.includes(q) || hasMatchingWant;
+      });
 
       container.innerHTML = filtered.map(v => {
         let vDoneCount = 0;
-        const wantsHtml = v.wants.map(w => {
+        const wants = Array.isArray(v.wants) ? v.wants : [];
+
+        const wantsHtml = wants.map(w => {
           totalGifts++;
-          const key = `${v.name}-${w.name}`;
+          const itemName = typeof w === 'string' ? w : (w.name || 'Unknown');
+          const isLove = typeof w === 'object' && !!w.love;
+          const key = `${v.name}-${itemName}`;
           const isDone = !!weeklyState[key];
-          if (isDone) { completedGifts++; vDoneCount++; }
-          const icon = isDone ? '✓' : (w.love ? '❤️' : '👍');
+          
+          if (isDone) {
+            completedGifts++;
+            vDoneCount++;
+          }
+          
+          const icon = isDone ? '✓' : (isLove ? '❤️' : '👍');
+          const badgeClass = `badge${isLove ? ' love' : ''}${isDone ? ' done' : ''}`;
+
           return `
-            <button type="button" class="badge ${w.love ? 'love' : ''} ${isDone ? 'done' : ''}" data-key="${escapeHtml(key)}">
+            <button type="button" class="${badgeClass}" data-key="${escapeHtml(key)}">
               <span>${icon}</span>
-              <span>${escapeHtml(w.name)}</span>
+              <span>${escapeHtml(itemName)}</span>
             </button>
           `;
         }).join('');
 
-        const isAllDone = vDoneCount === v.wants.length;
+        const isAllDone = wants.length > 0 && vDoneCount === wants.length;
+        const cardClass = `card${isAllDone ? ' all-done' : ''}`;
 
         return `
-          <div class="card ${isAllDone ? 'all-done' : ''}">
+          <div class="${cardClass}">
             <div class="card-top">
               <div class="villager-title">
-                <span class="villager-name">${escapeHtml(v.name)}</span>
-                <span class="villager-loc">${escapeHtml(v.loc)}</span>
+                <span class="villager-name">${escapeHtml(v.name || 'Villager')}</span>
+                <span class="villager-loc">${escapeHtml(v.loc || 'Kilima / Bahari')}</span>
               </div>
-              <span class="card-counter">${vDoneCount} / ${v.wants.length}</span>
+              <span class="card-counter">${vDoneCount} / ${wants.length}</span>
             </div>
             <div class="wants-grid">
               ${wantsHtml}
@@ -1144,7 +1161,7 @@
 
       document.getElementById('progress-text').innerText = `Caught: ${caughtCount}/${BUGS_DATABASE.length} | Star: ${starCount}/${BUGS_DATABASE.length}`;
     } else {
-      // STATIC CLEAN MAP VIEWER (KILIMA OR BAHARI)
+      // DUAL MAP VIEWER
       const isKilima = currentMapRegion === 'kilima';
       const mapSrc = isKilima ? './kilima-map.jpg' : './bahari-map.jpg';
       const mapAlt = isKilima ? 'Kilima Valley Map' : 'Bahari Bay Map';
@@ -1196,13 +1213,21 @@
 
   async function loadData() {
     try {
-      const res = await fetch('./wants.json?t=' + Date.now());
+      const res = await fetch('./wants.json?t=' + Date.now(), { cache: 'no-store' });
       if (res.ok) {
         const json = await res.json();
-        villagersData = json.villagers;
+        if (Array.isArray(json.villagers) && json.villagers.length > 0) {
+          villagersData = json.villagers;
+        }
+        if (json.updated_at && currentTab === 'weekly') {
+          document.getElementById('sub-info').innerText = `Synced: ${json.updated_at.slice(5, 16)}`;
+        }
       }
     } catch (e) {
       console.warn("Using bundled fallback data...");
+      if (currentTab === 'weekly') {
+        document.getElementById('sub-info').innerText = 'Using offline fallback';
+      }
     }
     renderList();
   }
