@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-08 01:16:32 UTC",
+  "updated_at": "2026-09-08 01:20:30 UTC",
   "villagers": [
     {
       "name": "Ashura",
@@ -393,28 +393,6 @@
         },
         {
           "name": "Palian Onion Soup",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "Sifuu",
-      "loc": "Kilima / Bahari",
-      "wants": [
-        {
-          "name": "Chapaa Meat",
-          "love": false
-        },
-        {
-          "name": "Oily Anchovy",
-          "love": false
-        },
-        {
-          "name": "Beans On Toast",
-          "love": true
-        },
-        {
-          "name": "Blood Beetle",
           "love": true
         }
       ]
