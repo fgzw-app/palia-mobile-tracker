@@ -1,274 +1,554 @@
 {
-  "updated_at": "2026-09-07 12:00:00 UTC",
+  "updated_at": "2026-09-08 01:16:32 UTC",
   "villagers": [
     {
       "name": "Ashura",
-      "loc": "Kilima Tavern",
+      "loc": "Kilima / Bahari",
       "wants": [
-        { "name": "Sapwood Plank", "love": false },
-        { "name": "Golden Salmon", "love": false },
-        { "name": "Highland Sturgeon", "love": false },
-        { "name": "Sashimi", "love": true }
+        {
+          "name": ".mw-parser-output .template-itembox{max-width:100%}.mw-parser-output .template-itembox .template-itembox-rel>.quality{position:absolute;bottom:-6px;left:-6px} Sapwood Plank",
+          "love": false
+        },
+        {
+          "name": "Golden Salmon",
+          "love": false
+        },
+        {
+          "name": "Highland Sturgeon",
+          "love": true
+        },
+        {
+          "name": "Sashimi",
+          "love": true
+        }
       ]
     },
     {
       "name": "Auni",
-      "loc": "Tavern / Kilima Fields",
+      "loc": "Kilima / Bahari",
       "wants": [
-        { "name": "Brushtail Dragonfly", "love": false },
-        { "name": "Bahari Bee", "love": false },
-        { "name": "Stripeshell Snail", "love": true },
-        { "name": "Celebration Cake", "love": true }
+        {
+          "name": "Brushtail Dragonfly",
+          "love": false
+        },
+        {
+          "name": "Bahari Bee",
+          "love": false
+        },
+        {
+          "name": "Stripeshell Snail",
+          "love": true
+        },
+        {
+          "name": "Blueberry Pie",
+          "love": true
+        }
       ]
     },
     {
       "name": "Badruu",
-      "loc": "Daiya Family Farm",
+      "loc": "Kilima / Bahari",
       "wants": [
-        { "name": "Cotton Seed", "love": false },
-        { "name": "Rice", "love": false },
-        { "name": "Loaded Potato Soup", "love": true },
-        { "name": "Jewelled Mantis", "love": true }
+        {
+          "name": "Cotton Seed",
+          "love": false
+        },
+        {
+          "name": "Rice",
+          "love": false
+        },
+        {
+          "name": "Loaded Potato Soup",
+          "love": true
+        },
+        {
+          "name": "Jewelled Mantis",
+          "love": true
+        }
       ]
     },
     {
       "name": "Caleri",
-      "loc": "Library",
+      "loc": "Kilima / Bahari",
       "wants": [
-        { "name": "Wild Ginger", "love": false },
-        { "name": "Glass Bulb", "love": false },
-        { "name": "Cream of Tomato Soup", "love": true },
-        { "name": "Chapaa Masala", "love": true }
+        {
+          "name": "Wild Ginger",
+          "love": false
+        },
+        {
+          "name": "Glass Bulb",
+          "love": false
+        },
+        {
+          "name": "Cream of Tomato Soup",
+          "love": true
+        },
+        {
+          "name": "Chapaa Masala",
+          "love": true
+        }
       ]
     },
     {
       "name": "Chayne",
-      "loc": "Apothecary",
+      "loc": "Kilima / Bahari",
       "wants": [
-        { "name": "Carrot", "love": false },
-        { "name": "Blueberry Bush Seed", "love": false },
-        { "name": "Jewelled Mantis", "love": true },
-        { "name": "Veggie Chili", "love": true }
+        {
+          "name": "Carrot",
+          "love": false
+        },
+        {
+          "name": "Blueberry Bush Seed",
+          "love": false
+        },
+        {
+          "name": "Jewelled Mantis",
+          "love": true
+        },
+        {
+          "name": "Veggie Chili",
+          "love": true
+        }
       ]
     },
     {
       "name": "Delaila",
-      "loc": "Daiya Family Farm",
+      "loc": "Kilima / Bahari",
       "wants": [
-        { "name": "Muujin Meat", "love": false },
-        { "name": "Kilima Catfish", "love": false },
-        { "name": "Rockhopper Pumpkin", "love": true },
-        { "name": "Gold Bar", "love": true }
+        {
+          "name": "Rainbow Trout",
+          "love": false
+        },
+        {
+          "name": "HydratePro Fertilizer",
+          "love": false
+        },
+        {
+          "name": "Rice 'n Beans",
+          "love": true
+        },
+        {
+          "name": "Rockhopper Pumpkin",
+          "love": true
+        }
       ]
     },
     {
       "name": "Einar",
-      "loc": "Fisherman's Lagoon",
+      "loc": "Kilima / Bahari",
       "wants": [
-        { "name": "Bahari Crab", "love": false },
-        { "name": "Fairy Carp", "love": false },
-        { "name": "Midnight Floatfish", "love": true },
-        { "name": "Enchanted Pupfish", "love": true }
+        {
+          "name": "Bahari Crab",
+          "love": false
+        },
+        {
+          "name": "Fairy Carp",
+          "love": false
+        },
+        {
+          "name": "Midnight Floatfish",
+          "love": true
+        },
+        {
+          "name": "Enchanted Pupfish",
+          "love": true
+        }
       ]
     },
     {
       "name": "Elouisa",
-      "loc": "Kilima Village",
+      "loc": "Kilima / Bahari",
       "wants": [
-        { "name": "Spotted Stinkbug", "love": false },
-        { "name": "Bahari Bee", "love": false },
-        { "name": "Energized Piranha", "love": true },
-        { "name": "Giant Goldfish", "love": true }
+        {
+          "name": "Spotted Stinkbug",
+          "love": false
+        },
+        {
+          "name": "Bahari Bee",
+          "love": false
+        },
+        {
+          "name": "Energized Piranha",
+          "love": true
+        },
+        {
+          "name": "Giant Goldfish",
+          "love": true
+        }
       ]
     },
     {
       "name": "Eshe",
-      "loc": "Mayor's Estate",
+      "loc": "Kilima / Bahari",
       "wants": [
-        { "name": "Grilled Oyster", "love": false },
-        { "name": "Samara", "love": false },
-        { "name": "Oysters Akwinduu", "love": true },
-        { "name": "Emerald Ogopuu Scale", "love": true }
+        {
+          "name": "Grilled Oyster",
+          "love": false
+        },
+        {
+          "name": "Samara",
+          "love": false
+        },
+        {
+          "name": "Oysters Akwinduu",
+          "love": true
+        },
+        {
+          "name": "Emerald Ogopuu Scale",
+          "love": true
+        }
       ]
     },
     {
       "name": "Hassian",
-      "loc": "Kilima Outskirts",
+      "loc": "Kilima / Bahari",
       "wants": [
-        { "name": "Leather", "love": false },
-        { "name": "Fabric", "love": false },
-        { "name": "Sabertoothed Anchovy", "love": true },
-        { "name": "Piksii Shmole Spore", "love": true }
+        {
+          "name": "Leather",
+          "love": false
+        },
+        {
+          "name": "Fabric",
+          "love": false
+        },
+        {
+          "name": "Sabertoothed Anchovy",
+          "love": true
+        },
+        {
+          "name": "Piksii Shmole Spore",
+          "love": true
+        }
       ]
     },
     {
       "name": "Hekla",
-      "loc": "Mirror Pond Ruins",
+      "loc": "Kilima / Bahari",
       "wants": [
-        { "name": "Grilled Fish", "love": false },
-        { "name": "Painted Perch", "love": false },
-        { "name": "Chub", "love": true },
-        { "name": "Enchanted Pupfish", "love": true }
+        {
+          "name": "Grilled Fish",
+          "love": false
+        },
+        {
+          "name": "Painted Perch",
+          "love": false
+        },
+        {
+          "name": "Chub",
+          "love": true
+        },
+        {
+          "name": "Enchanted Pupfish",
+          "love": true
+        }
       ]
     },
     {
       "name": "Hodari",
-      "loc": "Bahari Bay",
+      "loc": "Kilima / Bahari",
       "wants": [
-        { "name": "Spotted Chapaa Tail", "love": false },
-        { "name": "Heartwood", "love": false },
-        { "name": "Whitestone Slab", "love": true },
-        { "name": "Emerald Ogopuu Scale", "love": true }
+        {
+          "name": "Spotted Chapaa Tail",
+          "love": false
+        },
+        {
+          "name": "Heartwood",
+          "love": false
+        },
+        {
+          "name": "Whitestone Slab",
+          "love": true
+        },
+        {
+          "name": "Emerald Ogopuu Scale",
+          "love": true
+        }
       ]
     },
     {
       "name": "Jel",
-      "loc": "Tailor Shop",
+      "loc": "Kilima / Bahari",
       "wants": [
-        { "name": "Eyeless Minnow", "love": false },
-        { "name": "Bat Ray", "love": false },
-        { "name": "Midnight Floatfish", "love": true },
-        { "name": "Jade Koi", "love": true }
+        {
+          "name": "Eyeless Minnow",
+          "love": false
+        },
+        {
+          "name": "Bat Ray",
+          "love": false
+        },
+        {
+          "name": "Midnight Floatfish",
+          "love": true
+        },
+        {
+          "name": "Jade Koi",
+          "love": true
+        }
       ]
     },
     {
       "name": "Jina",
-      "loc": "Mirror Pond Ruins",
+      "loc": "Kilima / Bahari",
       "wants": [
-        { "name": "Shell", "love": false },
-        { "name": "Brightshroom", "love": false },
-        { "name": "Shimmerfin", "love": true },
-        { "name": "Apple Pie", "love": true }
+        {
+          "name": "Shell",
+          "love": false
+        },
+        {
+          "name": "Brightshroom",
+          "love": false
+        },
+        {
+          "name": "Shimmerfin",
+          "love": true
+        },
+        {
+          "name": "Apple Pie",
+          "love": true
+        }
       ]
     },
     {
       "name": "Kenli",
-      "loc": "Town Hall",
+      "loc": "Kilima / Bahari",
       "wants": [
-        { "name": "Grilled Oyster", "love": false },
-        { "name": "Hearty Vegetable Soup", "love": false },
-        { "name": "Petit Fives", "love": true },
-        { "name": "Meaty Stir Fry", "love": true }
-      ]
-    },
-    {
-      "name": "Kenyatta",
-      "loc": "Town Hall",
-      "wants": [
-        { "name": "Barracuda", "love": false },
-        { "name": "Oily Anchovy", "love": false },
-        { "name": "Leafstalker Mantis", "love": true },
-        { "name": "Bluebristle Muujin Mane", "love": true }
+        {
+          "name": "Grilled Oyster",
+          "love": false
+        },
+        {
+          "name": "Hearty Vegetable Soup",
+          "love": false
+        },
+        {
+          "name": "Petit Fives",
+          "love": true
+        },
+        {
+          "name": "Meaty Stir Fry",
+          "love": true
+        }
       ]
     },
     {
       "name": "Nai'o",
-      "loc": "Daiya Family Farm",
+      "loc": "Kilima / Bahari",
       "wants": [
-        { "name": "Spice Sprouts", "love": false },
-        { "name": "Heat Root", "love": false },
-        { "name": "Corn", "love": true },
-        { "name": "Golden Fern", "love": true }
+        {
+          "name": "Spice Sprouts",
+          "love": false
+        },
+        {
+          "name": "Heat Root",
+          "love": false
+        },
+        {
+          "name": "Corn",
+          "love": true
+        },
+        {
+          "name": "Golden Fern",
+          "love": true
+        }
       ]
     },
     {
       "name": "Najuma",
-      "loc": "Bahari Bay Workshop",
+      "loc": "Kilima / Bahari",
       "wants": [
-        { "name": "Tomato Plant Seed", "love": false },
-        { "name": "Garden Snail", "love": false },
-        { "name": "Apple Jam", "love": true },
-        { "name": "Silver Bar", "love": true }
+        {
+          "name": "Tomato Plant Seed",
+          "love": false
+        },
+        {
+          "name": "Garden Snail",
+          "love": false
+        },
+        {
+          "name": "Apple Jam",
+          "love": true
+        },
+        {
+          "name": "Silver Bar",
+          "love": true
+        }
       ]
     },
     {
       "name": "Reth",
-      "loc": "Kilima Tavern",
+      "loc": "Kilima / Bahari",
       "wants": [
-        { "name": "Wild Garlic", "love": false },
-        { "name": "Hearty Vegetable Soup", "love": false },
-        { "name": "Ogopuu Meat", "love": true },
-        { "name": "Palian Onion Soup", "love": true }
-      ]
-    },
-    {
-      "name": "Sifuu",
-      "loc": "Blacksmith Shop",
-      "wants": [
-        { "name": "Chapaa Meat", "love": false },
-        { "name": "Oily Anchovy", "love": false },
-        { "name": "Beans On Toast", "love": true },
-        { "name": "Blood Beetle", "love": true }
+        {
+          "name": "Wild Garlic",
+          "love": false
+        },
+        {
+          "name": "Hearty Vegetable Soup",
+          "love": false
+        },
+        {
+          "name": "Ogopuu Meat",
+          "love": true
+        },
+        {
+          "name": "Palian Onion Soup",
+          "love": true
+        }
       ]
     },
     {
       "name": "Subira",
-      "loc": "Inn (Upstairs)",
+      "loc": "Kilima / Bahari",
       "wants": [
-        { "name": "Rainbow Trout", "love": false },
-        { "name": "Silver Ore", "love": false },
-        { "name": "Ancient Amber Beetle", "love": true },
-        { "name": "Angelfish", "love": true }
+        {
+          "name": "Rainbow Trout",
+          "love": false
+        },
+        {
+          "name": "Silver Ore",
+          "love": false
+        },
+        {
+          "name": "Ancient Amber Beetle",
+          "love": true
+        },
+        {
+          "name": "Angelfish",
+          "love": true
+        }
       ]
     },
     {
       "name": "Tamala",
-      "loc": "Bahari Woods",
+      "loc": "Kilima / Bahari",
       "wants": [
-        { "name": "Knapweed", "love": false },
-        { "name": "Lunar Fairy Moth", "love": false },
-        { "name": "Toadstool Floatfish", "love": true },
-        { "name": "Ancient Amber Beetle", "love": true }
+        {
+          "name": "Knapweed",
+          "love": false
+        },
+        {
+          "name": "Lunar Fairy Moth",
+          "love": false
+        },
+        {
+          "name": "Toadstool Floatfish",
+          "love": true
+        },
+        {
+          "name": "Ancient Amber Beetle",
+          "love": true
+        }
       ]
     },
     {
       "name": "Tau",
-      "loc": "Village / Farm",
+      "loc": "Kilima / Bahari",
       "wants": [
-        { "name": "Calico Koi", "love": false },
-        { "name": "Garden Leafhopper", "love": false },
-        { "name": "Azure Chapaa Tail", "love": true },
-        { "name": "Wagon Wheel", "love": true }
+        {
+          "name": "Calico Koi",
+          "love": false
+        },
+        {
+          "name": "Garden Leafhopper",
+          "love": false
+        },
+        {
+          "name": "Azure Chapaa Tail",
+          "love": true
+        },
+        {
+          "name": "Wagon Wheel",
+          "love": true
+        }
       ]
     },
     {
       "name": "The Gardener",
-      "loc": "Temple of the Roots",
+      "loc": "Kilima / Bahari",
       "wants": [
-        { "name": "Glass Pane", "love": false },
-        { "name": "Glow Worm", "love": false },
-        { "name": "Flow-Infused Wood", "love": true },
-        { "name": "Will-o-wisp Rockhopper", "love": true }
+        {
+          "name": "Glass Pane",
+          "love": false
+        },
+        {
+          "name": "Glow Worm",
+          "love": false
+        },
+        {
+          "name": "Flow-Infused Wood",
+          "love": true
+        },
+        {
+          "name": "Will-o-wisp Rockhopper",
+          "love": true
+        }
       ]
     },
     {
       "name": "Tish",
-      "loc": "Furniture Store",
+      "loc": "Kilima / Bahari",
       "wants": [
-        { "name": "Coral", "love": false },
-        { "name": "Stuffed Cabbage Rolls", "love": false },
-        { "name": "Pearl", "love": true },
-        { "name": "Blueberry Pie", "love": true }
+        {
+          "name": "Coral",
+          "love": false
+        },
+        {
+          "name": "Stuffed Cabbage Rolls",
+          "love": false
+        },
+        {
+          "name": "Pearl",
+          "love": true
+        },
+        {
+          "name": "Blueberry Pie",
+          "love": true
+        }
       ]
     },
     {
       "name": "Ulfe",
-      "loc": "Bahari Bay",
+      "loc": "Kilima / Bahari",
       "wants": [
-        { "name": "Worm", "love": false },
-        { "name": "Enfield Eel", "love": false },
-        { "name": "Blue Spotted Ray", "love": true },
-        { "name": "Blue Marlin", "love": true }
+        {
+          "name": "Worm",
+          "love": false
+        },
+        {
+          "name": "Enfield Eel",
+          "love": false
+        },
+        {
+          "name": "Blue Spotted Ray",
+          "love": true
+        },
+        {
+          "name": "Blue Marlin",
+          "love": true
+        }
       ]
     },
     {
       "name": "Zeki",
-      "loc": "General Store",
+      "loc": "Kilima / Bahari",
       "wants": [
-        { "name": "Grilled Fish", "love": false },
-        { "name": "Fish Stew", "love": false },
-        { "name": "Ancient Koi", "love": true },
-        { "name": "Platinum Bar", "love": true }
+        {
+          "name": "Grilled Fish",
+          "love": false
+        },
+        {
+          "name": "Fish Stew",
+          "love": false
+        },
+        {
+          "name": "Ancient Koi",
+          "love": true
+        },
+        {
+          "name": "Platinum Bar",
+          "love": true
+        }
       ]
     }
   ]
