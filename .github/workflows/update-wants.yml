@@ -2,10 +2,9 @@ name: Auto-Sync Palia Weekly Wants
 
 on:
   schedule:
-    # Palia resets Monday at 04:00 UTC (12:00 PM SGT).
-    # Runs Monday at 05:00 UTC (1:00 PM SGT) — 1 hr buffer for Paliapedia to index new wants.
+    # Runs Monday at 05:00 UTC (1:00 PM SGT) — 1 hr buffer for Paliapedia to datamine
     - cron: '0 5 * * 1'
-  workflow_dispatch: # Allows manual one-tap sync from GitHub Actions tab
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -25,7 +24,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Scrape Clean Paliapedia Wants
+      - name: Scrape Paliapedia Wants
         run: |
           python - << 'EOF'
           import json
@@ -55,7 +54,6 @@ jobs:
               with urllib.request.urlopen(req, timeout=25) as res:
                   html = res.read().decode("utf-8")
 
-              # Strip HTML tags and normalize text
               clean_text = re.sub(r'<[^>]+>', '\n', html)
               lines = [re.sub(r'\s+', ' ', l).strip() for l in clean_text.splitlines() if l.strip()]
 
@@ -70,12 +68,13 @@ jobs:
 
                   if matched_name and matched_name not in villagers_dict:
                       wants = []
-                      for candidate in lines[i+1:i+16]:
+                      for candidate in lines[i+1:i+18]:
                           cand_clean = re.sub(r'[\*\•\-\(\)]', '', candidate).strip()
+                          cand_lower = cand_clean.lower()
                           if (len(cand_clean) > 2 
-                              and cand_clean.lower() not in BANNED 
-                              and not any(cand_clean.lower().startswith(b) for b in ("div", "class", "http"))
-                              and not any(cand_clean.lower() == v.lower() or cand_clean.lower() == f"{v} gifts".lower() for v in VILLAGERS)):
+                              and cand_lower not in BANNED 
+                              and not any(cand_lower.startswith(b) for b in ("div", "class", "http"))
+                              and not any(cand_lower == v.lower() or cand_lower == f"{v} gifts".lower() for v in VILLAGERS)):
                               if cand_clean not in [w["name"] for w in wants]:
                                   is_love = len(wants) >= 2
                                   wants.append({"name": cand_clean, "love": is_love})
@@ -85,7 +84,7 @@ jobs:
                           villagers_dict[matched_name] = wants
 
               if len(villagers_dict) < 5:
-                  print("Warning: Parser found insufficient villagers. Preserving existing wants.json.", file=sys.stderr)
+                  print("Warning: Parser found insufficient villagers. Retaining existing wants.json.", file=sys.stderr)
                   sys.exit(0)
 
               formatted_list = []
@@ -104,7 +103,7 @@ jobs:
               with open("wants.json", "w", encoding="utf-8") as f:
                   json.dump(output, f, indent=2, ensure_ascii=False)
 
-              print(f"Successfully synced {len(formatted_list)} clean villagers from Paliapedia!")
+              print(f"Success: Synced {len(formatted_list)} clean villagers from Paliapedia!")
 
           except Exception as e:
               print(f"Scraper error: {e}", file=sys.stderr)
