@@ -2,9 +2,9 @@ name: Auto-Sync Palia Weekly Wants
 
 on:
   schedule:
-    # Runs Monday at 05:00 UTC (1:00 PM SGT) — 1 hr buffer for Paliapedia to datamine
+    # Runs Monday at 05:00 UTC (1:00 PM SGT) after the weekly reset
     - cron: '0 5 * * 1'
-  workflow_dispatch:
+  workflow_dispatch: # Allows manual trigger from the GitHub Actions tab
 
 permissions:
   contents: write
@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Scrape Paliapedia Wants
+      - name: Scrape Wants from Palia Wiki
         run: |
           python - << 'EOF'
           import json
@@ -33,58 +33,83 @@ jobs:
           import urllib.request
           from datetime import datetime
 
-          URL = "https://paliapedia.com/tools/weekly-wants"
+          WIKI_API = "https://palia.wiki.gg/api.php?action=parse&page=Villagers/Weekly_Wants&prop=text&format=json"
           HEADERS = {
-              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-              "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+              "User-Agent": "PaliaCompanionGuideBot/2.0 (Mobile App Data Sync; contact@github.com)"
           }
 
-          VILLAGERS = [
+          KNOWN_VILLAGERS = [
               "Ashura", "Auni", "Badruu", "Caleri", "Chayne", "Delaila", "Einar",
               "Elouisa", "Eshe", "Hassian", "Hekla", "Hodari", "Jel", "Jina",
               "Kenli", "Kenyatta", "Nai'o", "Najuma", "Reth", "Sifuu", "Subira",
               "Tamala", "Tau", "The Gardener", "Tish", "Ulfe", "Zeki"
           ]
 
-          BANNED = {"gifts", "gift", "div", "class", "like", "love", "items", "wants", "true", "false", "item"}
-
           try:
-              print(f"Requesting {URL}...")
-              req = urllib.request.Request(URL, headers=HEADERS)
-              with urllib.request.urlopen(req, timeout=25) as res:
-                  html = res.read().decode("utf-8")
+              print(f"Fetching from {WIKI_API}...")
+              req = urllib.request.Request(WIKI_API, headers=HEADERS)
+              with urllib.request.urlopen(req, timeout=30) as res:
+                  data = json.loads(res.read().decode('utf-8'))
 
-              clean_text = re.sub(r'<[^>]+>', '\n', html)
-              lines = [re.sub(r'\s+', ' ', l).strip() for l in clean_text.splitlines() if l.strip()]
+              html = data.get("parse", {}).get("text", {}).get("*", "")
+              if not html:
+                  print("Error: Received empty HTML from MediaWiki API.", file=sys.stderr)
+                  sys.exit(1)
 
+              # Extract all table rows
+              rows = re.findall(r'<tr[^>]*>(.*?)</tr>', html, re.DOTALL | re.IGNORECASE)
               villagers_dict = {}
 
-              for i, line in enumerate(lines):
-                  matched_name = None
-                  for v in VILLAGERS:
-                      if line.lower() in (f"{v} gifts".lower(), v.lower()):
-                          matched_name = v
+              for row in rows:
+                  # Extract all table cells
+                  cells = re.findall(r'<t[dh][^>]*>(.*?)</t[dh]>', row, re.DOTALL | re.IGNORECASE)
+                  if not cells:
+                      continue
+
+                  # Clean HTML tags and entities from each cell
+                  clean_cells = []
+                  for c in cells:
+                      text = re.sub(r'<[^>]+>', ' ', c)
+                      text = re.sub(r'&#\d+;|&[a-z]+;', ' ', text)
+                      text = re.sub(r'\(.*?\)', '', text) # Remove notes like (Star)
+                      text = re.sub(r'\s+', ' ', text).strip()
+                      if text:
+                          clean_cells.append(text)
+
+                  if not clean_cells:
+                      continue
+
+                  # Check if the first cell matches a villager name
+                  first_cell = clean_cells[0]
+                  matched_villager = None
+                  for v in KNOWN_VILLAGERS:
+                      if v.lower() == first_cell.lower() or v.lower() in first_cell.lower():
+                          matched_villager = v
                           break
 
-                  if matched_name and matched_name not in villagers_dict:
-                      wants = []
-                      for candidate in lines[i+1:i+18]:
-                          cand_clean = re.sub(r'[\*\•\-\(\)]', '', candidate).strip()
-                          cand_lower = cand_clean.lower()
+                  if matched_villager and matched_villager not in villagers_dict:
+                      # The remaining cells in the wiki table contain the weekly wants
+                      items = []
+                      for candidate in clean_cells[1:]:
+                          cand_clean = candidate.strip()
                           if (len(cand_clean) > 2 
-                              and cand_lower not in BANNED 
-                              and not any(cand_lower.startswith(b) for b in ("div", "class", "http"))
-                              and not any(cand_lower == v.lower() or cand_lower == f"{v} gifts".lower() for v in VILLAGERS)):
-                              if cand_clean not in [w["name"] for w in wants]:
-                                  is_love = len(wants) >= 2
-                                  wants.append({"name": cand_clean, "love": is_love})
-                          if len(wants) == 4:
-                              break
-                      if len(wants) >= 3:
-                          villagers_dict[matched_name] = wants
+                              and cand_clean.lower() not in ("like", "love", "unknown", "item", "wants", "gift")
+                              and not any(cand_clean.lower() == k.lower() for k in KNOWN_VILLAGERS)):
+                              if cand_clean not in items:
+                                  items.append(cand_clean)
+
+                      if len(items) >= 3:
+                          wants = []
+                          for idx, itm in enumerate(items[:4]):
+                              # Palia Wiki standard: slots 1 & 2 are Likes, slots 3 & 4 are Loves
+                              wants.append({
+                                  "name": itm,
+                                  "love": idx >= 2
+                              })
+                          villagers_dict[matched_villager] = wants
 
               if len(villagers_dict) < 5:
-                  print("Warning: Parser found insufficient villagers. Retaining existing wants.json.", file=sys.stderr)
+                  print(f"Warning: Extracted only {len(villagers_dict)} villagers from table. Retaining current wants.json.", file=sys.stderr)
                   sys.exit(0)
 
               formatted_list = []
@@ -103,11 +128,11 @@ jobs:
               with open("wants.json", "w", encoding="utf-8") as f:
                   json.dump(output, f, indent=2, ensure_ascii=False)
 
-              print(f"Success: Synced {len(formatted_list)} clean villagers from Paliapedia!")
+              print(f"Success: Synced {len(formatted_list)} clean villagers from Palia Wiki!")
 
           except Exception as e:
-              print(f"Scraper error: {e}", file=sys.stderr)
-              sys.exit(0)
+              print(f"Scraping error: {e}", file=sys.stderr)
+              sys.exit(1)
           EOF
 
       - name: Commit and Push Changes
@@ -118,6 +143,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes in wants.json to commit."
           else
-            git commit -m "chore(data): sync clean weekly wants from paliapedia [skip ci]"
+            git commit -m "chore(data): auto-update weekly wants from palia.wiki.gg [skip ci]"
             git push origin HEAD:${{ github.ref_name }}
           fi
