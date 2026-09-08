@@ -6,7 +6,7 @@
       "loc": "Kilima / Bahari",
       "wants": [
         {
-          "name": ".mw-parser-output .template-itembox{max-width:100%}.mw-parser-output .template-itembox .template-itembox-rel>.quality{position:absolute;bottom:-6px;left:-6px} Sapwood Plank",
+          "name": "Sapwood Plank",
           "love": false
         },
         {
@@ -393,6 +393,28 @@
         },
         {
           "name": "Palian Onion Soup",
+          "love": true
+        }
+      ]
+    },
+    {
+      "name": "Sifuu",
+      "loc": "Kilima / Bahari",
+      "wants": [
+        {
+          "name": "Chapaa Meat",
+          "love": false
+        },
+        {
+          "name": "Oily Anchovy",
+          "love": false
+        },
+        {
+          "name": "Beans On Toast",
+          "love": true
+        },
+        {
+          "name": "Blood Beetle",
           "love": true
         }
       ]
