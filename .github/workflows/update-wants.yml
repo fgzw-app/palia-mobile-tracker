@@ -4,7 +4,7 @@ on:
   schedule:
     # Runs Monday at 05:00 UTC (1:00 PM SGT) — after in-game reset & wiki logs update
     - cron: '0 5 * * 1'
-  workflow_dispatch: # Allows manual one-click sync from the Actions tab
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -45,9 +45,39 @@ jobs:
               "Tamala", "Tau", "The Gardener", "Tish", "Ulfe", "Zeki"
           ]
 
+          VILLAGER_LOCATIONS = {
+              "Ashura": "Kilima Tavern",
+              "Auni": "Tavern / Fields",
+              "Badruu": "Daiya Farm",
+              "Caleri": "Library",
+              "Chayne": "Apothecary",
+              "Delaila": "Daiya Farm",
+              "Einar": "Fisherman Lagoon",
+              "Elouisa": "Kilima Village",
+              "Eshe": "Mayor's Estate",
+              "Hassian": "Kilima Outskirts",
+              "Hekla": "Mirror Pond Ruins",
+              "Hodari": "Bahari Bay",
+              "Jel": "Tailor Shop",
+              "Jina": "Mirror Pond Ruins",
+              "Kenli": "Town Hall",
+              "Kenyatta": "Town Hall / Stables",
+              "Nai'o": "Daiya Farm",
+              "Najuma": "Bahari Workshop",
+              "Reth": "Kilima Tavern",
+              "Sifuu": "Blacksmith Shop",
+              "Subira": "Inn Upstairs",
+              "Tamala": "Bahari Woods",
+              "Tau": "Village / Farm",
+              "The Gardener": "Temple of the Roots",
+              "Tish": "Furniture Store",
+              "Ulfe": "Bahari Bay",
+              "Zeki": "General Store"
+          }
+
           BANNED_WORDS = {
               "like", "love", "unknown", "item", "wants", "gift", 
-              "gifts", "image", "file", "icon", "star"
+              "gifts", "image", "file", "icon", "star", "none", "tba"
           }
 
           try:
@@ -61,27 +91,24 @@ jobs:
                   print("Error: Empty HTML content returned from MediaWiki API.", file=sys.stderr)
                   sys.exit(1)
 
-              # Strip all global style blocks, scripts, and comments first
+              # Strip all global styles, scripts, comments
               html_clean = re.sub(r'<style[^>]*>.*?</style>', '', html, flags=re.DOTALL | re.IGNORECASE)
               html_clean = re.sub(r'<script[^>]*>.*?</script>', '', html_clean, flags=re.DOTALL | re.IGNORECASE)
               html_clean = re.sub(r'<!--.*?-->', '', html_clean, flags=re.DOTALL)
 
-              # Locate all table rows
               rows = re.findall(r'<tr[^>]*>(.*?)</tr>', html_clean, re.DOTALL | re.IGNORECASE)
               villagers_dict = {}
 
               for row in rows:
                   cells = re.findall(r'<t[dh][^>]*>(.*?)</t[dh]>', row, re.DOTALL | re.IGNORECASE)
-                  if not cells:
+                  if len(cells) < 2:
                       continue
 
                   clean_cells = []
                   for c in cells:
-                      # Comprehensive clean: remove HTML tags, entities, and parenthetical notes
                       text = re.sub(r'<[^>]+>', ' ', c)
                       text = re.sub(r'&#\d+;|&[a-zA-Z]+;', ' ', text)
                       text = re.sub(r'\(.*?\)', '', text)
-                      # Eliminate any lingering CSS rules or brace blocks
                       text = re.sub(r'\{.*?\}', '', text)
                       text = re.sub(r'\.mw-[^\s]+', '', text)
                       text = re.sub(r'\s+', ' ', text).strip()
@@ -91,11 +118,13 @@ jobs:
                   if not clean_cells:
                       continue
 
-                  # Determine if this row belongs to a villager
                   first_cell = clean_cells[0]
                   matched_villager = None
+
+                  # Check for matching villager name in the leading text
                   for v in KNOWN_VILLAGERS:
-                      if v.lower() == first_cell.lower() or v.lower() in first_cell.lower():
+                      pattern = r'\b' + re.escape(v.lower()) + r'\b'
+                      if re.search(pattern, first_cell.lower()):
                           matched_villager = v
                           break
 
@@ -105,7 +134,6 @@ jobs:
                           cand = candidate.strip()
                           cand_lower = cand.lower()
 
-                          # Skip invalid tokens, CSS artifacts, or villager names in candidate cells
                           if (len(cand) > 2 
                               and cand_lower not in BANNED_WORDS
                               and not cand.startswith((".", "#", "{", ";"))
@@ -113,27 +141,31 @@ jobs:
                               if cand not in items:
                                   items.append(cand)
 
-                      if len(items) >= 3:
+                      if len(items) >= 2:
                           wants = []
                           for idx, itm in enumerate(items[:4]):
-                              # Wiki format standard: slots 1-2 = Like (thumbs up), slots 3-4 = Love (heart)
                               wants.append({
                                   "name": itm,
                                   "love": idx >= 2
                               })
                           villagers_dict[matched_villager] = wants
 
-              if len(villagers_dict) < 5:
-                  print(f"Warning: Only found {len(villagers_dict)} villagers. Keeping existing wants.json.", file=sys.stderr)
-                  sys.exit(0)
+              # Verify count
+              print(f"Parsed {len(villagers_dict)} of {len(KNOWN_VILLAGERS)} villagers.")
 
               formatted_list = []
-              for name, wants in villagers_dict.items():
-                  formatted_list.append({
-                      "name": name,
-                      "loc": "Kilima / Bahari",
-                      "wants": wants
-                  })
+              # Ensure consistent order across all 27 villagers
+              for name in KNOWN_VILLAGERS:
+                  if name in villagers_dict:
+                      formatted_list.append({
+                          "name": name,
+                          "loc": VILLAGER_LOCATIONS.get(name, "Kilima / Bahari"),
+                          "wants": villagers_dict[name]
+                      })
+
+              if len(formatted_list) < 15:
+                  print("Warning: Parser found too few villagers. Retaining existing wants.json.", file=sys.stderr)
+                  sys.exit(0)
 
               output = {
                   "updated_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
@@ -143,7 +175,7 @@ jobs:
               with open("wants.json", "w", encoding="utf-8") as f:
                   json.dump(output, f, indent=2, ensure_ascii=False)
 
-              print(f"Success: Cleanly extracted and synced {len(formatted_list)} villagers from palia.wiki.gg!")
+              print(f"Success: Synced all {len(formatted_list)} villagers into wants.json!")
 
           except Exception as e:
               print(f"Scraper error: {e}", file=sys.stderr)
@@ -158,6 +190,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes in wants.json to commit."
           else
-            git commit -m "chore(data): auto-update weekly wants from palia.wiki.gg [skip ci]"
+            git commit -m "chore(data): sync full villager roster from palia.wiki.gg [skip ci]"
             git push origin HEAD:${{ github.ref_name }}
           fi
