@@ -1,17 +1,25 @@
 {
-  "updated_at": "2026-09-14 05:14:39 UTC",
+  "updated_at": "2026-09-14 05:57:11 UTC",
   "villagers": [
     {
       "name": "Ashura",
       "loc": "Kilima Tavern",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Sweet Leaf",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:17 Edit",
+          "name": "Prism Trout",
           "love": false
+        },
+        {
+          "name": "Ancient Wood Plank",
+          "love": true
+        },
+        {
+          "name": "Fisherman's Brew",
+          "love": true
         }
       ]
     },
@@ -20,12 +28,20 @@
       "loc": "Tavern / Fields",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Common Blue Butterfly",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:17 Edit",
+          "name": "Garden Leafhopper",
           "love": false
+        },
+        {
+          "name": "Nightshadow Batterfly",
+          "love": true
+        },
+        {
+          "name": "Blueberry Pie",
+          "love": true
         }
       ]
     },
@@ -34,12 +50,20 @@
       "loc": "Daiya Farm",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Carrot Seed",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:18 Edit",
+          "name": "Corn Seed",
           "love": false
+        },
+        {
+          "name": "Royal Heather",
+          "love": true
+        },
+        {
+          "name": "Jewelled Mantis",
+          "love": true
         }
       ]
     },
@@ -48,12 +72,20 @@
       "loc": "Library",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Coral",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:19 Edit",
+          "name": "Silk",
           "love": false
+        },
+        {
+          "name": "Pinecone",
+          "love": true
+        },
+        {
+          "name": "Royal Wisteria",
+          "love": true
         }
       ]
     },
@@ -62,12 +94,20 @@
       "loc": "Apothecary",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Wild Ginger",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:20 Edit",
+          "name": "Apple Jam",
           "love": false
+        },
+        {
+          "name": "Dawnspur Tea",
+          "love": true
+        },
+        {
+          "name": "Palian Onion Soup",
+          "love": true
         }
       ]
     },
@@ -76,12 +116,20 @@
       "loc": "Daiya Farm",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Muujin Meat",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:20 Edit",
+          "name": "HydratePro Fertilizer",
           "love": false
+        },
+        {
+          "name": "Sunburst Batterfly",
+          "love": true
+        },
+        {
+          "name": "Breakfast Skillet",
+          "love": true
         }
       ]
     },
@@ -90,12 +138,20 @@
       "loc": "Fisherman Lagoon",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Eyeless Minnow",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:21 Edit",
+          "name": "Red-bellied Piranha",
           "love": false
+        },
+        {
+          "name": "Fathead Minnow",
+          "love": true
+        },
+        {
+          "name": "Angelfish",
+          "love": true
         }
       ]
     },
@@ -104,12 +160,20 @@
       "loc": "Kilima Village",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Duskray",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:21 Edit",
+          "name": "Inky Dragonfly",
           "love": false
+        },
+        {
+          "name": "Scarlet Koi",
+          "love": true
+        },
+        {
+          "name": "Elder Shmole Spore",
+          "love": true
         }
       ]
     },
