@@ -392,7 +392,7 @@
 
   <div class="stats-bar">
     <span id="progress-text">Completed: 0 / 0</span>
-    <span id="sub-info">Reset: Mon 6:00 PM (SGT)</span>
+    <span id="sub-info">Reset: Mon 7:00 PM (SGT)</span>
   </div>
 </header>
 
@@ -916,14 +916,14 @@
     window.addEventListener('mouseup', () => { isDragging = false; });
   }
 
-  // Calculated for Monday 10:00 UTC (6:00 PM SGT) Reset
+  // Calculated for Monday 11:00 UTC (7:00 PM SGT) — 1-hour buffer after GitHub's 10:00 UTC scrape
   function getNextResetTime() {
     const now = new Date();
     const day = now.getUTCDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
     let daysUntilReset = (1 - day + 7) % 7;
 
-    // If it is already Monday and past 10:00:00 UTC, advance to next Monday
-    if (day === 1 && (now.getUTCHours() > 10 || (now.getUTCHours() === 10 && (now.getUTCMinutes() > 0 || now.getUTCSeconds() > 0)))) {
+    // If it is Monday and past 11:00:00 UTC, advance target to the following Monday
+    if (day === 1 && (now.getUTCHours() > 11 || (now.getUTCHours() === 11 && (now.getUTCMinutes() > 0 || now.getUTCSeconds() > 0)))) {
       daysUntilReset = 7;
     }
 
@@ -931,7 +931,7 @@
       now.getUTCFullYear(),
       now.getUTCMonth(),
       now.getUTCDate() + daysUntilReset,
-      10, 0, 0, 0
+      11, 0, 0, 0
     ));
 
     return nextReset;
