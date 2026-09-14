@@ -392,7 +392,7 @@
 
   <div class="stats-bar">
     <span id="progress-text">Completed: 0 / 0</span>
-    <span id="sub-info">Reset: Mon 12:00 PM (SGT)</span>
+    <span id="sub-info">Reset: Tue 12:00 PM (SGT)</span>
   </div>
 </header>
 
@@ -684,7 +684,7 @@
     { name: "Will-o-wisp Rockhopper", loc: "Elderwood Forest • Elderwood Swamps", time: "Any Time" }
   ];
 
-  // Full 27-Villager Verified Baseline (Always present even offline)
+  // Full 27-Villager Verified Offline Baseline
   const VILLAGERS = [
     { name: "Ashura", loc: "Kilima Tavern", wants: [{name: "Sapwood Plank", love: false}, {name: "Golden Salmon", love: false}, {name: "Highland Sturgeon", love: true}, {name: "Sashimi", love: true}] },
     { name: "Auni", loc: "Tavern / Fields", wants: [{name: "Brushtail Dragonfly", love: false}, {name: "Bahari Bee", love: false}, {name: "Stripeshell Snail", love: true}, {name: "Blueberry Pie", love: true}] },
@@ -916,16 +916,17 @@
     window.addEventListener('mouseup', () => { isDragging = false; });
   }
 
+  // Calculated for Tuesday 12:00 PM SGT Reset
   function getNextResetTime() {
     const now = new Date();
     const nowUtc = now.getTime() + (now.getTimezoneOffset() * 60000);
     const sgtNow = new Date(nowUtc + (8 * 3600000));
     const nextReset = new Date(sgtNow);
     const day = sgtNow.getDay();
-    let daysUntilReset = (1 - day + 7) % 7;
+    // 2 represents Tuesday (0 = Sunday, 1 = Monday, 2 = Tuesday)
+    let daysUntilReset = (2 - day + 7) % 7;
     
-    // Palia weekly reset occurs Monday at 04:00 UTC (12:00 PM SGT)
-    if (day === 1 && (sgtNow.getHours() > 12 || (sgtNow.getHours() === 12 && sgtNow.getMinutes() > 0))) {
+    if (day === 2 && (sgtNow.getHours() > 12 || (sgtNow.getHours() === 12 && sgtNow.getMinutes() > 0))) {
       daysUntilReset = 7;
     }
     
@@ -1277,6 +1278,13 @@
     }
     renderList();
   }
+
+  // Auto-refresh when switching back to this tab/app from mobile sleep
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      loadData();
+    }
+  });
 
   loadData();
 </script>
