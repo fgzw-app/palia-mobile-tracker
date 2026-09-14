@@ -2,8 +2,8 @@ name: Auto-Sync Palia Weekly Wants
 
 on:
   schedule:
-    # Runs Monday at 05:00 UTC (1:00 PM SGT) — after in-game reset & wiki logs update
-    - cron: '0 5 * * 1'
+    # Runs Tuesday at 05:00 UTC (1:00 PM SGT)
+    - cron: '0 5 * * 2'
   workflow_dispatch:
 
 permissions:
@@ -121,7 +121,6 @@ jobs:
                   first_cell = clean_cells[0]
                   matched_villager = None
 
-                  # Check for matching villager name in the leading text
                   for v in KNOWN_VILLAGERS:
                       pattern = r'\b' + re.escape(v.lower()) + r'\b'
                       if re.search(pattern, first_cell.lower()):
@@ -150,11 +149,9 @@ jobs:
                               })
                           villagers_dict[matched_villager] = wants
 
-              # Verify count
               print(f"Parsed {len(villagers_dict)} of {len(KNOWN_VILLAGERS)} villagers.")
 
               formatted_list = []
-              # Ensure consistent order across all 27 villagers
               for name in KNOWN_VILLAGERS:
                   if name in villagers_dict:
                       formatted_list.append({
@@ -190,6 +187,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes in wants.json to commit."
           else
-            git commit -m "chore(data): sync full villager roster from palia.wiki.gg [skip ci]"
+            git commit -m "chore(data): sync full villager roster on Tuesday [skip ci]"
             git push origin HEAD:${{ github.ref_name }}
           fi
