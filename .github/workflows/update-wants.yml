@@ -2,8 +2,8 @@ name: Auto-Sync Palia Weekly Wants
 
 on:
   schedule:
-    # Runs Tuesday at 05:00 UTC (1:00 PM SGT)
-    - cron: '0 5 * * 2'
+    # Runs Monday at 10:00 UTC (6:00 PM SGT) — allows wiki contributors 6 hours to verify wants
+    - cron: '0 10 * * 1'
   workflow_dispatch:
 
 permissions:
@@ -91,7 +91,6 @@ jobs:
                   print("Error: Empty HTML content returned from MediaWiki API.", file=sys.stderr)
                   sys.exit(1)
 
-              # Strip all global styles, scripts, comments
               html_clean = re.sub(r'<style[^>]*>.*?</style>', '', html, flags=re.DOTALL | re.IGNORECASE)
               html_clean = re.sub(r'<script[^>]*>.*?</script>', '', html_clean, flags=re.DOTALL | re.IGNORECASE)
               html_clean = re.sub(r'<!--.*?-->', '', html_clean, flags=re.DOTALL)
@@ -187,6 +186,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes in wants.json to commit."
           else
-            git commit -m "chore(data): sync full villager roster on Tuesday [skip ci]"
+            git commit -m "chore(data): auto-sync weekly wants Monday 10:00 UTC [skip ci]"
             git push origin HEAD:${{ github.ref_name }}
           fi
