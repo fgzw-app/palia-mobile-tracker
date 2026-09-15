@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-14 10:13:56 UTC",
+  "updated_at": "2026-09-15 01:08:57 UTC",
   "villagers": [
     {
       "name": "Ashura",
@@ -182,12 +182,20 @@
       "loc": "Mayor's Estate",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Leather",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:22 Edit",
+          "name": "Fish Stew",
           "love": false
+        },
+        {
+          "name": "Oysters Akwinduu",
+          "love": true
+        },
+        {
+          "name": "Steak Dinner",
+          "love": true
         }
       ]
     },
@@ -196,12 +204,20 @@
       "loc": "Kilima Outskirts",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Plant Fiber",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:23 Edit",
+          "name": "Fabric",
           "love": false
+        },
+        {
+          "name": "Iron Bar",
+          "love": true
+        },
+        {
+          "name": "Elder Shmole Spore",
+          "love": true
         }
       ]
     },
@@ -210,12 +226,20 @@
       "loc": "Mirror Pond Ruins",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Grilled Meat",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:23 Edit",
+          "name": "Brightshroom",
           "love": false
+        },
+        {
+          "name": "Beluga Sturgeon",
+          "love": true
+        },
+        {
+          "name": "Hollow Jaakcat Floof",
+          "love": true
         }
       ]
     },
@@ -224,12 +248,20 @@
       "loc": "Bahari Bay",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Fur",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:24 Edit",
+          "name": "Flow-Infused Wood",
           "love": false
+        },
+        {
+          "name": "Azure Chapaa Tail",
+          "love": true
+        },
+        {
+          "name": "Bahari Glowbug",
+          "love": true
         }
       ]
     },
@@ -238,12 +270,20 @@
       "loc": "Tailor Shop",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Umbran Carp",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:25 Edit",
+          "name": "Muujin Mane",
           "love": false
+        },
+        {
+          "name": "Golden Fern",
+          "love": true
+        },
+        {
+          "name": "Green Pearl",
+          "love": true
         }
       ]
     },
@@ -252,12 +292,20 @@
       "loc": "Mirror Pond Ruins",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Grilled Mushroom",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:26 Edit",
+          "name": "Duskwing Butterfly",
           "love": false
+        },
+        {
+          "name": "Dragon's Beard Peat",
+          "love": true
+        },
+        {
+          "name": "Dari Cloves",
+          "love": true
         }
       ]
     },
@@ -266,12 +314,20 @@
       "loc": "Town Hall",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Spotted Chapaa Tail",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:26 Edit",
+          "name": "Creamy Carrot Soup",
           "love": false
+        },
+        {
+          "name": "Royal Betta",
+          "love": true
+        },
+        {
+          "name": "Chapaa Masala",
+          "love": true
         }
       ]
     },
@@ -280,12 +336,20 @@
       "loc": "Town Hall / Stables",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Blueberry Jam",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:27 Edit",
+          "name": "Acorn",
           "love": false
+        },
+        {
+          "name": "Jaakcat Fur",
+          "love": true
+        },
+        {
+          "name": "Majiri-of-War",
+          "love": true
         }
       ]
     },
@@ -294,12 +358,20 @@
       "loc": "Daiya Farm",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Waterlogged Boot",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:28 Edit",
+          "name": "Wheat Seed",
           "love": false
+        },
+        {
+          "name": "Rockhopper Pumpkin Seed",
+          "love": true
+        },
+        {
+          "name": "Phoenix Moth",
+          "love": true
         }
       ]
     },
@@ -308,12 +380,20 @@
       "loc": "Bahari Workshop",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Wild Garlic",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:28 Edit",
+          "name": "Garden Snail",
           "love": false
+        },
+        {
+          "name": "Iron Ore",
+          "love": true
+        },
+        {
+          "name": "Highland Floatfish",
+          "love": true
         }
       ]
     },
@@ -322,12 +402,20 @@
       "loc": "Kilima Tavern",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Onion",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:29 Edit",
+          "name": "Hearty Vegetable Soup",
           "love": false
+        },
+        {
+          "name": "Jaakcat Stew",
+          "love": true
+        },
+        {
+          "name": "Breakfast Skillet",
+          "love": true
         }
       ]
     },
@@ -336,12 +424,20 @@
       "loc": "Blacksmith Shop",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Sernuk Antlers",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:30 Edit",
+          "name": "Copper Bar",
           "love": false
+        },
+        {
+          "name": "Jaakcat Stew",
+          "love": true
+        },
+        {
+          "name": "Blood Beetle",
+          "love": true
         }
       ]
     },
@@ -350,12 +446,20 @@
       "loc": "Inn Upstairs",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Grilled Mushroom",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:33 Edit",
+          "name": "Stuffed Cabbage Rolls",
           "love": false
+        },
+        {
+          "name": "Steamed Fish",
+          "love": true
+        },
+        {
+          "name": "Spicy Rice Cakes",
+          "love": true
         }
       ]
     },
@@ -364,12 +468,20 @@
       "loc": "Bahari Woods",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Emerald Carpet Moss",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:30 Edit",
+          "name": "Lunar Fairy Moth",
           "love": false
+        },
+        {
+          "name": "Lantern Ash Seed",
+          "love": true
+        },
+        {
+          "name": "Fairy Mantis",
+          "love": true
         }
       ]
     },
@@ -378,12 +490,20 @@
       "loc": "Village / Farm",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Chapaa Meat",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:31 Edit",
+          "name": "Cantankerous Koi",
           "love": false
+        },
+        {
+          "name": "Scarlet Koi",
+          "love": true
+        },
+        {
+          "name": "Akwinduu Chapaa",
+          "love": true
         }
       ]
     },
@@ -392,12 +512,20 @@
       "loc": "Temple of the Roots",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Common Field Cricket",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:34 Edit",
+          "name": "Glow Worm",
           "love": false
+        },
+        {
+          "name": "Veil Piksii",
+          "love": true
+        },
+        {
+          "name": "Ancient Amber Beetle",
+          "love": true
         }
       ]
     },
@@ -406,12 +534,20 @@
       "loc": "Furniture Store",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Clay",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:32 Edit",
+          "name": "Stuffed Cabbage Rolls",
           "love": false
+        },
+        {
+          "name": "Ashwood Plank",
+          "love": true
+        },
+        {
+          "name": "Green Pearl",
+          "love": true
         }
       ]
     },
@@ -420,12 +556,20 @@
       "loc": "Bahari Bay",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Bahari Bream",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:33 Edit",
+          "name": "Flowtato Fries with Ketchup",
           "love": false
+        },
+        {
+          "name": "Will-o-wisp Rockhopper",
+          "love": true
+        },
+        {
+          "name": "Stormray",
+          "love": true
         }
       ]
     },
@@ -434,12 +578,20 @@
       "loc": "General Store",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Unopened Oyster",
           "love": false
         },
         {
-          "name": "Last updated: 2026-09-14 04:00:32 Edit",
+          "name": "Golden Salmon",
           "love": false
+        },
+        {
+          "name": "Mini Mullet",
+          "love": true
+        },
+        {
+          "name": "Piksii Shmole Spore",
+          "love": true
         }
       ]
     }
