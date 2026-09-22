@@ -35,7 +35,7 @@ jobs:
 
           WIKI_API = "https://palia.wiki.gg/api.php?action=parse&page=Villagers/Weekly_Wants&prop=text&format=json"
           HEADERS = {
-              "User-Agent": "PaliaCompanionGuideBot/4.0 (Personal Mobile Tool; contact@github.com)"
+              "User-Agent": "PaliaCompanionGuideBot/5.0 (Mobile App Data Sync; contact@github.com)"
           }
 
           KNOWN_VILLAGERS = [
@@ -117,9 +117,12 @@ jobs:
                   if not cleaned:
                       continue
 
+                  first_cell = cleaned[0].lower()
                   matched_name = None
+                  
+                  # Match villager by exact name or substring (catches "Tish", "Tish's Shop", etc.)
                   for v in KNOWN_VILLAGERS:
-                      if re.search(rf'\b{re.escape(v.lower())}\b', cleaned[0].lower()):
+                      if v.lower() in first_cell:
                           matched_name = v
                           break
 
@@ -129,7 +132,6 @@ jobs:
                           cand_clean = candidate.strip()
                           cand_lower = cand_clean.lower()
 
-                          # Filter out metadata lines, timestamps, and edit buttons
                           if (
                               len(cand_clean) > 2
                               and cand_lower not in BANNED
@@ -141,7 +143,7 @@ jobs:
                               if cand_clean not in items:
                                   items.append(cand_clean)
 
-                      if len(items) >= 2:
+                      if len(items) >= 1:
                           villagers_dict[matched_name] = [
                               {"name": itm, "love": idx >= 2}
                               for idx, itm in enumerate(items[:4])
@@ -158,8 +160,8 @@ jobs:
 
               print(f"Parsed {len(formatted_list)} of {len(KNOWN_VILLAGERS)} villagers.")
 
-              if len(formatted_list) < 15:
-                  print("Warning: Insufficient villagers parsed. Retaining existing wants.json.", file=sys.stderr)
+              if len(formatted_list) < 10:
+                  print("Warning: Insufficient villagers parsed. Preserving existing wants.json.", file=sys.stderr)
                   sys.exit(0)
 
               output = {
@@ -170,7 +172,7 @@ jobs:
               with open("wants.json", "w", encoding="utf-8") as f:
                   json.dump(output, f, indent=2, ensure_ascii=False)
 
-              print("Success: wants.json updated cleanly with no metadata artifacts!")
+              print("Success: wants.json updated cleanly!")
 
           except Exception as e:
               print(f"Error during scrape: {e}", file=sys.stderr)
@@ -185,6 +187,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes in wants.json to commit."
           else
-            git commit -m "chore(data): auto-sync weekly wants without metadata bleed [skip ci]"
+            git commit -m "chore(data): auto-sync weekly wants [skip ci]"
             git push origin HEAD:${{ github.ref_name }}
           fi
