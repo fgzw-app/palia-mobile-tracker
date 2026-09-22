@@ -1,591 +1,182 @@
-{
-  "updated_at": "2026-09-21 10:12:56 UTC",
-  "villagers": [
-    {
-      "name": "Ashura",
-      "loc": "Kilima Tavern",
-      "wants": [
-        {
-          "name": "Striped Dace",
-          "love": false
-        },
-        {
-          "name": "Striped Sturgeon",
-          "love": false
-        },
-        {
-          "name": "Fried Catfish Dinner",
-          "love": true
-        },
-        {
-          "name": "Fisherman's Brew",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "Auni",
-      "loc": "Tavern / Fields",
-      "wants": [
-        {
-          "name": "Waterlogged Boot",
-          "love": false
-        },
-        {
-          "name": "Garden Snail",
-          "love": false
-        },
-        {
-          "name": "Royal Betta",
-          "love": true
-        },
-        {
-          "name": "Blueberry Pie",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "Badruu",
-      "loc": "Daiya Farm",
-      "wants": [
-        {
-          "name": "Rosy Bitterling",
-          "love": false
-        },
-        {
-          "name": "Spicy Pepper Seed",
-          "love": false
-        },
-        {
-          "name": "Pumpkin Pie",
-          "love": true
-        },
-        {
-          "name": "Jewelled Mantis",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "Caleri",
-      "loc": "Library",
-      "wants": [
-        {
-          "name": "Grilled Oyster",
-          "love": false
-        },
-        {
-          "name": "Glass Bulb",
-          "love": false
-        },
-        {
-          "name": "Fern Tea",
-          "love": true
-        },
-        {
-          "name": "Dari Cloves",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "Chayne",
-      "loc": "Apothecary",
-      "wants": [
-        {
-          "name": "Congee",
-          "love": false
-        },
-        {
-          "name": "Wheat",
-          "love": false
-        },
-        {
-          "name": "Dragon's Beard Peat",
-          "love": true
-        },
-        {
-          "name": "Elderwood Lotus",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "Delaila",
-      "loc": "Daiya Farm",
-      "wants": [
-        {
-          "name": "Cantankerous Koi",
-          "love": false
-        },
-        {
-          "name": "HydratePro Fertilizer",
-          "love": false
-        },
-        {
-          "name": "Stalking Catfish",
-          "love": true
-        },
-        {
-          "name": "Rockhopper Pumpkin",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "Einar",
-      "loc": "Fisherman Lagoon",
-      "wants": [
-        {
-          "name": "Striped Dace",
-          "love": false
-        },
-        {
-          "name": "Garden Snail",
-          "love": false
-        },
-        {
-          "name": "Dart Eel",
-          "love": true
-        },
-        {
-          "name": "Highland Floatfish",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "Elouisa",
-      "loc": "Kilima Village",
-      "wants": [
-        {
-          "name": "Calico Koi",
-          "love": false
-        },
-        {
-          "name": "Albino Eel",
-          "love": false
-        },
-        {
-          "name": "Loaded Flowtato",
-          "love": true
-        },
-        {
-          "name": "Green Pearl",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "Eshe",
-      "loc": "Mayor's Estate",
-      "wants": [
-        {
-          "name": "Fur",
-          "love": false
-        },
-        {
-          "name": "Juniper Seed",
-          "love": false
-        },
-        {
-          "name": "Oysters Akwinduu",
-          "love": true
-        },
-        {
-          "name": "Elderflower",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "Hassian",
-      "loc": "Kilima Outskirts",
-      "wants": [
-        {
-          "name": "Grilled Meat",
-          "love": false
-        },
-        {
-          "name": "Fabric",
-          "love": false
-        },
-        {
-          "name": "Lesser Snakehead",
-          "love": true
-        },
-        {
-          "name": "Waveback Ogopuu Scale",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "Hekla",
-      "loc": "Mirror Pond Ruins",
-      "wants": [
-        {
-          "name": "Grilled Mushroom",
-          "love": false
-        },
-        {
-          "name": "Bahari Bream",
-          "love": false
-        },
-        {
-          "name": "Blue Crab",
-          "love": true
-        },
-        {
-          "name": "Breakfast Skillet",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "Hodari",
-      "loc": "Bahari Bay",
-      "wants": [
-        {
-          "name": "Stone Brick",
-          "love": false
-        },
-        {
-          "name": "Sernuk Noodle Stew",
-          "love": false
-        },
-        {
-          "name": "Anch' 'n Grits",
-          "love": true
-        },
-        {
-          "name": "Emerald Ogopuu Scale",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "Jel",
-      "loc": "Tailor Shop",
-      "wants": [
-        {
-          "name": "Waterlogged Boot",
-          "love": false
-        },
-        {
-          "name": "Sernuk Hide",
-          "love": false
-        },
-        {
-          "name": "Golden Fern",
-          "love": true
-        },
-        {
-          "name": "Bluebristle Muujin Mane",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "Jina",
-      "loc": "Mirror Pond Ruins",
-      "wants": [
-        {
-          "name": "Shell",
-          "love": false
-        },
-        {
-          "name": "Heat Root",
-          "love": false
-        },
-        {
-          "name": "Brighteye Butterfly",
-          "love": true
-        },
-        {
-          "name": "Elderwood Lotus",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "Kenli",
-      "loc": "Town Hall",
-      "wants": [
-        {
-          "name": "Grilled Fish",
-          "love": false
-        },
-        {
-          "name": "Ramen",
-          "love": false
-        },
-        {
-          "name": "Princess Ladybug",
-          "love": true
-        },
-        {
-          "name": "Breakfast Skillet",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "Kenyatta",
-      "loc": "Town Hall / Stables",
-      "wants": [
-        {
-          "name": "Knapweed",
-          "love": false
-        },
-        {
-          "name": "Inky Dragonfly",
-          "love": false
-        },
-        {
-          "name": "Spicy Rice Cakes",
-          "love": true
-        },
-        {
-          "name": "Whispering Widow Moth",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "Nai'o",
-      "loc": "Daiya Farm",
-      "wants": [
-        {
-          "name": "Spice Sprouts",
-          "love": false
-        },
-        {
-          "name": "Rice Seed",
-          "love": false
-        },
-        {
-          "name": "Kopaa Nuts",
-          "love": true
-        },
-        {
-          "name": "Steak Dinner",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "Najuma",
-      "loc": "Bahari Workshop",
-      "wants": [
-        {
-          "name": "Flint",
-          "love": false
-        },
-        {
-          "name": "Garden Snail",
-          "love": false
-        },
-        {
-          "name": "Ashwood Plank",
-          "love": true
-        },
-        {
-          "name": "Highland Floatfish",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "Reth",
-      "loc": "Kilima Tavern",
-      "wants": [
-        {
-          "name": "Tomato",
-          "love": false
-        },
-        {
-          "name": "Hearty Vegetable Soup",
-          "love": false
-        },
-        {
-          "name": "Rice 'n Beans",
-          "love": true
-        },
-        {
-          "name": "Breakfast Skillet",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "Sifuu",
-      "loc": "Blacksmith Shop",
-      "wants": [
-        {
-          "name": "Sernuk Meat",
-          "love": false
-        },
-        {
-          "name": "Elder Sernuk Antlers",
-          "love": false
-        },
-        {
-          "name": "Dawnspur Tea",
-          "love": true
-        },
-        {
-          "name": "Bean Burger",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "Subira",
-      "loc": "Inn Upstairs",
-      "wants": [
-        {
-          "name": "Grilled Fish",
-          "love": false
-        },
-        {
-          "name": "Radiant Sunfish",
-          "love": false
-        },
-        {
-          "name": "Ancient Koi",
-          "love": true
-        },
-        {
-          "name": "Spitfire Cicada",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "Tamala",
-      "loc": "Bahari Woods",
-      "wants": [
-        {
-          "name": "Kilima Night Moth",
-          "love": false
-        },
-        {
-          "name": "Garden Millipede",
-          "love": false
-        },
-        {
-          "name": "Lantern Ash Seed",
-          "love": true
-        },
-        {
-          "name": "Leafstalker Mantis",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "Tau",
-      "loc": "Village / Farm",
-      "wants": [
-        {
-          "name": "Sernuk Meat",
-          "love": false
-        },
-        {
-          "name": "Oily Anchovy",
-          "love": false
-        },
-        {
-          "name": "Starry Bitterling",
-          "love": true
-        },
-        {
-          "name": "Proudhorned Sernuk Antlers",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "The Gardener",
-      "loc": "Temple of the Roots",
-      "wants": [
-        {
-          "name": "Staircase Mushroom",
-          "love": false
-        },
-        {
-          "name": "Glow Worm",
-          "love": false
-        },
-        {
-          "name": "Veil Piksii",
-          "love": true
-        },
-        {
-          "name": "Ancient Amber Beetle",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "Tish",
-      "loc": "Furniture Store",
-      "wants": [
-        {
-          "name": "Use right column to edit.",
-          "love": false
-        },
-        {
-          "name": "Last updated: 2026-09-21 04:00:29 Edit",
-          "love": false
-        }
-      ]
-    },
-    {
-      "name": "Ulfe",
-      "loc": "Bahari Bay",
-      "wants": [
-        {
-          "name": "Fathead Minnow",
-          "love": false
-        },
-        {
-          "name": "Umbran Carp",
-          "love": false
-        },
-        {
-          "name": "Spicy Crab Fried Rice",
-          "love": true
-        },
-        {
-          "name": "Midnight Jaakcat Floof",
-          "love": true
-        }
-      ]
-    },
-    {
-      "name": "Zeki",
-      "loc": "General Store",
-      "wants": [
-        {
-          "name": "Silvery Minnow",
-          "love": false
-        },
-        {
-          "name": "Fish Stew",
-          "love": false
-        },
-        {
-          "name": "Major Manta",
-          "love": true
-        },
-        {
-          "name": "Jadium Bar",
-          "love": true
-        }
-      ]
-    }
-  ]
-}
+name: Auto-Sync Palia Weekly Wants
+
+on:
+  schedule:
+    # Runs Monday at 10:00 UTC (6:00 PM SGT)
+    - cron: '0 10 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Scrape Wants from palia.gaming.tools
+        run: |
+          python - << 'EOF'
+          import json
+          import re
+          import sys
+          import urllib.request
+          from datetime import datetime
+
+          PAGE_URL = "https://palia.gaming.tools/tools/weekly-wants"
+          HEADERS = {
+              "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1",
+              "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+          }
+
+          KNOWN_VILLAGERS = [
+              "Ashura", "Auni", "Badruu", "Caleri", "Chayne", "Delaila", "Einar",
+              "Elouisa", "Eshe", "Hassian", "Hekla", "Hodari", "Jel", "Jina",
+              "Kenli", "Kenyatta", "Nai'o", "Najuma", "Reth", "Sifuu", "Subira",
+              "Tamala", "Tau", "The Gardener", "Tish", "Ulfe", "Zeki"
+          ]
+
+          VILLAGER_LOCATIONS = {
+              "Ashura": "Kilima Tavern",
+              "Auni": "Tavern / Fields",
+              "Badruu": "Daiya Farm",
+              "Caleri": "Library",
+              "Chayne": "Apothecary",
+              "Delaila": "Daiya Farm",
+              "Einar": "Fisherman Lagoon",
+              "Elouisa": "Kilima Village",
+              "Eshe": "Mayor's Estate",
+              "Hassian": "Kilima Outskirts",
+              "Hekla": "Mirror Pond Ruins",
+              "Hodari": "Bahari Bay",
+              "Jel": "Tailor Shop",
+              "Jina": "Mirror Pond Ruins",
+              "Kenli": "Town Hall",
+              "Kenyatta": "Town Hall / Stables",
+              "Nai'o": "Daiya Farm",
+              "Najuma": "Bahari Workshop",
+              "Reth": "Kilima Tavern",
+              "Sifuu": "Blacksmith Shop",
+              "Subira": "Inn Upstairs",
+              "Tamala": "Bahari Woods",
+              "Tau": "Village / Farm",
+              "The Gardener": "Temple of the Roots",
+              "Tish": "Furniture Store",
+              "Ulfe": "Bahari Bay",
+              "Zeki": "General Store"
+          }
+
+          try:
+              print(f"Connecting to: {PAGE_URL}")
+              req = urllib.request.Request(PAGE_URL, headers=HEADERS)
+              with urllib.request.urlopen(req, timeout=30) as res:
+                  raw_content = res.read().decode('utf-8')
+
+              villagers_dict = {}
+
+              # Strategy 1: Look for Next.js / Nuxt hydration payload (__NEXT_DATA__ or similar)
+              json_blob = None
+              next_data_match = re.search(r'<script id="__NEXT_DATA__" type="application/json">({.*?})</script>', raw_content)
+              
+              if next_data_match:
+                  try:
+                      parsed = json.loads(next_data_match.group(1))
+                      # Recursively find villager objects or lists in props
+                      page_props = parsed.get("props", {}).get("pageProps", {})
+                      json_blob = page_props.get("villagers") or page_props.get("data") or page_props
+                  except Exception as err:
+                      print(f"Failed parsing __NEXT_DATA__: {err}")
+
+              # Strategy 2: If structured JSON blob is retrieved
+              if isinstance(json_blob, list):
+                  for item in json_blob:
+                      v_name = item.get("name") or item.get("villagerName")
+                      wants_list = item.get("wants") or item.get("weeklyWants") or []
+                      if v_name in KNOWN_VILLAGERS and wants_list:
+                          formatted_wants = []
+                          for w in wants_list:
+                              w_name = w.get("name") if isinstance(w, dict) else str(w)
+                              is_love = bool(w.get("love") or w.get("isLoved") or w.get("rewardTier", 0) >= 3) if isinstance(w, dict) else False
+                              formatted_wants.append({"name": w_name, "love": is_love})
+                          villagers_dict[v_name] = formatted_wants[:4]
+
+              # Strategy 3: HTML DOM fallback for rendered cards
+              if len(villagers_dict) < 15:
+                  print("Falling back to DOM container extraction...")
+                  # Identify blocks per villager
+                  for v in KNOWN_VILLAGERS:
+                      pattern = rf"{v}[\s\S]*?(?=(?:{'|'.join(KNOWN_VILLAGERS)})|$)"
+                      match = re.search(pattern, raw_content)
+                      if match:
+                          block = match.group(0)
+                          # Extract likely item names or alt text inside the villager card
+                          items = re.findall(r'alt="([^"]+)"|title="([^"]+)"|<span[^>]*>([^<]+)</span>', block)
+                          clean_items = []
+                          for t in items:
+                              candidate = (t[0] or t[1] or t[2]).strip()
+                              if (candidate 
+                                  and len(candidate) > 2 
+                                  and candidate.lower() not in ["like", "love", "gift", "item", "icon", "star", v.lower()]
+                                  and candidate not in KNOWN_VILLAGERS
+                                  and candidate not in clean_items):
+                                  clean_items.append(candidate)
+
+                          if len(clean_items) >= 2:
+                              villagers_dict[v] = [
+                                  {"name": name, "love": idx >= 2} 
+                                  for idx, name in enumerate(clean_items[:4])
+                              ]
+
+              print(f"Extracted data for {len(villagers_dict)} villagers.")
+
+              formatted_list = []
+              for name in KNOWN_VILLAGERS:
+                  if name in villagers_dict:
+                      formatted_list.append({
+                          "name": name,
+                          "loc": VILLAGER_LOCATIONS.get(name, "Kilima / Bahari"),
+                          "wants": villagers_dict[name]
+                      })
+
+              # Safety Gate: Do not overwrite if extraction came back partial
+              if len(formatted_list) < 15:
+                  print("Warning: Insufficient villagers extracted. Aborting without overwriting wants.json.", file=sys.stderr)
+                  sys.exit(0)
+
+              output = {
+                  "updated_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
+                  "source": "palia.gaming.tools",
+                  "villagers": formatted_list
+              }
+
+              with open("wants.json", "w", encoding="utf-8") as f:
+                  json.dump(output, f, indent=2, ensure_ascii=False)
+
+              print(f"Success: wants.json generated successfully from palia.gaming.tools!")
+
+          except Exception as e:
+              print(f"Scraper error: {e}", file=sys.stderr)
+              sys.exit(0)
+          EOF
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add wants.json
+          if git diff --staged --quiet; then
+            echo "No changes in wants.json to commit."
+          else
+            git commit -m "chore(data): sync weekly wants from palia.gaming.tools [skip ci]"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
