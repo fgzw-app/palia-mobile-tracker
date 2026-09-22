@@ -35,7 +35,7 @@ jobs:
 
           WIKI_API = "https://palia.wiki.gg/api.php?action=parse&page=Villagers/Weekly_Wants&prop=text&format=json"
           HEADERS = {
-              "User-Agent": "PaliaCompanionGuideBot/3.0 (Personal Mobile Tool; contact@github.com)"
+              "User-Agent": "PaliaCompanionGuideBot/4.0 (Personal Mobile Tool; contact@github.com)"
           }
 
           KNOWN_VILLAGERS = [
@@ -75,7 +75,10 @@ jobs:
               "Zeki": "General Store"
           }
 
-          BANNED = {"like", "love", "unknown", "item", "wants", "gift", "gifts", "none", "tba", "star"}
+          BANNED = {
+              "like", "love", "unknown", "item", "wants", "gift", "gifts", 
+              "none", "tba", "star", "edit", "history", "view", "page"
+          }
 
           try:
               req = urllib.request.Request(WIKI_API, headers=HEADERS)
@@ -87,7 +90,14 @@ jobs:
                   print("Wiki returned empty payload.", file=sys.stderr)
                   sys.exit(0)
 
-              rows = re.findall(r'<tr[^>]*>(.*?)</tr>', html, re.DOTALL | re.IGNORECASE)
+              # Strip administrative markup, edit links, scripts, and metadata
+              html_clean = re.sub(r'<style[^>]*>.*?</style>', '', html, flags=re.DOTALL | re.IGNORECASE)
+              html_clean = re.sub(r'<script[^>]*>.*?</script>', '', html_clean, flags=re.DOTALL | re.IGNORECASE)
+              html_clean = re.sub(r'<small[^>]*>.*?</small>', '', html_clean, flags=re.DOTALL | re.IGNORECASE)
+              html_clean = re.sub(r'<span class="mw-editsection">.*?</span>', '', html_clean, flags=re.DOTALL | re.IGNORECASE)
+              html_clean = re.sub(r'<!--.*?-->', '', html_clean, flags=re.DOTALL)
+
+              rows = re.findall(r'<tr[^>]*>(.*?)</tr>', html_clean, re.DOTALL | re.IGNORECASE)
               villagers_dict = {}
 
               for r in rows:
@@ -117,10 +127,17 @@ jobs:
                       items = []
                       for candidate in cleaned[1:]:
                           cand_clean = candidate.strip()
-                          if (len(cand_clean) > 2
-                                  and cand_clean.lower() not in BANNED
-                                  and not cand_clean.startswith((".", "#", "{", ";"))
-                                  and not any(cand_clean.lower() == k.lower() for k in KNOWN_VILLAGERS)):
+                          cand_lower = cand_clean.lower()
+
+                          # Filter out metadata lines, timestamps, and edit buttons
+                          if (
+                              len(cand_clean) > 2
+                              and cand_lower not in BANNED
+                              and not cand_lower.startswith(("last updated", "edit", "view", "page"))
+                              and not re.search(r'\d{4}-\d{2}-\d{2}', cand_clean)
+                              and not cand_clean.startswith((".", "#", "{", ";", "[", "/"))
+                              and not any(cand_lower == k.lower() for k in KNOWN_VILLAGERS)
+                          ):
                               if cand_clean not in items:
                                   items.append(cand_clean)
 
@@ -139,10 +156,10 @@ jobs:
                           "wants": villagers_dict[name]
                       })
 
-              print(f"Parsed {len(formatted_list)} villagers.")
+              print(f"Parsed {len(formatted_list)} of {len(KNOWN_VILLAGERS)} villagers.")
 
               if len(formatted_list) < 15:
-                  print("Warning: Insufficient data found. Aborting to prevent overwriting wants.json.")
+                  print("Warning: Insufficient villagers parsed. Retaining existing wants.json.", file=sys.stderr)
                   sys.exit(0)
 
               output = {
@@ -153,7 +170,7 @@ jobs:
               with open("wants.json", "w", encoding="utf-8") as f:
                   json.dump(output, f, indent=2, ensure_ascii=False)
 
-              print("wants.json successfully updated!")
+              print("Success: wants.json updated cleanly with no metadata artifacts!")
 
           except Exception as e:
               print(f"Error during scrape: {e}", file=sys.stderr)
@@ -168,6 +185,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes in wants.json to commit."
           else
-            git commit -m "chore(data): auto-sync weekly wants [skip ci]"
+            git commit -m "chore(data): auto-sync weekly wants without metadata bleed [skip ci]"
             git push origin HEAD:${{ github.ref_name }}
           fi
