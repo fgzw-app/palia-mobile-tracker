@@ -684,9 +684,9 @@
     { name: "Will-o-wisp Rockhopper", loc: "Elderwood Forest • Elderwood Swamps", time: "Any Time" }
   ];
 
-  // Full 27-Villager Verified Offline Baseline
+  // Verified 27-Villager Offline Baseline (Ashura Cleaned)
   const VILLAGERS = [
-    { name: "Ashura", loc: "Kilima Tavern", wants: [{name: "Sapwood Plank", love: false}, {name: "Golden Salmon", love: false}, {name: "Highland Sturgeon", love: true}, {name: "Sashimi", love: true}] },
+    { name: "Ashura", loc: "Kilima Tavern", wants: [{name: "Sapwood Plank", love: false}, {name: "Striped Dace", love: false}, {name: "Highland Sturgeon", love: true}, {name: "Sashimi", love: true}] },
     { name: "Auni", loc: "Tavern / Fields", wants: [{name: "Brushtail Dragonfly", love: false}, {name: "Bahari Bee", love: false}, {name: "Stripeshell Snail", love: true}, {name: "Blueberry Pie", love: true}] },
     { name: "Badruu", loc: "Daiya Farm", wants: [{name: "Cotton Seed", love: false}, {name: "Rice", love: false}, {name: "Loaded Potato Soup", love: true}, {name: "Jewelled Mantis", love: true}] },
     { name: "Caleri", loc: "Library", wants: [{name: "Wild Ginger", love: false}, {name: "Glass Bulb", love: false}, {name: "Cream of Tomato Soup", love: true}, {name: "Chapaa Masala", love: true}] },
@@ -916,13 +916,12 @@
     window.addEventListener('mouseup', () => { isDragging = false; });
   }
 
-  // Calculated for Monday 11:00 UTC (7:00 PM SGT) — 1-hour buffer after GitHub's 10:00 UTC scrape
+  // Calculated for Monday 11:00 UTC (7:00 PM SGT) Reset
   function getNextResetTime() {
     const now = new Date();
     const day = now.getUTCDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
     let daysUntilReset = (1 - day + 7) % 7;
 
-    // If it is Monday and past 11:00:00 UTC, advance target to the following Monday
     if (day === 1 && (now.getUTCHours() > 11 || (now.getUTCHours() === 11 && (now.getUTCMinutes() > 0 || now.getUTCSeconds() > 0)))) {
       daysUntilReset = 7;
     }
