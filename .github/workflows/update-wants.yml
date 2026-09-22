@@ -2,7 +2,7 @@ name: Auto-Sync Palia Weekly Wants
 
 on:
   schedule:
-    # Runs Monday at 10:00 UTC (6:00 PM SGT) — allows wiki contributors 6 hours to verify wants
+    # Runs Monday at 10:00 UTC (6:00 PM SGT)
     - cron: '0 10 * * 1'
   workflow_dispatch:
 
@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Scrape Wants from Palia Wiki
+      - name: Scrape Wants from palia.gaming.tools Feed
         run: |
           python - << 'EOF'
           import json
@@ -32,11 +32,6 @@ jobs:
           import sys
           import urllib.request
           from datetime import datetime
-
-          WIKI_API = "https://palia.wiki.gg/api.php?action=parse&page=Villagers/Weekly_Wants&prop=text&format=json"
-          HEADERS = {
-              "User-Agent": "PaliaCompanionGuideBot/2.0 (Mobile App Data Sync; contact@github.com)"
-          }
 
           KNOWN_VILLAGERS = [
               "Ashura", "Auni", "Badruu", "Caleri", "Chayne", "Delaila", "Einar",
@@ -75,107 +70,93 @@ jobs:
               "Zeki": "General Store"
           }
 
-          BANNED_WORDS = {
-              "like", "love", "unknown", "item", "wants", "gift", 
-              "gifts", "image", "file", "icon", "star", "none", "tba"
+          HEADERS = {
+              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+              "Accept": "application/json, text/plain, */*",
+              "Referer": "https://palia.gaming.tools/tools/weekly-wants"
           }
 
+          villagers_dict = {}
+
+          # Attempt 1: Fetch the site HTML to discover their bundled JSON data chunk
           try:
-              print(f"Connecting to Palia Wiki API: {WIKI_API}")
-              req = urllib.request.Request(WIKI_API, headers=HEADERS)
-              with urllib.request.urlopen(req, timeout=30) as res:
-                  data = json.loads(res.read().decode('utf-8'))
+              print("Inspecting palia.gaming.tools build manifests...")
+              req = urllib.request.Request("https://palia.gaming.tools/tools/weekly-wants", headers=HEADERS)
+              with urllib.request.urlopen(req, timeout=15) as res:
+                  html = res.read().decode('utf-8')
 
-              html = data.get("parse", {}).get("text", {}).get("*", "")
-              if not html:
-                  print("Error: Empty HTML content returned from MediaWiki API.", file=sys.stderr)
-                  sys.exit(1)
-
-              html_clean = re.sub(r'<style[^>]*>.*?</style>', '', html, flags=re.DOTALL | re.IGNORECASE)
-              html_clean = re.sub(r'<script[^>]*>.*?</script>', '', html_clean, flags=re.DOTALL | re.IGNORECASE)
-              html_clean = re.sub(r'<!--.*?-->', '', html_clean, flags=re.DOTALL)
-
-              rows = re.findall(r'<tr[^>]*>(.*?)</tr>', html_clean, re.DOTALL | re.IGNORECASE)
-              villagers_dict = {}
-
-              for row in rows:
-                  cells = re.findall(r'<t[dh][^>]*>(.*?)</t[dh]>', row, re.DOTALL | re.IGNORECASE)
-                  if len(cells) < 2:
-                      continue
-
-                  clean_cells = []
-                  for c in cells:
-                      text = re.sub(r'<[^>]+>', ' ', c)
-                      text = re.sub(r'&#\d+;|&[a-zA-Z]+;', ' ', text)
-                      text = re.sub(r'\(.*?\)', '', text)
-                      text = re.sub(r'\{.*?\}', '', text)
-                      text = re.sub(r'\.mw-[^\s]+', '', text)
-                      text = re.sub(r'\s+', ' ', text).strip()
-                      if text:
-                          clean_cells.append(text)
-
-                  if not clean_cells:
-                      continue
-
-                  first_cell = clean_cells[0]
-                  matched_villager = None
-
-                  for v in KNOWN_VILLAGERS:
-                      pattern = r'\b' + re.escape(v.lower()) + r'\b'
-                      if re.search(pattern, first_cell.lower()):
-                          matched_villager = v
-                          break
-
-                  if matched_villager and matched_villager not in villagers_dict:
-                      items = []
-                      for candidate in clean_cells[1:]:
-                          cand = candidate.strip()
-                          cand_lower = cand.lower()
-
-                          if (len(cand) > 2 
-                              and cand_lower not in BANNED_WORDS
-                              and not cand.startswith((".", "#", "{", ";"))
-                              and not any(cand_lower == k.lower() for k in KNOWN_VILLAGERS)):
-                              if cand not in items:
-                                  items.append(cand)
-
-                      if len(items) >= 2:
-                          wants = []
-                          for idx, itm in enumerate(items[:4]):
-                              wants.append({
-                                  "name": itm,
-                                  "love": idx >= 2
-                              })
-                          villagers_dict[matched_villager] = wants
-
-              print(f"Parsed {len(villagers_dict)} of {len(KNOWN_VILLAGERS)} villagers.")
-
-              formatted_list = []
-              for name in KNOWN_VILLAGERS:
-                  if name in villagers_dict:
-                      formatted_list.append({
-                          "name": name,
-                          "loc": VILLAGER_LOCATIONS.get(name, "Kilima / Bahari"),
-                          "wants": villagers_dict[name]
-                      })
-
-              if len(formatted_list) < 15:
-                  print("Warning: Parser found too few villagers. Retaining existing wants.json.", file=sys.stderr)
-                  sys.exit(0)
-
-              output = {
-                  "updated_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
-                  "villagers": formatted_list
-              }
-
-              with open("wants.json", "w", encoding="utf-8") as f:
-                  json.dump(output, f, indent=2, ensure_ascii=False)
-
-              print(f"Success: Synced all {len(formatted_list)} villagers into wants.json!")
-
+              # Check for Next.js build chunk or static data asset URLs
+              build_id = re.search(r'"buildId":"([^"]+)"', html)
+              if build_id:
+                  bid = build_id.group(1)
+                  data_url = f"https://palia.gaming.tools/_next/data/{bid}/tools/weekly-wants.json"
+                  print(f"Querying Next.js data endpoint: {data_url}")
+                  d_req = urllib.request.Request(data_url, headers=HEADERS)
+                  with urllib.request.urlopen(d_req, timeout=15) as d_res:
+                      feed = json.loads(d_res.read().decode('utf-8'))
+                      v_list = feed.get("pageProps", {}).get("villagers", [])
+                      for v in v_list:
+                          name = v.get("name")
+                          wants = v.get("wants", [])
+                          if name in KNOWN_VILLAGERS and wants:
+                              villagers_dict[name] = [
+                                  {"name": w.get("name", "Unknown"), "love": bool(w.get("rewardTier", 0) >= 3 or w.get("isLoved"))}
+                                  for w in wants[:4]
+                              ]
           except Exception as e:
-              print(f"Scraper error: {e}", file=sys.stderr)
-              sys.exit(0)
+              print(f"gaming.tools client fetch bypassed: {e}")
+
+          # Attempt 2: Fallback to Palia Wiki API if gaming.tools was unreachable
+          if len(villagers_dict) < 15:
+              print("Triggering Palia Wiki backup pipeline...")
+              WIKI_API = "https://palia.wiki.gg/api.php?action=parse&page=Villagers/Weekly_Wants&prop=text&format=json"
+              w_req = urllib.request.Request(WIKI_API, headers={"User-Agent": "PaliaCompanionGuide/2.0"})
+              try:
+                  with urllib.request.urlopen(w_req, timeout=20) as w_res:
+                      wiki_data = json.loads(w_res.read().decode('utf-8'))
+                      html_content = wiki_data.get("parse", {}).get("text", {}).get("*", "")
+                      
+                      rows = re.findall(r'<tr[^>]*>(.*?)</tr>', html_content, re.DOTALL | re.IGNORECASE)
+                      for row in rows:
+                          cells = re.findall(r'<t[dh][^>]*>(.*?)</t[dh]>', row, re.DOTALL | re.IGNORECASE)
+                          if len(cells) < 2:
+                              continue
+                          clean = [re.sub(r'<[^>]+>', '', c).strip() for c in cells]
+                          for v in KNOWN_VILLAGERS:
+                              if v.lower() in clean[0].lower() and v not in villagers_dict:
+                                  items = [c for c in clean[1:] if len(c) > 2 and c.lower() not in ["like", "love", "none", "unknown"]]
+                                  if len(items) >= 2:
+                                      villagers_dict[v] = [
+                                          {"name": itm, "love": idx >= 2} for idx, itm in enumerate(items[:4])
+                                      ]
+              except Exception as err:
+                  print(f"Wiki fallback failed: {err}")
+
+          # Verification and writing
+          formatted_list = []
+          for name in KNOWN_VILLAGERS:
+              if name in villagers_dict:
+                  formatted_list.append({
+                      "name": name,
+                      "loc": VILLAGER_LOCATIONS.get(name, "Kilima / Bahari"),
+                      "wants": villagers_dict[name]
+                  })
+
+          print(f"Successfully processed {len(formatted_list)} villagers.")
+
+          if len(formatted_list) < 15:
+              print("Fatal: Could not extract minimum villager quota. Retaining existing wants.json.", file=sys.stderr)
+              sys.exit(1)
+
+          output = {
+              "updated_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
+              "villagers": formatted_list
+          }
+
+          with open("wants.json", "w", encoding="utf-8") as f:
+              json.dump(output, f, indent=2, ensure_ascii=False)
+
+          print("wants.json successfully updated and written.")
           EOF
 
       - name: Commit and Push Changes
@@ -186,6 +167,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes in wants.json to commit."
           else
-            git commit -m "chore(data): auto-sync weekly wants Monday 10:00 UTC [skip ci]"
+            git commit -m "chore(data): auto-sync weekly wants [skip ci]"
             git push origin HEAD:${{ github.ref_name }}
           fi
