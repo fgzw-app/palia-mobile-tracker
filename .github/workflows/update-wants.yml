@@ -2,8 +2,8 @@ name: Auto-Sync Palia Weekly Wants
 
 on:
   schedule:
-    # Runs Monday at 10:00 UTC (6:00 PM SGT)
-    - cron: '0 10 * * 1'
+    # Runs daily at 10:00 UTC (6:00 PM SGT) to backfill villagers as wiki updates
+    - cron: '0 10 * * *'
   workflow_dispatch:
 
 permissions:
@@ -24,18 +24,19 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Scrape Wants from Palia Wiki API
+      - name: Cumulative Scrape from Palia Wiki API
         run: |
           python - << 'EOF'
           import json
+          import os
           import re
           import sys
           import urllib.request
-          from datetime import datetime
+          from datetime import datetime, timezone
 
           WIKI_API = "https://palia.wiki.gg/api.php?action=parse&page=Villagers/Weekly_Wants&prop=text&format=json"
           HEADERS = {
-              "User-Agent": "PaliaCompanionGuideBot/5.0 (Mobile App Data Sync; contact@github.com)"
+              "User-Agent": "PaliaCompanionGuideBot/6.0 (Daily Backfill Sync; contact@github.com)"
           }
 
           KNOWN_VILLAGERS = [
@@ -80,6 +81,23 @@ jobs:
               "none", "tba", "star", "edit", "history", "view", "page"
           }
 
+          now_utc = datetime.now(timezone.utc)
+          # ISO weekday: 1 = Monday ... 7 = Sunday
+          is_monday_reset = (now_utc.isoweekday() == 1)
+
+          # Load existing wants.json if present
+          existing_villagers = {}
+          if os.path.exists("wants.json") and not is_monday_reset:
+              try:
+                  with open("wants.json", "r", encoding="utf-8") as f:
+                      old_data = json.load(f)
+                      for v in old_data.get("villagers", []):
+                          if v.get("name") and v.get("wants"):
+                              existing_villagers[v["name"]] = v["wants"]
+                  print(f"Loaded existing data for {len(existing_villagers)} villagers for mid-week merge.")
+              except Exception as err:
+                  print(f"Notice: Could not load previous wants.json ({err}). Starting fresh.")
+
           try:
               req = urllib.request.Request(WIKI_API, headers=HEADERS)
               with urllib.request.urlopen(req, timeout=30) as res:
@@ -87,10 +105,10 @@ jobs:
 
               html = raw.get("parse", {}).get("text", {}).get("*", "")
               if not html:
-                  print("Wiki returned empty payload.", file=sys.stderr)
+                  print("Wiki returned empty content.", file=sys.stderr)
                   sys.exit(0)
 
-              # Strip administrative markup, edit links, scripts, and metadata
+              # Strip noise, scripts, and metadata
               html_clean = re.sub(r'<style[^>]*>.*?</style>', '', html, flags=re.DOTALL | re.IGNORECASE)
               html_clean = re.sub(r'<script[^>]*>.*?</script>', '', html_clean, flags=re.DOTALL | re.IGNORECASE)
               html_clean = re.sub(r'<small[^>]*>.*?</small>', '', html_clean, flags=re.DOTALL | re.IGNORECASE)
@@ -98,7 +116,7 @@ jobs:
               html_clean = re.sub(r'<!--.*?-->', '', html_clean, flags=re.DOTALL)
 
               rows = re.findall(r'<tr[^>]*>(.*?)</tr>', html_clean, re.DOTALL | re.IGNORECASE)
-              villagers_dict = {}
+              scraped_dict = {}
 
               for r in rows:
                   cells = re.findall(r'<t[dh][^>]*>(.*?)</t[dh]>', r, re.DOTALL | re.IGNORECASE)
@@ -119,14 +137,13 @@ jobs:
 
                   first_cell = cleaned[0].lower()
                   matched_name = None
-                  
-                  # Match villager by exact name or substring (catches "Tish", "Tish's Shop", etc.)
+
                   for v in KNOWN_VILLAGERS:
                       if v.lower() in first_cell:
                           matched_name = v
                           break
 
-                  if matched_name and matched_name not in villagers_dict:
+                  if matched_name and matched_name not in scraped_dict:
                       items = []
                       for candidate in cleaned[1:]:
                           cand_clean = candidate.strip()
@@ -144,38 +161,50 @@ jobs:
                                   items.append(cand_clean)
 
                       if len(items) >= 1:
-                          villagers_dict[matched_name] = [
+                          scraped_dict[matched_name] = [
                               {"name": itm, "love": idx >= 2}
                               for idx, itm in enumerate(items[:4])
                           ]
 
+              print(f"Scraped {len(scraped_dict)} villagers from live wiki today.")
+
+              # Cumulative Merge: Keep existing villager data if today's scrape has fewer items
+              final_villagers_dict = {}
+              for name in KNOWN_VILLAGERS:
+                  today_wants = scraped_dict.get(name, [])
+                  previous_wants = existing_villagers.get(name, [])
+
+                  if len(today_wants) >= len(previous_wants) and len(today_wants) > 0:
+                      final_villagers_dict[name] = today_wants
+                  elif len(previous_wants) > 0:
+                      final_villagers_dict[name] = previous_wants
+
               formatted_list = []
               for name in KNOWN_VILLAGERS:
-                  if name in villagers_dict:
+                  if name in final_villagers_dict:
                       formatted_list.append({
                           "name": name,
                           "loc": VILLAGER_LOCATIONS.get(name, "Kilima / Bahari"),
-                          "wants": villagers_dict[name]
+                          "wants": final_villagers_dict[name]
                       })
 
-              print(f"Parsed {len(formatted_list)} of {len(KNOWN_VILLAGERS)} villagers.")
-
               if len(formatted_list) < 10:
-                  print("Warning: Insufficient villagers parsed. Preserving existing wants.json.", file=sys.stderr)
+                  print("Warning: Under minimum villager quota. Retaining existing file.", file=sys.stderr)
                   sys.exit(0)
 
               output = {
-                  "updated_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
+                  "updated_at": now_utc.strftime("%Y-%m-%d %H:%M:%S UTC"),
+                  "week_id": now_utc.strftime("%Y-W%W"),
                   "villagers": formatted_list
               }
 
               with open("wants.json", "w", encoding="utf-8") as f:
                   json.dump(output, f, indent=2, ensure_ascii=False)
 
-              print("Success: wants.json updated cleanly!")
+              print(f"Success: wants.json synchronized ({len(formatted_list)}/27 villagers).")
 
           except Exception as e:
-              print(f"Error during scrape: {e}", file=sys.stderr)
+              print(f"Scraper error: {e}", file=sys.stderr)
               sys.exit(0)
           EOF
 
@@ -185,8 +214,8 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add wants.json
           if git diff --staged --quiet; then
-            echo "No changes in wants.json to commit."
+            echo "No new updates found today."
           else
-            git commit -m "chore(data): auto-sync weekly wants [skip ci]"
+            git commit -m "chore(data): daily wants cumulative sync [skip ci]"
             git push origin HEAD:${{ github.ref_name }}
           fi
