@@ -171,6 +171,12 @@
       text-decoration: line-through;
       opacity: 0.65;
     }
+    .badge.placeholder {
+      background: #191223;
+      border: 1px dashed #3D3052;
+      color: #7A6C91;
+      cursor: default;
+    }
 
     /* Compendium Cards */
     .item-card {
@@ -684,8 +690,8 @@
     { name: "Will-o-wisp Rockhopper", loc: "Elderwood Forest • Elderwood Swamps", time: "Any Time" }
   ];
 
-  // Verified 27-Villager Offline Baseline (Ashura Cleaned)
-  const VILLAGERS = [
+  // Guaranteed 27-Villager Master Roster
+  const MASTER_ROSTER = [
     { name: "Ashura", loc: "Kilima Tavern", wants: [{name: "Sapwood Plank", love: false}, {name: "Striped Dace", love: false}, {name: "Highland Sturgeon", love: true}, {name: "Sashimi", love: true}] },
     { name: "Auni", loc: "Tavern / Fields", wants: [{name: "Brushtail Dragonfly", love: false}, {name: "Bahari Bee", love: false}, {name: "Stripeshell Snail", love: true}, {name: "Blueberry Pie", love: true}] },
     { name: "Badruu", loc: "Daiya Farm", wants: [{name: "Cotton Seed", love: false}, {name: "Rice", love: false}, {name: "Loaded Potato Soup", love: true}, {name: "Jewelled Mantis", love: true}] },
@@ -715,12 +721,34 @@
     { name: "Zeki", loc: "General Store", wants: [{name: "Grilled Fish", love: false}, {name: "Fish Stew", love: false}, {name: "Ancient Koi", love: true}, {name: "Platinum Bar", love: true}] }
   ];
 
-  let villagersData = VILLAGERS;
+  let villagersData = JSON.parse(JSON.stringify(MASTER_ROSTER));
   let weeklyState = JSON.parse(localStorage.getItem('palia_weekly_state') || '{}');
   let fishCaughtState = JSON.parse(localStorage.getItem('palia_fish_caught') || '{}');
   let fishStarState = JSON.parse(localStorage.getItem('palia_fish_star') || '{}');
   let bugCaughtState = JSON.parse(localStorage.getItem('palia_bug_caught') || '{}');
   let bugStarState = JSON.parse(localStorage.getItem('palia_bug_star') || '{}');
+
+  // Smart Merge: Guarantee all 27 villagers remain present
+  function mergeVillagerData(incomingVillagers) {
+    if (!Array.isArray(incomingVillagers) || incomingVillagers.length === 0) return;
+
+    const incomingMap = new Map();
+    incomingVillagers.forEach(v => {
+      if (v && v.name) incomingMap.set(v.name.toLowerCase().trim(), v);
+    });
+
+    villagersData = MASTER_ROSTER.map(base => {
+      const live = incomingMap.get(base.name.toLowerCase().trim());
+      if (live && Array.isArray(live.wants) && live.wants.length > 0) {
+        return {
+          name: base.name,
+          loc: live.loc || base.loc,
+          wants: live.wants
+        };
+      }
+      return base;
+    });
+  }
 
   function switchTab(tab) {
     currentTab = tab;
@@ -916,7 +944,7 @@
     window.addEventListener('mouseup', () => { isDragging = false; });
   }
 
-  // Calculated for Monday 11:00 UTC (7:00 PM SGT) Reset
+  // Monday 11:00 UTC (7:00 PM SGT) Reset
   function getNextResetTime() {
     const now = new Date();
     const day = now.getUTCDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
@@ -1019,7 +1047,7 @@
   }
 
   function renderList() {
-    const q = (searchStates[currentTab] || '').toLowerCase();
+    const q = (searchStates[currentTab] || '').toLowerCase().trim();
     const container = document.getElementById('list');
 
     if (currentTab === 'weekly') {
@@ -1041,7 +1069,7 @@
         let vDoneCount = 0;
         const wants = Array.isArray(v.wants) ? v.wants : [];
 
-        const wantsHtml = wants.map(w => {
+        let wantsHtml = wants.map(w => {
           totalGifts++;
           const rawName = typeof w === 'string' ? w : (w.name || 'Unknown');
           const itemName = sanitizeItemName(rawName);
@@ -1065,11 +1093,22 @@
           `;
         }).join('');
 
+        // Pad with placeholder badges if fewer than 4 items are currently known
+        const missingCount = Math.max(0, 4 - wants.length);
+        for (let i = 0; i < missingCount; i++) {
+          wantsHtml += `
+            <div class="badge placeholder">
+              <span>⏳</span>
+              <span>Pending</span>
+            </div>
+          `;
+        }
+
         const isAllDone = wants.length > 0 && vDoneCount === wants.length;
         const cardClass = `card${isAllDone ? ' all-done' : ''}`;
 
         return `
-          <div class="${cardClass}">
+          <div class="card ${cardClass}">
             <div class="card-top">
               <div class="villager-title">
                 <span class="villager-name">${escapeHtml(v.name || 'Villager')}</span>
@@ -1222,7 +1261,7 @@
   document.getElementById('list').addEventListener('click', (e) => {
     if (currentTab === 'weekly') {
       const btn = e.target.closest('.badge');
-      if (btn) {
+      if (btn && !btn.classList.contains('placeholder')) {
         const key = btn.getAttribute('data-key');
         if (key) toggleWeeklyWant(key);
       }
@@ -1243,8 +1282,8 @@
       const res = await fetch('./wants.json?nocache=' + Date.now(), { cache: 'reload' });
       if (res.ok) {
         const json = await res.json();
-        if (Array.isArray(json.villagers) && json.villagers.length > 0) {
-          villagersData = json.villagers;
+        if (Array.isArray(json.villagers)) {
+          mergeVillagerData(json.villagers);
         }
         if (json.updated_at && currentTab === 'weekly') {
           document.getElementById('sub-info').innerText = `Synced: ${json.updated_at.slice(5, 16)}`;
@@ -1263,8 +1302,8 @@
       const res = await fetch('./wants.json?t=' + Date.now(), { cache: 'no-store' });
       if (res.ok) {
         const json = await res.json();
-        if (Array.isArray(json.villagers) && json.villagers.length > 0) {
-          villagersData = json.villagers;
+        if (Array.isArray(json.villagers)) {
+          mergeVillagerData(json.villagers);
         }
         if (json.updated_at && currentTab === 'weekly') {
           document.getElementById('sub-info').innerText = `Synced: ${json.updated_at.slice(5, 16)}`;
