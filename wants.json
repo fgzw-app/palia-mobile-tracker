@@ -1,24 +1,24 @@
 {
-  "updated_at": "2026-09-22 01:26:42 UTC",
+  "updated_at": "2026-09-22 01:47:25 UTC",
   "villagers": [
     {
       "name": "Ashura",
       "loc": "Kilima Tavern",
       "wants": [
         {
-          "name": ".mw-parser-output .template-itembox{max-width:100%}.mw-parser-output .template-itembox .template-itembox-rel>.quality{position:absolute;bottom:-6px;left:-6px}\n\n\n\nStriped Dace",
-          "love": false
-        },
-        {
           "name": "Striped Sturgeon",
           "love": false
         },
         {
           "name": "Fried Catfish Dinner",
-          "love": true
+          "love": false
         },
         {
           "name": "Fisherman's Brew",
+          "love": true
+        },
+        {
+          "name": "Last updated: 2026-09-21 07:08:51 Edit",
           "love": true
         }
       ]
@@ -538,16 +538,8 @@
           "love": false
         },
         {
-          "name": "Use right column to edit.",
+          "name": "Last updated: 2026-09-21 04:00:29 Edit",
           "love": false
-        },
-        {
-          "name": "Use right column to edit.",
-          "love": true
-        },
-        {
-          "name": "Use right column to edit.",
-          "love": true
         }
       ]
     },
