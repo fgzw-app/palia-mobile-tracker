@@ -1,24 +1,24 @@
 {
-  "updated_at": "2026-09-22 01:47:25 UTC",
+  "updated_at": "2026-09-22 01:54:50 UTC",
   "villagers": [
     {
       "name": "Ashura",
       "loc": "Kilima Tavern",
       "wants": [
         {
+          "name": "Striped Dace",
+          "love": false
+        },
+        {
           "name": "Striped Sturgeon",
           "love": false
         },
         {
           "name": "Fried Catfish Dinner",
-          "love": false
-        },
-        {
-          "name": "Fisherman's Brew",
           "love": true
         },
         {
-          "name": "Last updated: 2026-09-21 07:08:51 Edit",
+          "name": "Fisherman's Brew",
           "love": true
         }
       ]
@@ -526,20 +526,6 @@
         {
           "name": "Ancient Amber Beetle",
           "love": true
-        }
-      ]
-    },
-    {
-      "name": "Tish",
-      "loc": "Furniture Store",
-      "wants": [
-        {
-          "name": "Use right column to edit.",
-          "love": false
-        },
-        {
-          "name": "Last updated: 2026-09-21 04:00:29 Edit",
-          "love": false
         }
       ]
     },
