@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#1F1829">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -26,9 +26,23 @@
       --rare: #3B82F6;
       --epic: #A855F7;
       --legendary: #F59E0B;
+      --stone-bg: #271C38;
+      --stone-border: #4A346B;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; overflow-x: hidden; }
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+      -webkit-tap-highlight-color: transparent; 
+    }
+    body { 
+      background-color: var(--bg); 
+      color: var(--text); 
+      padding-bottom: calc(85px + env(safe-area-inset-bottom)); 
+      overflow-x: hidden; 
+      min-height: 100vh;
+    }
     
     header {
       background: #1F1829;
@@ -37,7 +51,7 @@
       top: 0;
       z-index: 100;
       border-bottom: 1px solid var(--card-border);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.4);
     }
     .header-top { display: flex; justify-content: space-between; align-items: center; }
     h1 { font-size: 1.15rem; font-weight: 700; color: #FFF; display: flex; align-items: center; gap: 6px; }
@@ -53,6 +67,7 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
+      letter-spacing: 0.2px;
     }
 
     .btn-action {
@@ -67,6 +82,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      transition: background 0.15s ease;
     }
     .btn-action:active { background: #443261; }
 
@@ -80,6 +96,7 @@
       color: #FFF;
       font-size: 0.95rem;
       outline: none;
+      transition: border-color 0.2s ease;
     }
     .search-box:focus { border-color: var(--accent); }
 
@@ -106,10 +123,11 @@
       border: 1px solid var(--card-border);
       color: var(--text-muted);
       font-size: 0.72rem;
-      padding: 4px 10px;
+      padding: 5px 11px;
       border-radius: 20px;
       white-space: nowrap;
       cursor: pointer;
+      transition: all 0.15s ease;
     }
     .filter-pill.active { background: #3E2F54; border-color: var(--accent); color: #FFF; font-weight: 600; }
 
@@ -117,8 +135,8 @@
       padding: 12px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      max-width: 650px;
+      gap: 12px;
+      max-width: 680px;
       margin: 0 auto;
     }
     
@@ -127,25 +145,47 @@
       border: 1px solid var(--card-border);
       border-radius: 12px;
       padding: 14px;
-      transition: opacity 0.2s;
+      transition: opacity 0.2s ease, border-color 0.2s ease;
     }
     .card.all-done { opacity: 0.55; border-color: var(--done-border); }
 
     .card-top {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
+      align-items: flex-start;
+      margin-bottom: 8px;
     }
-    .villager-title { display: flex; align-items: baseline; gap: 8px; }
+    .villager-title { display: flex; flex-direction: column; gap: 2px; }
+    .villager-headline { display: flex; align-items: baseline; gap: 8px; }
     .villager-name { font-weight: 700; font-size: 1.05rem; color: #FFF; }
-    .villager-loc { font-size: 0.78rem; color: var(--accent); }
+    .villager-loc { font-size: 0.78rem; color: var(--accent); font-weight: 500; }
+    
+    .starstone-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.72rem;
+      background: var(--stone-bg);
+      border: 1px solid var(--stone-border);
+      color: #D6C2F5;
+      padding: 2px 7px;
+      border-radius: 4px;
+      margin-top: 4px;
+      width: fit-content;
+    }
+    .starstone-tag.special {
+      background: #2D231E;
+      border-color: #573E30;
+      color: #F8B383;
+    }
+
     .card-counter { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
 
     .wants-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
       gap: 8px;
+      margin-top: 8px;
     }
 
     .badge {
@@ -161,8 +201,11 @@
       align-items: center;
       justify-content: flex-start;
       gap: 6px;
-      line-height: 1.2;
+      line-height: 1.25;
+      text-align: left;
+      transition: all 0.12s ease;
     }
+    .badge:active { transform: scale(0.97); }
     .badge.love { background: var(--badge-love); border-color: #64284D; color: #FFD3E8; }
     .badge.done {
       background: var(--done-bg) !important;
@@ -172,11 +215,12 @@
       opacity: 0.65;
     }
     .badge.placeholder {
-      background: #191223;
-      border: 1px dashed #3D3052;
+      background: #181223;
+      border: 1px dashed #3A2C50;
       color: #7A6C91;
       cursor: default;
     }
+    .badge.placeholder:active { transform: none; }
 
     /* Compendium Cards */
     .item-card {
@@ -221,7 +265,7 @@
       color: var(--text-muted);
       font-size: 0.75rem;
       font-weight: 600;
-      padding: 6px 8px;
+      padding: 7px 8px;
       border-radius: 6px;
       cursor: pointer;
       display: flex;
@@ -229,6 +273,7 @@
       justify-content: center;
       gap: 4px;
     }
+    .action-btn:active { transform: scale(0.98); }
     .action-btn.active-regular { background: #174E3E; border-color: #288066; color: #A3F3DB; }
     .action-btn.active-star { background: #523512; border-color: #A36B20; color: #FFD485; }
 
@@ -279,12 +324,12 @@
       z-index: 50;
     }
     .map-ctrl-btn {
-      width: 38px;
-      height: 38px;
-      background: rgba(31, 24, 41, 0.9);
+      width: 40px;
+      height: 40px;
+      background: rgba(31, 24, 41, 0.92);
       border: 1px solid var(--card-border);
       color: #FFF;
-      font-size: 1.15rem;
+      font-size: 1.2rem;
       font-weight: 700;
       border-radius: 10px;
       display: flex;
@@ -299,11 +344,11 @@
       position: absolute;
       left: 14px;
       bottom: 16px;
-      background: rgba(20, 14, 28, 0.85);
+      background: rgba(20, 14, 28, 0.88);
       border: 1px solid var(--card-border);
-      padding: 5px 10px;
+      padding: 6px 12px;
       border-radius: 20px;
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       color: var(--text-muted);
       pointer-events: none;
       backdrop-filter: blur(4px);
@@ -351,7 +396,7 @@
       <button class="btn-action" id="reset-btn">Reset</button>
     </div>
   </div>
-  <input type="text" id="search" class="search-box" placeholder="Search villager or item..." autocomplete="off">
+  <input type="text" id="search" class="search-box" placeholder="Search villager, item, or starstone..." autocomplete="off">
   
   <!-- Fish Filters -->
   <div id="fish-filters" style="display: none; flex-direction: column;">
@@ -447,6 +492,37 @@
     weekly: '',
     fish: '',
     bugs: ''
+  };
+
+  // Starstone / Luna Sign Registry for all 27 Villagers
+  const VILLAGER_STARSTONES = {
+    "Ashura": { gem: "Onyx", label: "💎 Onyx (Loved)", isSpecial: false },
+    "Auni": { gem: "Citrine", label: "💎 Citrine (Loved)", isSpecial: false },
+    "Badruu": { gem: "Sapphire", label: "💎 Sapphire (Loved)", isSpecial: false },
+    "Caleri": { gem: "Aquamarine", label: "💎 Aquamarine (Loved)", isSpecial: false },
+    "Chayne": { gem: "Quartz", label: "💎 Quartz (Loved)", isSpecial: false },
+    "Delaila": { gem: "Garnet", label: "💎 Garnet (Loved)", isSpecial: false },
+    "Einar": { gem: "Pebbles", label: "🪨 Shiny Pebbles (Galdur)", isSpecial: true },
+    "Elouisa": { gem: "Aquamarine", label: "💎 Aquamarine (Loved)", isSpecial: false },
+    "Eshe": { gem: "Ruby", label: "💎 Ruby (Loved)", isSpecial: false },
+    "Hassian": { gem: "Emerald", label: "💎 Emerald (Loved)", isSpecial: false },
+    "Hekla": { gem: "Copper", label: "⚙️ Copper Ore / Seeds (Galdur)", isSpecial: true },
+    "Hodari": { gem: "Garnet", label: "💎 Garnet (Loved)", isSpecial: false },
+    "Jel": { gem: "Sapphire", label: "💎 Sapphire (Loved)", isSpecial: false },
+    "Jina": { gem: "Emerald", label: "💎 Emerald (Loved)", isSpecial: false },
+    "Kenli": { gem: "Jasper", label: "💎 Jasper (Loved)", isSpecial: false },
+    "Kenyatta": { gem: "Amethyst", label: "💎 Amethyst (Loved)", isSpecial: false },
+    "Nai'o": { gem: "Jasper", label: "💎 Jasper (Loved)", isSpecial: false },
+    "Najuma": { gem: "Quartz", label: "💎 Quartz (Loved)", isSpecial: false },
+    "Reth": { gem: "Citrine", label: "💎 Citrine (Loved)", isSpecial: false },
+    "Sifuu": { gem: "Garnet", label: "💎 Garnet (Loved)", isSpecial: false },
+    "Subira": { gem: "Onyx", label: "💎 Onyx (Loved)", isSpecial: false },
+    "Tamala": { gem: "Amethyst", label: "💎 Amethyst (Loved)", isSpecial: false },
+    "Tau": { gem: "Meat", label: "🥩 Meat & Fur (Plumehound)", isSpecial: true },
+    "The Gardener": { gem: "Flow Wood", label: "🪵 Flow Wood & Stone (Galdur)", isSpecial: true },
+    "Tish": { gem: "Quartz", label: "💎 Quartz (Loved)", isSpecial: false },
+    "Ulfe": { gem: "Fish", label: "🐟 Bahari Fish & Worms", isSpecial: true },
+    "Zeki": { gem: "Fish Stew", label: "🍲 Fish Stew & Bars (Grimalkin)", isSpecial: true }
   };
 
   // 123 Palia Fish Database
@@ -690,7 +766,7 @@
     { name: "Will-o-wisp Rockhopper", loc: "Elderwood Forest • Elderwood Swamps", time: "Any Time" }
   ];
 
-  // Guaranteed 27-Villager Master Roster
+  // Guaranteed 27-Villager Master Roster with Verified Defaults
   const MASTER_ROSTER = [
     { name: "Ashura", loc: "Kilima Tavern", wants: [{name: "Sapwood Plank", love: false}, {name: "Striped Dace", love: false}, {name: "Highland Sturgeon", love: true}, {name: "Sashimi", love: true}] },
     { name: "Auni", loc: "Tavern / Fields", wants: [{name: "Brushtail Dragonfly", love: false}, {name: "Bahari Bee", love: false}, {name: "Stripeshell Snail", love: true}, {name: "Blueberry Pie", love: true}] },
@@ -728,7 +804,7 @@
   let bugCaughtState = JSON.parse(localStorage.getItem('palia_bug_caught') || '{}');
   let bugStarState = JSON.parse(localStorage.getItem('palia_bug_star') || '{}');
 
-  // Smart Merge: Guarantee all 27 villagers remain present
+  // Smart Merge: Guarantee all 27 villagers remain present & preserves checkmark keys
   function mergeVillagerData(incomingVillagers) {
     if (!Array.isArray(incomingVillagers) || incomingVillagers.length === 0) return;
 
@@ -774,7 +850,7 @@
 
     if (tab === 'weekly') {
       document.getElementById('page-title').innerHTML = '<span>✨ Weekly Wants</span>';
-      searchInput.placeholder = 'Search villager or item...';
+      searchInput.placeholder = 'Search villager, item, or starstone...';
       searchInput.style.display = 'block';
       resetBtn.style.display = 'inline-flex';
       syncBtn.style.display = 'inline-flex';
@@ -944,7 +1020,7 @@
     window.addEventListener('mouseup', () => { isDragging = false; });
   }
 
-  // Monday 11:00 UTC (7:00 PM SGT) Reset
+  // Target: Monday at 11:00 UTC (7:00 PM SGT) Reset
   function getNextResetTime() {
     const now = new Date();
     const day = now.getUTCDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
@@ -964,6 +1040,24 @@
     return nextReset;
   }
 
+  // Identifies the active weekly cycle to prevent mid-week daily scrapes from clearing gifts
+  function getCurrentWeekCycleId() {
+    const nextReset = getNextResetTime();
+    return `palia-cycle-${nextReset.getTime()}`;
+  }
+
+  function checkWeeklyCycle() {
+    const currentCycle = getCurrentWeekCycleId();
+    const storedCycle = localStorage.getItem('palia_active_week_cycle');
+
+    if (storedCycle && storedCycle !== currentCycle) {
+      // Monday 11:00 UTC reset passed: wipe completed gift state
+      weeklyState = {};
+      localStorage.removeItem('palia_weekly_state');
+    }
+    localStorage.setItem('palia_active_week_cycle', currentCycle);
+  }
+
   let nextResetDate = getNextResetTime();
 
   function updateTimer() {
@@ -974,6 +1068,7 @@
       weeklyState = {};
       localStorage.removeItem('palia_weekly_state');
       nextResetDate = getNextResetTime();
+      checkWeeklyCycle();
       loadData();
       diff = nextResetDate - now;
     }
@@ -989,6 +1084,7 @@
     }
   }
 
+  checkWeeklyCycle();
   setInterval(updateTimer, 1000);
   updateTimer();
 
@@ -1021,7 +1117,7 @@
   }
 
   function resetAll() {
-    if (confirm("Reset all tracked gifts for the week?")) {
+    if (confirm("Reset all tracked gifts for the current week?")) {
       weeklyState = {};
       localStorage.removeItem('palia_weekly_state');
       renderList();
@@ -1057,17 +1153,22 @@
       const filtered = villagersData.filter(v => {
         const name = (v.name || '').toLowerCase();
         const loc = (v.loc || '').toLowerCase();
+        const stoneInfo = VILLAGER_STARSTONES[v.name];
+        const stoneName = stoneInfo ? stoneInfo.gem.toLowerCase() : '';
         const wants = Array.isArray(v.wants) ? v.wants : [];
+        
         const hasMatchingWant = wants.some(w => {
           const wName = typeof w === 'string' ? w : (w.name || '');
           return wName.toLowerCase().includes(q);
         });
-        return name.includes(q) || loc.includes(q) || hasMatchingWant;
+
+        return name.includes(q) || loc.includes(q) || stoneName.includes(q) || hasMatchingWant;
       });
 
       container.innerHTML = filtered.map(v => {
         let vDoneCount = 0;
         const wants = Array.isArray(v.wants) ? v.wants : [];
+        const stoneData = VILLAGER_STARSTONES[v.name] || { label: "💎 Starstone (Loved)", isSpecial: false };
 
         let wantsHtml = wants.map(w => {
           totalGifts++;
@@ -1093,7 +1194,7 @@
           `;
         }).join('');
 
-        // Pad with placeholder badges if fewer than 4 items are currently known
+        // Pad with placeholder badges if fewer than 4 items are currently discovered
         const missingCount = Math.max(0, 4 - wants.length);
         for (let i = 0; i < missingCount; i++) {
           wantsHtml += `
@@ -1108,11 +1209,16 @@
         const cardClass = `card${isAllDone ? ' all-done' : ''}`;
 
         return `
-          <div class="card ${cardClass}">
+          <div class="${cardClass}">
             <div class="card-top">
               <div class="villager-title">
-                <span class="villager-name">${escapeHtml(v.name || 'Villager')}</span>
-                <span class="villager-loc">${escapeHtml(v.loc || 'Kilima / Bahari')}</span>
+                <div class="villager-headline">
+                  <span class="villager-name">${escapeHtml(v.name || 'Villager')}</span>
+                  <span class="villager-loc">${escapeHtml(v.loc || 'Kilima / Bahari')}</span>
+                </div>
+                <div class="starstone-tag ${stoneData.isSpecial ? 'special' : ''}">
+                  ${escapeHtml(stoneData.label)}
+                </div>
               </div>
               <span class="card-counter">${vDoneCount} / ${wants.length}</span>
             </div>
@@ -1318,9 +1424,9 @@
     renderList();
   }
 
-  // Auto-refresh when switching back to this tab/app from mobile sleep
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
+      checkWeeklyCycle();
       loadData();
     }
   });
