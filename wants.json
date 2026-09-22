@@ -1,5 +1,6 @@
 {
-  "updated_at": "2026-09-22 01:54:50 UTC",
+  "updated_at": "2026-09-22 02:14:26 UTC",
+  "week_id": "2026-W38",
   "villagers": [
     {
       "name": "Ashura",
@@ -526,6 +527,16 @@
         {
           "name": "Ancient Amber Beetle",
           "love": true
+        }
+      ]
+    },
+    {
+      "name": "Tish",
+      "loc": "Furniture Store",
+      "wants": [
+        {
+          "name": "Use right column to edit.",
+          "love": false
         }
       ]
     },
