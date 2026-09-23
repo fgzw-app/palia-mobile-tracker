@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-22 10:02:00 UTC",
+  "updated_at": "2026-09-23 10:01:44 UTC",
   "week_id": "2026-W38",
   "villagers": [
     {
@@ -535,8 +535,20 @@
       "loc": "Furniture Store",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Sundrop Lily",
           "love": false
+        },
+        {
+          "name": "Stuffed Cabbage Rolls",
+          "love": false
+        },
+        {
+          "name": "Pearl",
+          "love": true
+        },
+        {
+          "name": "Will-o-wisp Rockhopper",
+          "love": true
         }
       ]
     },
