@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-28 10:03:41 UTC",
+  "updated_at": "2026-09-29 10:03:15 UTC",
   "week_id": "2026-W39",
   "villagers": [
     {
@@ -183,8 +183,20 @@
       "loc": "Mayor's Estate",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Grilled Oyster",
           "love": false
+        },
+        {
+          "name": "Bluefin Tuna",
+          "love": false
+        },
+        {
+          "name": "Oysters Akwinduu",
+          "love": true
+        },
+        {
+          "name": "Lotus Leaf Tea",
+          "love": true
         }
       ]
     },
