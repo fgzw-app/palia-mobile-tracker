@@ -1,26 +1,14 @@
 {
-  "updated_at": "2026-10-18 13:38:41 UTC",
-  "week_id": "2026-W41",
+  "updated_at": "2026-10-19 16:40:22 UTC",
+  "week_id": "2026-W42",
   "villagers": [
     {
       "name": "Ashura",
       "loc": "Kilima Tavern",
       "wants": [
         {
-          "name": "Rainbow Trout",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "Juniper Seed",
-          "love": false
-        },
-        {
-          "name": "Sernuk Noodle Stew",
-          "love": true
-        },
-        {
-          "name": "Blueberry Pie",
-          "love": true
         }
       ]
     },
@@ -29,20 +17,8 @@
       "loc": "Tavern / Fields",
       "wants": [
         {
-          "name": "Spotted Stinkbug",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "Proudhorned Stag Beetle",
-          "love": false
-        },
-        {
-          "name": "Banshee Beetle",
-          "love": true
-        },
-        {
-          "name": "Blueberry Pie",
-          "love": true
         }
       ]
     },
@@ -51,20 +27,8 @@
       "loc": "Daiya Farm",
       "wants": [
         {
-          "name": "Wagon Wheel",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "Creamy Carrot Soup",
-          "love": false
-        },
-        {
-          "name": "Royal Heather",
-          "love": true
-        },
-        {
-          "name": "Bean Burger",
-          "love": true
         }
       ]
     },
@@ -73,20 +37,8 @@
       "loc": "Library",
       "wants": [
         {
-          "name": "Knapweed",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "Silk",
-          "love": false
-        },
-        {
-          "name": "Blushing Batterfly",
-          "love": true
-        },
-        {
-          "name": "Bouillabaisse",
-          "love": true
         }
       ]
     },
@@ -95,20 +47,8 @@
       "loc": "Apothecary",
       "wants": [
         {
-          "name": "Onion Seed",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "Wheat Seed",
-          "love": false
-        },
-        {
-          "name": "Enfield Moth",
-          "love": true
-        },
-        {
-          "name": "Lotus Leaf Tea",
-          "love": true
         }
       ]
     },
@@ -117,20 +57,8 @@
       "loc": "Daiya Farm",
       "wants": [
         {
-          "name": "Rosy Bitterling",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "SpeedyGro Fertilizer",
-          "love": false
-        },
-        {
-          "name": "Iron Bar",
-          "love": true
-        },
-        {
-          "name": "Breakfast Skillet",
-          "love": true
         }
       ]
     },
@@ -139,20 +67,8 @@
       "loc": "Fisherman Lagoon",
       "wants": [
         {
-          "name": "Bahari Crab",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "Prism Trout",
-          "love": false
-        },
-        {
-          "name": "Midnight Floatfish",
-          "love": true
-        },
-        {
-          "name": "Void Ray",
-          "love": true
         }
       ]
     },
@@ -161,20 +77,8 @@
       "loc": "Kilima Village",
       "wants": [
         {
-          "name": "Spotted Stinkbug",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "Paddlefish",
-          "love": false
-        },
-        {
-          "name": "Indigo Lamprey",
-          "love": true
-        },
-        {
-          "name": "Cloudfish",
-          "love": true
         }
       ]
     },
@@ -183,20 +87,8 @@
       "loc": "Mayor's Estate",
       "wants": [
         {
-          "name": "Leather",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "Samara",
-          "love": false
-        },
-        {
-          "name": "Oysters Akwinduu",
-          "love": true
-        },
-        {
-          "name": "Emerald Ogopuu Scale",
-          "love": true
         }
       ]
     },
@@ -205,20 +97,8 @@
       "loc": "Kilima Outskirts",
       "wants": [
         {
-          "name": "Fur",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "Striped Chapaa Tail",
-          "love": false
-        },
-        {
-          "name": "Iron Ore",
-          "love": true
-        },
-        {
-          "name": "Dispel Arrow",
-          "love": true
         }
       ]
     },
@@ -227,20 +107,8 @@
       "loc": "Mirror Pond Ruins",
       "wants": [
         {
-          "name": "Briar Daisy",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "Fried Catfish Dinner",
-          "love": false
-        },
-        {
-          "name": "Pearl",
-          "love": true
-        },
-        {
-          "name": "Hollow Jaakcat Floof",
-          "love": true
         }
       ]
     },
@@ -249,20 +117,8 @@
       "loc": "Bahari Bay",
       "wants": [
         {
-          "name": "Spotted Chapaa Tail",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "Copper Bar",
-          "love": false
-        },
-        {
-          "name": "Proudhorned Sernuk Antlers",
-          "love": true
-        },
-        {
-          "name": "Firebreathing Dragonfly",
-          "love": true
         }
       ]
     },
@@ -271,20 +127,8 @@
       "loc": "Tailor Shop",
       "wants": [
         {
-          "name": "Coral",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "Muujin Mane",
-          "love": false
-        },
-        {
-          "name": "Amber Mantis",
-          "love": true
-        },
-        {
-          "name": "Willow Lamprey",
-          "love": true
         }
       ]
     },
@@ -293,20 +137,8 @@
       "loc": "Mirror Pond Ruins",
       "wants": [
         {
-          "name": "Grilled Mushroom",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "Brightshroom",
-          "love": false
-        },
-        {
-          "name": "Nightshadow Batterfly",
-          "love": true
-        },
-        {
-          "name": "Ooh Barracuda",
-          "love": true
         }
       ]
     },
@@ -315,20 +147,8 @@
       "loc": "Town Hall",
       "wants": [
         {
-          "name": "Grilled Fish",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "Hearty Vegetable Soup",
-          "love": false
-        },
-        {
-          "name": "Loaded Flowtato",
-          "love": true
-        },
-        {
-          "name": "Palian Onion Soup",
-          "love": true
         }
       ]
     },
@@ -337,20 +157,8 @@
       "loc": "Town Hall / Stables",
       "wants": [
         {
-          "name": "Leather",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "Creamy Carrot Soup",
-          "love": false
-        },
-        {
-          "name": "Spotted Mantis",
-          "love": true
-        },
-        {
-          "name": "Blood Beetle",
-          "love": true
         }
       ]
     },
@@ -359,20 +167,8 @@
       "loc": "Daiya Farm",
       "wants": [
         {
-          "name": "Waterlogged Boot",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "HarvestBoost Fertilizer",
-          "love": false
-        },
-        {
-          "name": "Rice 'n Beans",
-          "love": true
-        },
-        {
-          "name": "Golden Fern",
-          "love": true
         }
       ]
     },
@@ -381,20 +177,8 @@
       "loc": "Bahari Workshop",
       "wants": [
         {
-          "name": "Wild Garlic",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "Glass Pane",
-          "love": false
-        },
-        {
-          "name": "Silver Ore",
-          "love": true
-        },
-        {
-          "name": "Veggie Chili",
-          "love": true
         }
       ]
     },
@@ -403,20 +187,8 @@
       "loc": "Kilima Tavern",
       "wants": [
         {
-          "name": "Wild Garlic",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "Ramen",
-          "love": false
-        },
-        {
-          "name": "Apple Jam",
-          "love": true
-        },
-        {
-          "name": "Fruit Smoothie Bowl",
-          "love": true
         }
       ]
     },
@@ -425,20 +197,8 @@
       "loc": "Blacksmith Shop",
       "wants": [
         {
-          "name": "Sardine",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "Elder Sernuk Antlers",
-          "love": false
-        },
-        {
-          "name": "Mossy Moth",
-          "love": true
-        },
-        {
-          "name": "Dispel Arrow",
-          "love": true
         }
       ]
     },
@@ -447,20 +207,8 @@
       "loc": "Inn Upstairs",
       "wants": [
         {
-          "name": "Wild Green Onion",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "Gold Ore",
-          "love": false
-        },
-        {
-          "name": "Hearty Vegetable Soup",
-          "love": true
-        },
-        {
-          "name": "Sushi",
-          "love": true
         }
       ]
     },
@@ -469,20 +217,8 @@
       "loc": "Bahari Woods",
       "wants": [
         {
-          "name": "Emerald Carpet Moss",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "Garden Millipede",
-          "love": false
-        },
-        {
-          "name": "Charged Cardinal",
-          "love": true
-        },
-        {
-          "name": "Shadvaraak Beetle",
-          "love": true
         }
       ]
     },
@@ -491,20 +227,8 @@
       "loc": "Village / Farm",
       "wants": [
         {
-          "name": "Muujin Meat",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "Duskwing Butterfly",
-          "love": false
-        },
-        {
-          "name": "Ogopuu Meat",
-          "love": true
-        },
-        {
-          "name": "Will-o-wisp Rockhopper",
-          "love": true
         }
       ]
     },
@@ -513,20 +237,8 @@
       "loc": "Temple of the Roots",
       "wants": [
         {
-          "name": "Knapweed",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "Glow Worm",
-          "love": false
-        },
-        {
-          "name": "Veil Piksii",
-          "love": true
-        },
-        {
-          "name": "Princess Ladybug",
-          "love": true
         }
       ]
     },
@@ -535,20 +247,8 @@
       "loc": "Furniture Store",
       "wants": [
         {
-          "name": "Sundrop Lily",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "Juniper Seed",
-          "love": false
-        },
-        {
-          "name": "Ashwood Plank",
-          "love": true
-        },
-        {
-          "name": "Jadium Bar",
-          "love": true
         }
       ]
     },
@@ -557,20 +257,8 @@
       "loc": "Bahari Bay",
       "wants": [
         {
-          "name": "Spicy Pepper",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "Blue Crab",
-          "love": false
-        },
-        {
-          "name": "Cloudfish",
-          "love": true
-        },
-        {
-          "name": "Crab Gumbo",
-          "love": true
         }
       ]
     },
@@ -579,20 +267,8 @@
       "loc": "General Store",
       "wants": [
         {
-          "name": "Silvery Minnow",
+          "name": "Use right column to edit.",
           "love": false
-        },
-        {
-          "name": "Golden Salmon",
-          "love": false
-        },
-        {
-          "name": "Green Anchovy",
-          "love": true
-        },
-        {
-          "name": "Dari Cloves",
-          "love": true
         }
       ]
     }
