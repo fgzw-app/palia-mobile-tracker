@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-09 20:14:11 UTC",
+  "updated_at": "2026-11-10 17:20:54 UTC",
   "week_id": "2026-W45",
   "villagers": [
     {
@@ -7,8 +7,20 @@
       "loc": "Kilima Tavern",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Channel Catfish",
           "love": false
+        },
+        {
+          "name": "Golden Salmon",
+          "love": false
+        },
+        {
+          "name": "Fish Stew",
+          "love": true
+        },
+        {
+          "name": "Lantern Ash Seed",
+          "love": true
         }
       ]
     },
@@ -17,8 +29,20 @@
       "loc": "Tavern / Fields",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Ship Fragments",
           "love": false
+        },
+        {
+          "name": "Proudhorned Stag Beetle",
+          "love": false
+        },
+        {
+          "name": "Jewelled Mantis",
+          "love": true
+        },
+        {
+          "name": "Apple Pie",
+          "love": true
         }
       ]
     },
