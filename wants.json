@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-11 17:31:24 UTC",
+  "updated_at": "2026-11-12 17:46:19 UTC",
   "week_id": "2026-W45",
   "villagers": [
     {
@@ -271,8 +271,20 @@
       "loc": "Tailor Shop",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Eyeless Minnow",
           "love": false
+        },
+        {
+          "name": "Albino Eel",
+          "love": false
+        },
+        {
+          "name": "Wisteria Tea",
+          "love": true
+        },
+        {
+          "name": "Midnight Paddlefish",
+          "love": true
         }
       ]
     },
@@ -303,8 +315,20 @@
       "loc": "Town Hall",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Wagon Wheel",
           "love": false
+        },
+        {
+          "name": "Striped Chapaa Tail",
+          "love": false
+        },
+        {
+          "name": "Pan Fried Dumplings",
+          "love": true
+        },
+        {
+          "name": "Palian Onion Soup",
+          "love": true
         }
       ]
     },
@@ -313,8 +337,20 @@
       "loc": "Town Hall / Stables",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Brushtail Dragonfly",
           "love": false
+        },
+        {
+          "name": "Creamy Carrot Soup",
+          "love": false
+        },
+        {
+          "name": "Kimchi Fried Rice",
+          "love": true
+        },
+        {
+          "name": "Bluebristle Muujin Mane",
+          "love": true
         }
       ]
     },
@@ -345,8 +381,20 @@
       "loc": "Bahari Workshop",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Wild Garlic",
           "love": false
+        },
+        {
+          "name": "Glass Pane",
+          "love": false
+        },
+        {
+          "name": "Charged Cardinal",
+          "love": true
+        },
+        {
+          "name": "Silver Bar",
+          "love": true
         }
       ]
     },
@@ -355,8 +403,20 @@
       "loc": "Kilima Tavern",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Yellow Perch",
           "love": false
+        },
+        {
+          "name": "Heat Root",
+          "love": false
+        },
+        {
+          "name": "Anch' 'n Grits",
+          "love": true
+        },
+        {
+          "name": "Rockhopper Pumpkin",
+          "love": true
         }
       ]
     },
@@ -365,8 +425,20 @@
       "loc": "Blacksmith Shop",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Steak Dinner",
           "love": false
+        },
+        {
+          "name": "Iron Ore",
+          "love": false
+        },
+        {
+          "name": "Turn Pike",
+          "love": true
+        },
+        {
+          "name": "Gold Ore",
+          "love": true
         }
       ]
     },
@@ -397,8 +469,20 @@
       "loc": "Bahari Woods",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Emerald Carpet Moss",
           "love": false
+        },
+        {
+          "name": "Lunar Fairy Moth",
+          "love": false
+        },
+        {
+          "name": "Pearl",
+          "love": true
+        },
+        {
+          "name": "Fairy Mantis",
+          "love": true
         }
       ]
     },
@@ -407,8 +491,20 @@
       "loc": "Village / Farm",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Trout Dinner",
           "love": false
+        },
+        {
+          "name": "Leather",
+          "love": false
+        },
+        {
+          "name": "Golden Salmon",
+          "love": true
+        },
+        {
+          "name": "Grilled Meat",
+          "love": true
         }
       ]
     },
@@ -439,8 +535,20 @@
       "loc": "Furniture Store",
       "wants": [
         {
-          "name": "Use right column to edit.",
+          "name": "Shell",
           "love": false
+        },
+        {
+          "name": "Samara",
+          "love": false
+        },
+        {
+          "name": "Ashwood Plank",
+          "love": true
+        },
+        {
+          "name": "Angelfish",
+          "love": true
         }
       ]
     },
